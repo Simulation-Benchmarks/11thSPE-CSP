@@ -1,3 +1,7 @@
+refinement_factor_base = 4000.0;
+DefineConstant[ refinement_factor = 1.0 ];
+refinement_factor = refinement_factor*refinement_factor_base;
+
 Include "spe11a.geo";
 
 lab_scale_bbox() = BoundingBox Surface{Surface{:}};
