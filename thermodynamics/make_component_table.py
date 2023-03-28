@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2023 Bernd Flemisch <bernd.flemisch@iws.uni-stuttgart.de>
+#
+# SPDX-License-Identifier: MIT
 #!/usr/bin/env python3
 
 """ Generate tables for component fluid properties.

@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2023 Dennis Gläser <dennis.glaeser@iws.uni-stuttgart.de>
+//
+// SPDX-License-Identifier: MIT
 DefineConstant[ refinement_factor = 1.0 ];
 
 cl__1 = 0.0125*refinement_factor;
