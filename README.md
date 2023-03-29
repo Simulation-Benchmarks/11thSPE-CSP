@@ -1,6 +1,6 @@
 # 11th SPE CSP
 
-This repository accompanies the 11th Society of Petroleum Engineers Comparative Solution Project, see https://spe.org/en/csp/.
+This repository accompanies the 11th Society of Petroleum Engineers Comparative Solution Project, see https://spe.org/csp/.
 
 Navigate to one of the following folders for accessing the corresponding material:
 
