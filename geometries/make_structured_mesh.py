@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2023 Dennis Gläser <dennis.glaeser@iws.uni-stuttgart.de>
+#
+# SPDX-License-Identifier: MIT
 """
 Generate a structured mesh in gmsh file format version 2 (.msh) for one of the SPE11 variant.
 This script is to be executed from the same folder in which the .geo files of the variants are.
