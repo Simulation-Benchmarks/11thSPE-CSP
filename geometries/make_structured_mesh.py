@@ -242,7 +242,7 @@ with open(msh_file_name, "w") as msh_file:
         {}
     """.format(len(physical_index_mapper.physical_groups(dim))).lstrip("\n")))
     msh_file.write("{}".format(
-        "\n".join(f'2 {tag} "{name}"'
+        "\n".join(f'{dim} {tag} "{name}"'
         for name, tag in physical_index_mapper.physical_groups(dim).items())
     ))
     msh_file.write(textwrap.dedent(f"""
