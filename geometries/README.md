@@ -1,6 +1,10 @@
 # SPE11 Geometry Files
 
 This folder contains geometry files for the SPE11 variants in the [gmsh](https://gmsh.info/) geometry format.
+__Note__: all files have been tested with `gmsh` version 4.11.1. In case you experience issues, consider upgrading
+your `gmsh` version. This may be required, in particular, for the Python scripts using the `gmsh` API (see below).
+
+
 You can open the geometry files with `gmsh`, or let it create a mesh directly via the command line with
 
 ```bash
