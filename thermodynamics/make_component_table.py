@@ -142,9 +142,14 @@ for i in range(cmdArgs["n_temp"]):
     viscosity *= 1e-6
     enthalpy = np.delete(values["Enthalpy_kJkg"], phaseBoundaryIndices)
     # transform unit (kJ/kg -> J/kg)
+
+    cv = np.delete(values["Cv_JgK"],phaseBoundaryIndices)
+    cp = np.delete(values["Cp_JgK"],phaseBoundaryIndices)
+    thermCond = np.delete(values["Therm_Cond_WmK"], phaseBoundaryIndices)
+    # transform unit (kJ/kg -> J/kg)
     enthalpy *= 1000
-
-    for p, rho, mu, h in zip(pressure, density, viscosity, enthalpy):
-        outFile.write(f" {temperature:.11e}, {p:.11e}, {rho:.11e}, {mu:.11e}, {h:.11e}\n")
-
+    cv *=1e-3
+    cp *=1e-3
+    for p, rho, mu, h, alpha, cev, cep in zip(pressure, density, viscosity, enthalpy,thermCond,cv,cp):
+        outFile.write(f"{temperature:.11e}, {p:.11e}, {rho:.11e}, {mu:.11e}, {h:.11e}, {alpha:.11e}, {cev:.11e}, {cep:.11e} \n")
 print(f"A file {fileName} has been generated.")
