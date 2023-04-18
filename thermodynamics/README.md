@@ -11,7 +11,7 @@ python3 ./make_component_table.py -c CO2 -t1 10 -t2 20 -nt 3 -p1 1e5 -p2 1.2e5 -
 ```
 for generating a table for CO2 properties in a temperature range [10, 20] °C with 3 sampling points and a pressure range [1e5, 1.2e5] Pa with 4 sampling points.
 
-Currently, the table contains density, viscosity and enthalpy values.
+Currently, the table contains density, viscosity, enthalpy, thermal conductivity, isochoric heat capacity and isobaric heat capacity values.
 
 ##  make_solubility_table.py
 
