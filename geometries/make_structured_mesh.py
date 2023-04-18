@@ -3,8 +3,9 @@
 # SPDX-License-Identifier: MIT
 """
 Generate a structured mesh in gmsh file format version 2 (.msh) for one of the SPE11 variant.
-This script is to be executed from the same folder in which the .geo files of the variants are.
+This script is to be executed from the same folder that contains the .geo files of the variants.
 """
+from __future__ import annotations
 
 import os
 import sys
@@ -12,12 +13,14 @@ import argparse
 import textwrap
 import typing
 import subprocess
+import itertools
 
 import gmsh
 
 from make_spe11c_geo import z_offset_at
 
 
+PHYSICAL_INDEX_SEAL = 7
 PHYSICAL_INDEX_OUTSIDE_OF_DOMAIN = 1000
 PHYSICAL_NAME_OUTSIDE_OF_DOMAIN = str(PHYSICAL_INDEX_OUTSIDE_OF_DOMAIN)
 
@@ -188,12 +191,74 @@ class PhysicalIndexMapper:
         return 2
 
 
+class FilteredLattice:
+    def __init__(self,
+                 lattice: StructuredLattice | FilteredLattice,
+                 physical_cell_indices: list[int],
+                 exclude_physical_index: int) -> None:
+        self._lattice = lattice
+        self._physical_cell_indices = physical_cell_indices
+        self._exclude_physical_index = exclude_physical_index
+        self._create_mappings()
+
+    @property
+    def number_of_cells(self) -> int:
+        return len(self._cells)
+
+    @property
+    def number_of_points(self) -> int:
+        return len(self._point_map_to_lattice)
+
+    @property
+    def cells(self) -> typing.Iterable:
+        return self._cells
+
+    @property
+    def points(self) -> list:
+        return self._points
+
+    def corners(self, cell: tuple) -> typing.Iterable:
+        return (self._point_map_from_lattice[p_idx] for p_idx in self._lattice.corners(cell))
+
+    @property
+    def physical_cell_indices(self) -> list:
+        return list(
+            self._physical_cell_indices[self._cell_index_map[i]]
+            for i in range(self.number_of_cells)
+        )
+
+    def _create_mappings(self) -> None:
+        self._cell_index_map = [i for i in range(self._lattice.number_of_cells) if self._is_included(i)]
+        self._cells = [cell for i, cell in enumerate(self._lattice.cells) if self._is_included(i)]
+        included_points = [False for _ in range(self._lattice.number_of_points)]
+        for i, cell in enumerate(self._lattice.cells):
+            if self._is_included(i):
+                for corner_idx in self._lattice.corners(cell):
+                    included_points[corner_idx] = True
+        self._point_map_from_lattice = list(itertools.accumulate(included_points, initial=0))[:-1]
+        self._point_map_to_lattice = [i for i in range(self._lattice.number_of_points) if included_points[i]]
+        self._points = [
+            self._lattice.points[self._point_map_to_lattice[i]]
+            for i in range(self.number_of_points)
+        ]
+
+    def _is_included(self, cell_index: int) -> bool:
+        return self._physical_cell_indices[cell_index] != self._exclude_physical_index
+
+
+
 parser = argparse.ArgumentParser(description="Create a structured gmsh grid for one of the SPE11 variants")
 parser.add_argument(
     "-v", "--variant",
     required=True,
     choices=["A", "B", "C"],
     help="Specify the variant for which to produce the grid"
+)
+parser.add_argument(
+    "-r", "--remove-cells-in-seal",
+    required=False,
+    action="store_true",
+    help="Remove all cells within the seal layers"
 )
 parser.add_argument("-nx", "--number-of-cells-x", required=True, help="Desired number of cells in x-direction")
 parser.add_argument("-ny", "--number-of-cells-y", required=True, help="Desired number of cells in y-direction")
@@ -218,18 +283,29 @@ gmsh_cell_type = (
 )
 
 physical_index_mapper = PhysicalIndexMapper(variant)
-lattice = StructuredLattice(*_get_bounding_box(gmsh.model), num_cells=num_cells)
+lattice: StructuredLattice | FilteredLattice = StructuredLattice(
+    *_get_bounding_box(gmsh.model),
+    num_cells=num_cells
+)
 num_cells_total = lattice.number_of_cells
 
 print("Determining physical groups for all cells")
-gmsh_cell_index = 1
-mesh_file_cell_entries = ["" for _ in range(num_cells_total)]
-for cell_count, cell in enumerate(lattice.cells):
-    print(f"Checking cell {cell_count} of {num_cells_total}", end="\r")
-    phys_index = physical_index_mapper.physical_index(lattice.center(cell))
-    mesh_file_cell_entries[gmsh_cell_index-1] = f"{gmsh_cell_index} {gmsh_cell_type} 2 {phys_index} {phys_index} "
-    mesh_file_cell_entries[gmsh_cell_index-1] += " ".join(str(i + 1) for i in lattice.corners(cell))
-    gmsh_cell_index += 1
+physical_cell_indices = [0 for _ in range(num_cells_total)]
+for cell_index, cell in enumerate(lattice.cells):
+    print(f"Checking cell {cell_index} of {num_cells_total}", end="\r")
+    physical_cell_indices[cell_index] = physical_index_mapper.physical_index(lattice.center(cell))
+
+print("Removing all cells outside of the domain")
+inside_lattice = FilteredLattice(lattice, physical_cell_indices, PHYSICAL_INDEX_OUTSIDE_OF_DOMAIN)
+inside_physical_cell_indices = inside_lattice.physical_cell_indices
+
+if args["remove_cells_in_seal"]:
+    print("Removing all cells in the seal layers")
+    filtered_lattice = FilteredLattice(inside_lattice, inside_physical_cell_indices, PHYSICAL_INDEX_SEAL)
+    filtered_physical_cell_indices = filtered_lattice.physical_cell_indices
+else:
+    filtered_lattice = inside_lattice
+    filtered_physical_cell_indices = inside_physical_cell_indices
 
 msh_file_name = os.path.splitext(_get_variant_geo_file(variant))[0] + "_structured.msh"
 print(f"Writing mesh file '{msh_file_name}'")
@@ -242,20 +318,24 @@ with open(msh_file_name, "w") as msh_file:
         {}
     """.format(len(physical_index_mapper.physical_groups(dim))).lstrip("\n")))
     msh_file.write("{}".format(
-        "\n".join(f'2 {tag} "{name}"'
+        "\n".join(f'{dim} {tag} "{name}"'
         for name, tag in physical_index_mapper.physical_groups(dim).items())
     ))
     msh_file.write(textwrap.dedent(f"""
         $EndPhysicalNames
         $Nodes
-        {lattice.number_of_points}
+        {filtered_lattice.number_of_points}
     """))
-    for count, p in enumerate(lattice.points):
+    for count, p in enumerate(filtered_lattice.points):
         msh_file.write(f"{count+1} {' '.join(str(c) for c in p)}\n".format())
     msh_file.write(textwrap.dedent(f"""
         $EndNodes
         $Elements
-        {len(mesh_file_cell_entries)}
-    """.lstrip("\n")))
-    msh_file.write("\n".join(mesh_file_cell_entries))
+        {filtered_lattice.number_of_cells}
+    """).lstrip("\n"))
+    for cell_index, cell in enumerate(filtered_lattice.cells):
+        phys_index = filtered_physical_cell_indices[cell_index]
+        msh_file.write(f"{cell_index+1} {gmsh_cell_type} 2 {phys_index} {phys_index} ")
+        msh_file.write(" ".join(str(i + 1) for i in filtered_lattice.corners(cell)))
+        msh_file.write("\n")
     msh_file.write("\n$EndElements")
