@@ -94,7 +94,7 @@ outFile.write("# The data has been obtained by querying the NIST Chemistry WebBo
 outFile.write("# Concerning temperature and pressure ranges, the following parameters have been used:\n")
 outFile.write(f"# min temperature = {minTemp}, max temperature = {maxTemp}, #temperature sampling points = {nTemp}\n")
 outFile.write(f"# min pressure = {minPress}, max pressure = {maxPress}, #pressure sampling points = {nPress}\n#\n")
-outFile.write("# temperature [°C],     pressure [Pa],   density [kg/m3],  viscosity [Pa.s],   enthalpy [J/kg]\n")
+outFile.write("# temperature [°C],     pressure [Pa],   density [kg/m3],  viscosity [Pa.s],   enthalpy [J/kg], thermal_conductivity [W/m.K], cv [J/kg.K], cp [J/kg.K]\n\n")
 
 # get the data
 for i in range(cmdArgs["n_temp"]):
