@@ -102,7 +102,7 @@ for i in range(cmdArgs["n_temp"]):
     query = {
         "Action": "Data",
         "Wide": "on",
-        "ID": "C7732185" if cmdArgs["comp_name"] == "H2O" else "C124389",
+        "ID": "C7732185" if cmdArgs["comp_name"].upper() == "H2O" else "C124389",
         "Type": "IsoTherm",
         "Digits": "12",
         "PLow": str(cmdArgs["min_press"]),
