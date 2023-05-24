@@ -82,7 +82,7 @@ if __name__ == "__main__":
     def _make_connecting_spline(source_tag: int, target_tag: int) -> tuple[int, list]:
         source = gmsh.model.getValue(0, source_tag, [])
         target = gmsh.model.getValue(0, target_tag, [])
-        assert abs(source[0] - target[0]) < 1e-6 \
+        assert abs(source[0] - target[0]) < 1e-8*SIZE_DOMAIN_Y \
             and abs(abs(source[2] - target[2]) - backside_dz) < 1e-6 \
             and "Unexpected geometric relation between front and back side points"
 
