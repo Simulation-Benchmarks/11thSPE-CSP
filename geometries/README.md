@@ -1,6 +1,10 @@
 # SPE11 Geometry Files
 
 This folder contains geometry files for the SPE11 variants in the [gmsh](https://gmsh.info/) geometry format.
+__Note__: all files have been tested with `gmsh` version 4.11.1. In case you experience issues, consider upgrading
+your `gmsh` version. This may be required, in particular, for the Python scripts using the `gmsh` API (see below).
+
+
 You can open the geometry files with `gmsh`, or let it create a mesh directly via the command line with
 
 ```bash
@@ -20,6 +24,11 @@ mesh file format, you will have to check if or how this information is forwarded
 
 ## SPE11-A (`spe11a.geo`)
 
+__Important__: the geometry is defined in the x-y plane, that is, all point coordinates are given in the form of `(x, y, 0.0)`.
+The description defines the geometry in the x-z plane (to be in agreement with variant C), however, we have chosen the x-y plane
+here in order to facilitate the parsing of two-dimensional meshes created with this geometry file.
+
+
 This file contains the geometry of the SPE11 variant A. At the beginning of the file you can see a large list of mesh size
 definitions around individual points of the geometry. You can modify these individually to achieve the desired mesh,
 or, you can conveniently scale all mesh sizes with the provided command-line argument `refinement_factor`. That is, in
@@ -31,6 +40,9 @@ gmsh -2 spe11a.geo -setnumber refinement_factor 2.0
 ```
 
 ## SPE11-B (`spe11b.geo`)
+
+__Important__: as for variant A, the geometry is defined in the x-y plane, while the description defines the geometry in the
+x-z plane in order to be in agreement with variant C. See the above section for more details.
 
 This file contains the geometry of the SPE11 variant B. Internally, it reuses `spe11a.geo` and scales it to the required
 dimensions. The default mesh sizes of `spe11a.geo` are also scaled in order to fit to the extended domain sizes. However,
@@ -59,6 +71,9 @@ python3 make_spe11c_geo.py --mesh-size 250
 
 ## Structured grid generation (`make_structured_mesh.py`)
 
+__Important__: for the variants A & B, keep in mind that the geometries are defined in the x-y plane instead of the x-z plane
+used in the description. See the above sections for more details.
+
 If you need a structured mesh for your simulator, you may use this script to generate a `.msh` file containing a structured mesh
 including the facies indices that all elements of the mesh belong to. The script takes the SPE variant and the resolution as
 runtime arguments. That is, to generate structured meshes for all three variants, you can use the script in the following way:
@@ -72,4 +87,5 @@ python3 make_structured_mesh.py --variant B -nx 200 -ny 200
 python3 make_structured_mesh.py --variant C -nx 200 -ny 200 -nz 200
 ```
 
-Note that this script also requires the Python API of `gmsh`.
+Note that this script also requires the Python API of `gmsh`. Furthermore, passing the flag `--remove-cells-in-seal` creates
+mesh files in which the cells in the seal layers are removed.
