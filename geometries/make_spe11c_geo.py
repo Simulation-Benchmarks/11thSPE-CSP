@@ -5,6 +5,7 @@ from math import pi
 from argparse import ArgumentParser
 import gmsh
 
+SIZE_DOMAIN_Y = 5000.0
 
 def z_offset_at(y: float) -> float:
     """
@@ -13,7 +14,7 @@ def z_offset_at(y: float) -> float:
     y-coordinate in the reference space.
     """
     f = (y - 2500.0)/2500.0
-    return 150.0*(1.0 - f*f)
+    return 150.0*(1.0 - f*f) + 10.0*y/SIZE_DOMAIN_Y
 
 
 if __name__ == "__main__":
@@ -72,18 +73,18 @@ if __name__ == "__main__":
     )
 
     print("Copying Surfaces to the back of the domain")
-    size_domain_y = 5000.0
     gmsh.model.occ.synchronize()
     frontside_surface_tags = gmsh.model.getEntities(dim=2)
     backside_surface_tags = gmsh.model.occ.copy(frontside_surface_tags)
-    gmsh.model.occ.translate(backside_surface_tags, dx=0.0, dy=size_domain_y, dz=0.0)
+    backside_dz = z_offset_at(SIZE_DOMAIN_Y)
+    gmsh.model.occ.translate(backside_surface_tags, dx=0.0, dy=SIZE_DOMAIN_Y, dz=backside_dz)
 
     def _make_connecting_spline(source_tag: int, target_tag: int) -> tuple[int, list]:
         source = gmsh.model.getValue(0, source_tag, [])
         target = gmsh.model.getValue(0, target_tag, [])
-        assert abs(source[0] - target[0]) < 1e-6 \
-            and abs(source[2] - target[2]) < 1e-6 \
-            and "Expecting source and target to have only differing y coordinates"
+        assert abs(source[0] - target[0]) < 1e-8*SIZE_DOMAIN_Y \
+            and abs(abs(source[2] - target[2]) - backside_dz) < 1e-8*SIZE_DOMAIN_Y \
+            and "Unexpected geometric relation between front and back side points"
 
         extrusion_length = 5000.0
         num_support_points = 10
