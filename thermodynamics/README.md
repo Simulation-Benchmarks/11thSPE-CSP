@@ -1,6 +1,8 @@
 # Thermodynamics
 
-The two scripts located in this folder create tables for the pure phase properties and solubilities.
+The two Python scripts located in this folder create CSV tables for the pure phase properties and solubilities.
+
+In addition, a MATLAB/Octave script can be used to generate Eclipse-type tables from the CSV files.
 
 ## make_component_table.py
 
@@ -19,3 +21,7 @@ The script implements the formulas for the solubility from [Spycher et al. 2003]
 ```bash
 python3 ./make_solubility_table.py -t1 10 -t2 20 -nt 3 -p1 1e5 -p2 1.2e5 -np 4
 ```
+
+## make_ecl_tables.m
+
+Convert the results from the above into Eclipse-type keywords. Limited to isothermal tables at the moment.
