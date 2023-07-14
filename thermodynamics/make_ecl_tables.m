@@ -1,3 +1,7 @@
+% SPDX-FileCopyrightText: 2023 Olav Møyner <Olav.Moyner@sintef.no>
+%
+% SPDX-License-Identifier: MIT
+%
 % This file should be run from the folder where you store your outputs from
 % the python scripts (make_component_table / make_solubility_table).
 Atm = 101325.0;
