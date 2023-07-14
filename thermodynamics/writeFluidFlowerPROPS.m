@@ -1,3 +1,6 @@
+% SPDX-FileCopyrightText: 2023 Olav Møyner <Olav.Moyner@sintef.no>
+%
+% SPDX-License-Identifier: MIT
 function writeFluidFlowerPROPS(tab_h2o, tab_co2, tab_sol, varargin)
     % Write FluidFlower properties as black oil tables.
     % Written by Olav Møyner. Copyright SINTEF AS (2023).
