@@ -1,3 +1,6 @@
+% SPDX-FileCopyrightText: 2023 Olav Møyner <Olav.Moyner@sintef.no>
+%
+% SPDX-License-Identifier: MIT
 function writeFluidFlowerSGOF(varargin)
     % Write fluid flower SGOF table.
     % Written by Olav Møyner. Copyright SINTEF AS (2023).
