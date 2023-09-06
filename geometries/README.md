@@ -93,13 +93,13 @@ mesh files in which the cells in the seal layers are removed.
 
 ## Extrusion of 2D meshes to one cell thick 3D meshes
 
-In order to extrude 2D generated meshes to ne cell thick 3D VTK 
-version for simulator that are not accepting such 2D meshes, a python tool `extrude_and_rotate.py` is added.
+The script `extrude_and_rotate.py` can be used to extrude 2D generated meshes to one cell thick 3D vtk
+versions for simulators that are not accepting such 2D meshes, .
 
-Leveraging [vtk](https://pypi.org/project/vtk/), it reads from [gmsh](https://gmsh.info/) generated `vtk` mesh, extrude them 
-with one cell in the 3rd dimension and rotate them in the x-z plane.
+Leveraging [vtk](https://pypi.org/project/vtk/), it reads from a [gmsh](https://gmsh.info/) generated `vtk` mesh, extrudes it 
+with one cell in the 3rd dimension and rotates it in the x-z plane.
 
-__Important__: The script is not detecting either if it is a structured mesh (based on *quad* element) or unstructured 
+__Important__: The script is not detecting either if it is a structured mesh (based on *quads*) or unstructured
 (based on *triangles*), so we have to provide it with the explicit option `--quad` or `--tri`.
 
 The full procedure is then, for instance for spe11-a:
@@ -111,12 +111,12 @@ python3 extrude_and_rotate.py --tri --spe a spe11a.vtk
 rm -iv spe11a.vtk 
 ```
 
-This should produce a `spe11a_extruded.vtu` that can be inspected with [paraview](https://www.paraview.org/) or an other
+This should produce a file `spe11a_extruded.vtu` that can be inspected with [paraview](https://www.paraview.org/) or another
 vtk enabled 3D reader. The cell data of porosity and permeability are tagged as _PORO_ and _PERM_ in this output. The facies labels
 are registered under _attribute_.
 
 An additional option exists for applying pore-volume modification for case spe11-b. Then the altered procedure, starting this time from
-the structured mesh is:
+a structured mesh is:
 
 ```bash
 python3 make_structured_mesh.py --variant B -nx 300 -ny 100
@@ -128,8 +128,8 @@ rm -iv spe11b_structured.vtu spe11b_structured.msh
 __Note__: In this last case we use [meshio](https://pypi.org/project/meshio/2.3.5/) to convert
 to **vtu** format (not vtk).
 
-__Note__: Though valid the option `--poromult` will have no effect on spe11-a case.
+__Note__: Though valid, the option `--poromult` will have no effect on spe11-a case.
 
-The file `spe11b_structured_extruded.vtu` should be produce and can be inspected using [paraview](https://www.paraview.org/) or an other
+The file `spe11b_structured_extruded.vtu` should be produced and can be inspected using [paraview](https://www.paraview.org/) or another
 vtk enabled 3D reader.
 
