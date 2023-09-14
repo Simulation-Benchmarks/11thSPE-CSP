@@ -37,7 +37,7 @@ class spe11_preprocessing:
         self.xb = [0, 2.8]
         self.is_aniso = False
 
-        if spe[0] == "b" or spe[0] == "c":
+        if (spe[0] == "b" or spe[0] == "B") or (spe[0] == "c" or spe[0] == "C"):
             self.perm = [1e-16, 1e-13, 2e-13, 5e-13, 1e-12, 2e-12, 1e-18]  # 7th is 0 by specs
             self.poro = [.1, .2, .2, .2, .25, .35, .0000001]  # ditto
             self.multipliers = [0., 5e4, 0., 0., 5e4, 0., 0.]
@@ -131,7 +131,7 @@ class spe11_preprocessing:
 
                 if pe0[0] == pe1[0] and (
                         np.abs(self.xb[0] - pe0[0]) < eps or np.abs(self.xb[1] - pe0[0]) < eps or np.abs(
-                        self.xb[0] - pe1[0]) < eps or np.abs(self.xb[1] - pe1[0]) < eps):
+                    self.xb[0] - pe1[0]) < eps or np.abs(self.xb[1] - pe1[0]) < eps):
                     area = np.max(np.abs(np.asarray([pe1[1] - pe0[1],
                                                      pe1[2] - pe0[2]])))
                     if g.GetCell(i).GetCellType() == vtk.VTK_TRIANGLE:
