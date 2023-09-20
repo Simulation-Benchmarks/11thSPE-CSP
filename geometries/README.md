@@ -69,7 +69,7 @@ python3 make_spe11c_geo.py --mesh-size 250
 ```
 
 
-## Structured grid generation (`make_structured_mesh.py`)
+## Structured grid generation (`make_structured_mesh.py -nx [nb_block_x] -ny [nb_block_y] [-nz [nb_block_z]]`)
 
 __Important__: for the variants A & B, keep in mind that the geometries are defined in the x-y plane instead of the x-z plane
 used in the description. See the above sections for more details.
@@ -89,3 +89,23 @@ python3 make_structured_mesh.py --variant C -nx 200 -ny 200 -nz 200
 
 Note that this script also requires the Python API of `gmsh`. Furthermore, passing the flag `--remove-cells-in-seal` creates
 mesh files in which the cells in the seal layers are removed.
+
+
+### Adapted structured grid generation (`make_structured_mesh.py -rax [percent_of_domain_x nb_block_local_x ...] -ray [percent_of_domain_y nb_block_local_y ...]`)
+
+In addition to regular cartesian grid, an option (`--range-x or -rax`, `--range-y or -ray`) is added to generated block wise 
+refined grids. To be agnostic of real case dimensions, the upper bound of the block to be discretized is specified as a percent
+of the total length (either _Lx_ or _Ly_ for `-rax` or `-ray`). It is followed by the number of cell along this axe for this block.
+
+The following command then generate a 300x200 mesh for case SPE11 variant A with 100 cells in x on the first half of _Lx_ (for variant A, _i.e._ _dx_ = 0.0125m) 
+and 200 cells in x on the second half of the domain (for variant A, _i.e._ _dx_ = 0.006125m). Along the y-axis, a regular spacing resulting in 200 cells is input.
+
+```bash
+# generate a [100 200]x200 mesh for variant A in the file spe11a_structured.msh
+python3 make_structured_mesh.py --variant A -rax .5 100 1. 200 -ray 1. 200
+```
+
+__Note__ : `-rax` and `-ray` must be specified and it is not possible to mix and match with regular options `-nx,-ny,-nz`.
+__Note__ : There is no such adaptation on the z-axis currently, _i.e._ SPE11 variant C is not accessible through this option. 
+
+
