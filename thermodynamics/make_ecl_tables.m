@@ -7,7 +7,7 @@
 Atm = 101325.0;
 Bar = 1e5;
 np = 50; % Number of pressure points
-p_min = 1*Atm;
+p_min = 1e-3*Atm; % Tiny value to make sure that the table is safe to extrapolate a bit
 p_max = 2.5*Bar;
 T = 20; % C
 
