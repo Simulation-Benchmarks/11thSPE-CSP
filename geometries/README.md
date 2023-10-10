@@ -53,7 +53,7 @@ you can still scale the default mesh size with a runtime argument:
 gmsh -2 spe11b.geo -setnumber refinement_factor 2.0
 ```
 
-## SPE11-C (`make_spe11c.geo`)
+## SPE11-C (`make_spe11c.py`)
 
 This is a generator script for producing the geometry of the SPE11 variant C. It makes use of the Python API of `gmsh`, and thus,
 you need to have `python` and the `gmsh` Python package available. The latter can simply be installed via `pip` with
@@ -89,3 +89,47 @@ python3 make_structured_mesh.py --variant C -nx 200 -ny 200 -nz 200
 
 Note that this script also requires the Python API of `gmsh`. Furthermore, passing the flag `--remove-cells-in-seal` creates
 mesh files in which the cells in the seal layers are removed.
+
+
+## Extrusion of 2D meshes to one cell thick 3D meshes
+
+The script `extrude_and_rotate.py` can be used to extrude 2D generated meshes to one cell thick 3D vtk
+versions for simulators that are not accepting such 2D meshes, .
+
+Leveraging [vtk](https://pypi.org/project/vtk/), it reads from a [gmsh](https://gmsh.info/) generated `vtk` mesh, extrudes it 
+with one cell in the 3rd dimension and rotates it in the x-z plane.
+
+__Important__: The script is not detecting either if it is a structured mesh (based on *quads*) or unstructured
+(based on *triangles*), so we have to provide it with the explicit option `--quad` or `--tri`.
+
+The full procedure is then, for instance for spe11-a:
+
+```bash
+gmsh -2 spe11a.geo -format vtk
+python3 extrude_and_rotate.py --tri --spe a spe11a.vtk
+#optionally some clean up
+rm -iv spe11a.vtk 
+```
+
+This should produce a file `spe11a_extruded.vtu` that can be inspected with [paraview](https://www.paraview.org/) or another
+vtk enabled 3D reader. The cell data of porosity and permeability are tagged as _PORO_ and _PERM_ in this output. The facies labels
+are registered under _attribute_.
+
+An additional option exists for applying pore-volume modification for case spe11-b. Then the altered procedure, starting this time from
+a structured mesh is:
+
+```bash
+python3 make_structured_mesh.py --variant B -nx 300 -ny 100
+meshio convert spe11b_structured.msh spe11b_structured.vtu
+python3 extrude_and_rotate.py --quad --poromult --spe b spe11b_structured.vtu
+#optionally some clean up
+rm -iv spe11b_structured.vtu spe11b_structured.msh
+```
+__Note__: In this last case we use [meshio](https://pypi.org/project/meshio/2.3.5/) to convert
+to **vtu** format (not vtk).
+
+__Note__: Though valid, the option `--poromult` will have no effect on spe11-a case.
+
+The file `spe11b_structured_extruded.vtu` should be produced and can be inspected using [paraview](https://www.paraview.org/) or another
+vtk enabled 3D reader.
+
