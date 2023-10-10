@@ -53,7 +53,7 @@ you can still scale the default mesh size with a runtime argument:
 gmsh -2 spe11b.geo -setnumber refinement_factor 2.0
 ```
 
-## SPE11-C (`make_spe11c.geo`)
+## SPE11-C (`make_spe11c.py`)
 
 This is a generator script for producing the geometry of the SPE11 variant C. It makes use of the Python API of `gmsh`, and thus,
 you need to have `python` and the `gmsh` Python package available. The latter can simply be installed via `pip` with
