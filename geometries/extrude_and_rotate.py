@@ -63,6 +63,7 @@ class spe11_preprocessing:
 
         self.precompute_fictive_volume_ration(g)
         (g, g3) = callback(g, g3, self.geom_off, self.depth_off)
+        self.build_global_ids(g3,True,True)
 
         writer = vtk.vtkXMLUnstructuredGridWriter()
         writer.SetFileName(fname.split('.')[0] + '_extruded.vtu')
@@ -154,6 +155,28 @@ class spe11_preprocessing:
                     self.modlist.append(i)
                     self.ratio[i] = area / vc
 
+    def build_global_ids(self,mesh, generate_cells_global_ids, generate_points_global_ids):
+        # First for points...
+        if mesh.GetPointData().GetGlobalIds():
+            print("Mesh already has globals ids for points; nothing done.")
+        elif generate_points_global_ids:
+            point_global_ids = vtk.vtkIdTypeArray()
+            point_global_ids.SetName("GLOBAL_IDS_POINTS")
+            point_global_ids.Allocate(mesh.GetNumberOfPoints())
+            for i in range(mesh.GetNumberOfPoints()):
+                point_global_ids.InsertNextValue(i)
+            mesh.GetPointData().SetGlobalIds(point_global_ids)
+        # ... then for cells.
+        if mesh.GetCellData().GetGlobalIds():
+            print("Mesh already has globals ids for cells; nothing done.")
+        elif generate_cells_global_ids:
+            cells_global_ids = vtk.vtkIdTypeArray()
+            cells_global_ids.SetName("GLOBAL_IDS_CELLS")
+            cells_global_ids.Allocate(mesh.GetNumberOfCells())
+            for i in range(mesh.GetNumberOfCells()):
+                cells_global_ids.InsertNextValue(i)
+            mesh.GetCellData().SetGlobalIds(cells_global_ids)
+
     # note do also swap y<->z
     def quad_mesh(self, poromult, g, g3, geom_off, depth_off):
         off = g.GetNumberOfPoints()
@@ -199,6 +222,17 @@ class spe11_preprocessing:
             poro_array = vtk.vtkFloatArray()
             poro_array.SetName("PORO")
 
+            vol_array = vtk.vtkFloatArray()
+            vol_array.SetName("VOLUME")
+
+            cellSizes = vtk.vtkCellSizeFilter()
+            cellSizes.SetInputData(g3)
+            cellSizes.ComputeVolumeOn()
+            cellSizes.Update()
+            cellSizesOutput = cellSizes.GetOutput()
+            vol = cellSizesOutput.GetCellData().GetArray("Volume") #Volume
+
+
             if g.GetCellData().GetArray(i).GetName() == former_tag:
                 array.SetName("attribute")
                 for j in range(g.GetCellData().GetArray(i).GetNumberOfTuples()):
@@ -209,10 +243,13 @@ class spe11_preprocessing:
                         perm_array.InsertNextTuple3(self.perm[attribute - 1], self.perm[attribute - 1],
                                                     (0.1 if self.is_aniso else 1.) * self.perm[
                                                         attribute - 1])  # C-numbering
+                        poro_array.InsertNextValue(self.poro[attribute - 1])  # C-numbering
+
+
                         if j not in self.modlist or not poromult:
-                            poro_array.InsertNextValue(self.poro[attribute - 1])  # C-numbering
+                            vol_array.InsertNextValue(vol.GetValue(j))  # C-numbering
                         else:
-                            poro_array.InsertNextValue(self.poro[attribute - 1] * (
+                            vol_array.InsertNextValue(vol.GetValue(j) * (
                                     1 + self.multipliers[attribute - 1] * self.ratio[j]))  # C-numbering
                     # gmsh generated triangle meshes still have line element, so have to skip them or flag them
                     elif g.GetCell(j).GetCellType() in [vtk.VTK_LINE]:
@@ -223,6 +260,7 @@ class spe11_preprocessing:
                 g3.GetCellData().AddArray(array)
                 g3.GetCellData().AddArray(perm_array)
                 g3.GetCellData().AddArray(poro_array)
+                g3.GetCellData().AddArray(vol_array)
 
     def paint_only(self, fname, poromult, former_tag):
         extension = fname.split('.')[-1]
