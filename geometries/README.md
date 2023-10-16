@@ -102,6 +102,7 @@ and 200 cells in x on the second half of the domain (for variant A, _i.e._ _dx_ 
 ```bash
 # generate a [100 200]x200 mesh for variant A in the file spe11a_structured.msh
 python3 make_structured_mesh.py --variant A -rax .5 100 1. 200 -ray 1. 200
+python3 make_structured_mesh.py --variant B -rax 0.1 10 0.5 10 1. 15 -ray .1 15 .6 20 .8 10 1. 20
 ```
 
 __Note__ : `-rax` and `-ray` must be specified and it is not possible to mix and match with regular options `-nx,-ny,-nz`.

@@ -29,7 +29,7 @@ PHYSICAL_NAME_OUTSIDE_OF_DOMAIN = str(PHYSICAL_INDEX_OUTSIDE_OF_DOMAIN)
 def _merge_duplicates(vreal):
     """
         unique vector of real normalized up to a tolerance
-    :param vreal: vector of non dimensional disctreization ticks between 0 and 1
+    :param vreal: vector of non dimensional discreization ticks between 0 and 1
     :return: vector with filtered out duplicates
     """
     eps = 1e-5
@@ -324,12 +324,12 @@ elif (args['number_of_cells_x'] is None and args['number_of_cells_x'] is None) a
     eps = .00001
     for i in range(0, len(args['range_x']), 2):
         if i == 0:
-            _tmp = np.arange(0, args['range_x'][0] + eps, args['range_x'][0] / args['range_x'][1])
+            _tmpx = np.arange(0, args['range_x'][0] + eps, args['range_x'][0] / args['range_x'][1])
         else:
             _step = (args['range_x'][i] - args['range_x'][i - 2]) / args['range_x'][i + 1]
-            _tmp = np.concatenate((_tmp, np.arange(_tmp[-1] + _step, args['range_x'][i] + eps, _step)))
+            _tmpx = np.concatenate((_tmpx, np.arange(_tmpx[-1] + _step, args['range_x'][i] + eps, _step)))
 
-        print(_tmp[-1], " -- ", args['range_x'][i])
+        print(_tmpx[-1], " -- ", args['range_x'][i])
         # assert (np.abs(_tmp[-1] - args['range_x'][i]) < .01 * eps)
 
     for i in range(0, len(args['range_y']), 2):
@@ -337,12 +337,12 @@ elif (args['number_of_cells_x'] is None and args['number_of_cells_x'] is None) a
             _tmpy = np.arange(0, args['range_y'][0] + eps, args['range_y'][0] / args['range_y'][1])
         else:
             _step = (args['range_y'][i] - args['range_y'][i - 2]) / args['range_y'][i + 1]
-            _tmpy = np.concatenate((_tmp, np.arange(_tmp[-1] + _step, args['range_y'][i] + eps, _step)))
+            _tmpy = np.concatenate((_tmpy, np.arange(_tmpy[-1] + _step, args['range_y'][i] + eps, _step)))
 
         print(_tmpy[-1], " -- ", args['range_y'][i])
         # assert (np.abs(_tmpy[-1] - args['range_y'][i]) < .01 * eps)
 
-    mask = [_merge_duplicates(_tmp), _merge_duplicates(_tmpy), [0.]]
+    mask = [_merge_duplicates(_tmpx), _merge_duplicates(_tmpy), [0.]]
     num_cells = (len(mask[0]) - 1, len(mask[1]) - 1)
 else:
     raise NotImplementedError
