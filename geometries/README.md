@@ -133,3 +133,32 @@ __Note__: Though valid, the option `--poromult` will have no effect on spe11-a c
 The file `spe11b_structured_extruded.vtu` should be produced and can be inspected using [paraview](https://www.paraview.org/) or another
 vtk enabled 3D reader.
 
+## Properties painting on meshes
+
+While `extrude_and_rotate.py` mentioned above work on the 2D generated meshes to extrude them _and_
+paint on them porosities and permeabilities, it also can work as a simple properties painting operation
+while using the `--paint` option on 2D meshes for *spe11a* and *spe11b* and on the 3D generated version
+of *spe11c* (as it does not require any extrusion).
+
+```bash
+gmsh -2 spe11b.geo
+meshio convert spe11b.msh spe11b.vtk
+python3 extrude_and_rotate.py --tri --paint --spe b spe11b.vtk
+#optionally some clean up
+rm -iv spe11b.vtk spe11b.msh
+```
+
+It will then generate an `spe11b_structured_painted.vtu`. In the case of *spe11c*
+the script act likewise.
+
+```bash
+python3 make_spe11c_geo.py --mesh-size 250
+python3 make_structured_mesh.py --variant C -nx 300 -ny 10 -nz 100
+meshio convert spe11c_structured.msh spe11c_structured.vtu
+python3 extrude_and_rotate.py --quad --paint --spe c spe11c_structured.vtu
+#optionally some clean up
+rm -iv spe11c_structured.vtu spe11c_structured.msh
+```
+
+__Note__ : The painted permeabilities on *spe11c* are the permeabilites from *spe11b* and 
+not the permeabilities transformed by Eq.(4.4)
