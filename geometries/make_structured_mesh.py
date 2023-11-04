@@ -16,13 +16,26 @@ import subprocess
 import itertools
 
 import gmsh
+import numpy as np
 
 from make_spe11c_geo import z_offset_at
 
-
+TOP_INDEX_SEAL = 8
 PHYSICAL_INDEX_SEAL = 7
 PHYSICAL_INDEX_OUTSIDE_OF_DOMAIN = 1000
 PHYSICAL_NAME_OUTSIDE_OF_DOMAIN = str(PHYSICAL_INDEX_OUTSIDE_OF_DOMAIN)
+
+
+def _merge_duplicates(vreal):
+    """
+        unique vector of real normalized up to a tolerance
+    :param vreal: vector of non dimensional discreization ticks between 0 and 1
+    :return: vector with filtered out duplicates
+    """
+    eps = 1e-5
+    dx = np.abs(np.diff(vreal / np.max(vreal)))
+    i = np.where(dx < eps)
+    return np.delete(vreal, i)
 
 
 def _is_in_bbox(position, min, max) -> bool:
@@ -39,16 +52,39 @@ def _get_variant_geo_file(variant: str) -> str:
 
 
 class StructuredLattice:
-    def __init__(self, min: tuple, max: tuple, num_cells: tuple) -> None:
+    def __init__(self, min: tuple, max: tuple, num_cells: tuple, mask: list) -> None:
+
+        if len(mask):
+            self._init_adapted(min, max, num_cells, mask)
+        else:
+            self._init_regular(min, max, num_cells)
+
+    def _init_regular(self, min: tuple, max: tuple, num_cells: tuple) -> None:
         self._num_cells = num_cells
         self._dim = len(num_cells)
-        self._dx = [(max[i] - min[i])/float(num_cells[i]) for i in range(self._dim)]
+        self._dx = [(max[i] - min[i]) / float(num_cells[i]) for i in range(self._dim)]
         self._points = [
             (
-                min[0] + i*self._dx[0],
-                min[1] + j*self._dx[1],
-                min[2] + k*(self._dx[2] if self._dim == 3 else 0.0)
+                min[0] + i * self._dx[0],
+                min[1] + j * self._dx[1],
+                min[2] + k * (self._dx[2] if self._dim == 3 else 0.0)
             )
+            for k in range(num_cells[2] + 1 if self._dim == 3 else 1)
+            for j in range(num_cells[1] + 1)
+            for i in range(num_cells[0] + 1)
+        ]
+
+    def _init_adapted(self, _min: tuple, _max: tuple, num_cells: tuple, mask: list) -> None:
+        self._num_cells = num_cells
+        self._dim = len(num_cells)
+        self._dx = [[(_max[i] - _min[i]) * mask[i][j] for j in range(len(mask[i]))] for i in range(self._dim)]
+        self._points = [
+            (
+                _min[0] + self._dx[0][i],
+                _min[1] + self._dx[1][j],
+                _min[2] + (self._dx[2][k] if self._dim == 3 else 0.0)
+            )
+
             for k in range(num_cells[2] + 1 if self._dim == 3 else 1)
             for j in range(num_cells[1] + 1)
             for i in range(num_cells[0] + 1)
@@ -56,17 +92,17 @@ class StructuredLattice:
 
     @property
     def number_of_points(self) -> int:
-        points = (self._num_cells[0]+1)*(self._num_cells[1]+1)
+        points = (self._num_cells[0] + 1) * (self._num_cells[1] + 1)
         if self._dim == 2:
             return points
-        return points*(self._num_cells[2]+1)
+        return points * (self._num_cells[2] + 1)
 
     @property
     def number_of_cells(self) -> int:
-        cells = self._num_cells[0]*self._num_cells[1]
+        cells = self._num_cells[0] * self._num_cells[1]
         if self._dim == 2:
             return cells
-        return cells*self._num_cells[2]
+        return cells * self._num_cells[2]
 
     @property
     def points(self) -> list:
@@ -91,13 +127,13 @@ class StructuredLattice:
             )
 
         if self._dim == 2:
-            p0 = cell[1]*(num_cells[0] + 1) + cell[0]
+            p0 = cell[1] * (num_cells[0] + 1) + cell[0]
             return _get_quad_corners(p0)
 
         x, y, z = cell
         nx, ny = num_cells[0], num_cells[1]
-        z_layer_offset = (nx+1)*(ny+1)
-        p0 = z*z_layer_offset + y*(nx + 1) + x
+        z_layer_offset = (nx + 1) * (ny + 1)
+        p0 = z * z_layer_offset + y * (nx + 1) + x
         return _get_quad_corners(p0) + _get_quad_corners(p0 + z_layer_offset)
 
     def center(self, cell: tuple) -> tuple:
@@ -108,7 +144,7 @@ class StructuredLattice:
                 result[i] + self._points[pidx][i]
                 for i in range(self._dim)
             ])
-        return tuple([(result[i]/len(corners) if i < self._dim else 0.0) for i in range(3)])
+        return tuple([(result[i] / len(corners) if i < self._dim else 0.0) for i in range(3)])
 
 
 class PhysicalIndexMapper:
@@ -159,7 +195,6 @@ class PhysicalIndexMapper:
         if self._variant == "C":
             gmsh.model.setCurrent(self._model_name)
         return result
-
 
     def _project_to_model_for_index_queries(self, position: tuple) -> tuple:
         if self._variant == "C":
@@ -246,7 +281,6 @@ class FilteredLattice:
         return self._physical_cell_indices[cell_index] != self._exclude_physical_index
 
 
-
 parser = argparse.ArgumentParser(description="Create a structured gmsh grid for one of the SPE11 variants")
 parser.add_argument(
     "-v", "--variant",
@@ -260,9 +294,16 @@ parser.add_argument(
     action="store_true",
     help="Remove all cells within the seal layers"
 )
-parser.add_argument("-nx", "--number-of-cells-x", required=True, help="Desired number of cells in x-direction")
-parser.add_argument("-ny", "--number-of-cells-y", required=True, help="Desired number of cells in y-direction")
+
+parser.add_argument("-nx", "--number-of-cells-x", required=False, help="Desired number of cells in x-direction")
+parser.add_argument("-ny", "--number-of-cells-y", required=False, help="Desired number of cells in y-direction")
 parser.add_argument("-nz", "--number-of-cells-z", required=False, help="Desired number of cells in z-direction")
+
+parser.add_argument("-rax", "--range_x", required=False, nargs='+', type=float,
+                    help="Desired mask in x for non uniform spacing in a sequence of [ percent-of-domain desired_num_cell_x ... ]")
+parser.add_argument("-ray", "--range_y", required=False, nargs='+', type=float,
+                    help="Desired mask in y for non uniform spacing in a sequence of [ percent-of-domain desired_num_cell_y ... ]")
+
 args = vars(parser.parse_args())
 
 variant = args["variant"]
@@ -275,18 +316,60 @@ if variant == "C":
         subprocess.run(["python3", "make_spe11c_geo.py", "-s", "100"], check=True)
         assert os.path.exists(_get_variant_geo_file(variant))
 
-num_cells = tuple([int(args[f"number_of_cells_{['x', 'y', 'z'][i]}"]) for i in range(dim)])
+if (args['number_of_cells_x'] is not None and args['number_of_cells_x'] is not None) and (
+        args['range_x'] is None and args['range_y'] is None):
+    num_cells = tuple([int(args[f"number_of_cells_{['x', 'y', 'z'][i]}"]) for i in range(dim)])
+elif (args['number_of_cells_x'] is None and args['number_of_cells_x'] is None) and (
+        args['range_x'] is not None and args['range_y'] is not None):
+    eps = .00001
+    for i in range(0, len(args['range_x']), 2):
+        if i == 0:
+            _tmpx = np.arange(0, args['range_x'][0] + eps, args['range_x'][0] / args['range_x'][1])
+        else:
+            _step = (args['range_x'][i] - args['range_x'][i - 2]) / args['range_x'][i + 1]
+            _tmpx = np.concatenate((_tmpx, np.arange(_tmpx[-1] + _step, args['range_x'][i] + eps, _step)))
+
+        print(_tmpx[-1], " -- ", args['range_x'][i])
+        # assert (np.abs(_tmp[-1] - args['range_x'][i]) < .01 * eps)
+
+    for i in range(0, len(args['range_y']), 2):
+        if i == 0:
+            _tmpy = np.arange(0, args['range_y'][0] + eps, args['range_y'][0] / args['range_y'][1])
+        else:
+            _step = (args['range_y'][i] - args['range_y'][i - 2]) / args['range_y'][i + 1]
+            _tmpy = np.concatenate((_tmpy, np.arange(_tmpy[-1] + _step, args['range_y'][i] + eps, _step)))
+
+        print(_tmpy[-1], " -- ", args['range_y'][i])
+        # assert (np.abs(_tmpy[-1] - args['range_y'][i]) < .01 * eps)
+
+    mask = [_merge_duplicates(_tmpx), _merge_duplicates(_tmpy), [0.]]
+    num_cells = (len(mask[0]) - 1, len(mask[1]) - 1)
+else:
+    raise NotImplementedError
+
+# TODO some asserts
+
 gmsh_cell_type = (
     3
     if dim == 2  # quadrangle,
-    else  5   # hexahedron
+    else 5  # hexahedron
 )
 
 physical_index_mapper = PhysicalIndexMapper(variant)
-lattice: StructuredLattice | FilteredLattice = StructuredLattice(
-    *_get_bounding_box(gmsh.model),
-    num_cells=num_cells
-)
+
+if (args['range_x'] and args['range_y']):
+    lattice: StructuredLattice | FilteredLattice = StructuredLattice(
+        *_get_bounding_box(gmsh.model),
+        num_cells=num_cells,
+        mask=mask
+    )
+else:
+    lattice: StructuredLattice | FilteredLattice = StructuredLattice(
+        *_get_bounding_box(gmsh.model),
+        num_cells=num_cells,
+        mask=[]
+    )
+
 num_cells_total = lattice.number_of_cells
 
 print("Determining physical groups for all cells")
@@ -319,7 +402,7 @@ with open(msh_file_name, "w") as msh_file:
     """.format(len(physical_index_mapper.physical_groups(dim))).lstrip("\n")))
     msh_file.write("{}".format(
         "\n".join(f'{dim} {tag} "{name}"'
-        for name, tag in physical_index_mapper.physical_groups(dim).items())
+                  for name, tag in physical_index_mapper.physical_groups(dim).items())
     ))
     msh_file.write(textwrap.dedent(f"""
         $EndPhysicalNames
@@ -327,7 +410,7 @@ with open(msh_file_name, "w") as msh_file:
         {filtered_lattice.number_of_points}
     """))
     for count, p in enumerate(filtered_lattice.points):
-        msh_file.write(f"{count+1} {' '.join(str(c) for c in p)}\n".format())
+        msh_file.write(f"{count + 1} {' '.join(str(c) for c in p)}\n".format())
     msh_file.write(textwrap.dedent(f"""
         $EndNodes
         $Elements
@@ -335,7 +418,7 @@ with open(msh_file_name, "w") as msh_file:
     """).lstrip("\n"))
     for cell_index, cell in enumerate(filtered_lattice.cells):
         phys_index = filtered_physical_cell_indices[cell_index]
-        msh_file.write(f"{cell_index+1} {gmsh_cell_type} 2 {phys_index} {phys_index} ")
+        msh_file.write(f"{cell_index + 1} {gmsh_cell_type} 2 {phys_index} {phys_index} ")
         msh_file.write(" ".join(str(i + 1) for i in filtered_lattice.corners(cell)))
         msh_file.write("\n")
     msh_file.write("\n$EndElements")
