@@ -39,6 +39,13 @@ order to generate a mesh with a characteristic mesh size twice as coarse as the 
 gmsh -2 spe11a.geo -setnumber refinement_factor 2.0
 ```
 
+Besides this, you can use the `with_facies_7` option (default: `1`), to remove all elements in facies 7:
+
+```bash
+# produces spe11a.msh with all elements in facies 7 removed
+gmsh -2 spe11a.geo -setnumber with_facies_7 0
+```
+
 ## SPE11-B (`spe11b.geo`)
 
 __Important__: as for variant A, the geometry is defined in the x-y plane, while the description defines the geometry in the
@@ -51,6 +58,13 @@ you can still scale the default mesh size with a runtime argument:
 ```bash
 # produces spe11b.msh with mesh sizes twice as coarse as the default for variant B
 gmsh -2 spe11b.geo -setnumber refinement_factor 2.0
+```
+
+You can also again decide to remove all elements inside facies 7:
+
+```bash
+# produces spe11b.msh with all elements in facies 7 removed
+gmsh -2 spe11b.geo -setnumber with_facies_7 0
 ```
 
 ## SPE11-C (`make_spe11c.py`)
@@ -96,7 +110,7 @@ mesh files in which the cells in the seal layers are removed.
 The script `extrude_and_rotate.py` can be used to extrude 2D generated meshes to one cell thick 3D vtk
 versions for simulators that are not accepting such 2D meshes, .
 
-Leveraging [vtk](https://pypi.org/project/vtk/), it reads from a [gmsh](https://gmsh.info/) generated `vtk` mesh, extrudes it 
+Leveraging [vtk](https://pypi.org/project/vtk/), it reads from a [gmsh](https://gmsh.info/) generated `vtk` mesh, extrudes it
 with one cell in the 3rd dimension and rotates it in the x-z plane.
 
 __Important__: The script is not detecting either if it is a structured mesh (based on *quads*) or unstructured
@@ -108,7 +122,7 @@ The full procedure is then, for instance for spe11-a:
 gmsh -2 spe11a.geo -format vtk
 python3 extrude_and_rotate.py --tri --spe a spe11a.vtk
 #optionally some clean up
-rm -iv spe11a.vtk 
+rm -iv spe11a.vtk
 ```
 
 This should produce a file `spe11a_extruded.vtu` that can be inspected with [paraview](https://www.paraview.org/) or another
@@ -132,4 +146,3 @@ __Note__: Though valid, the option `--poromult` will have no effect on spe11-a c
 
 The file `spe11b_structured_extruded.vtu` should be produced and can be inspected using [paraview](https://www.paraview.org/) or another
 vtk enabled 3D reader.
-
