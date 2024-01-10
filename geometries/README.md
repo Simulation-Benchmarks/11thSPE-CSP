@@ -87,8 +87,8 @@ python3 make_structured_mesh.py --variant B -nx 200 -ny 200
 python3 make_structured_mesh.py --variant C -nx 200 -ny 200 -nz 200
 ```
 
-Note that this script also requires the Python API of `gmsh`. Furthermore, passing the flag `--remove-cells-in-seal` creates
-mesh files in which the cells in the seal layers are removed.
+Note that this script also requires the Python API of `gmsh`. Furthermore, passing the flag `--remove-cells-in-facies-7` creates
+mesh files in which the cells in all regions of facies 7 are removed.
 
 
 ## Extrusion of 2D meshes to one cell thick 3D meshes
