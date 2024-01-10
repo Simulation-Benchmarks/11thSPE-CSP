@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 DefineConstant[ refinement_factor = 1.0 ];
+DefineConstant[ with_facies_7 = 1 ];
 
 cl__1 = 0.0125*refinement_factor;
 cl__2 = 0.01066435412095127*refinement_factor;
@@ -651,7 +652,9 @@ Curve Loop(1) = {305, 1, -24, 255, 256, 257, -258, 200, 293, 294, 295, 296, 297,
 Plane Surface(1) = {1};
 Curve Loop(31) = {72, 73, 74, 75, -78, -77, -76, -49, -48, -47, -46, -45, -44, -43, -42, -41, -40, 38, 39, -37, 68, 69, 70, 71};
 Plane Surface(31) = {31};
-Physical Surface("Facies 7", 7) = {1, 31};
+If ( with_facies_7 > 0 )
+    Physical Surface("Facies 7", 7) = {1, 31};
+EndIf
 
 // Facies 5
 Curve Loop(2) = {12, -2, -305, -304, -303, -302, -301, -300, -299, -298, -297, -296, -295, -294, -293, 216, -215, -214, -213, 212, -211, 273, 274, 275, 276, 277, 278, 279, 280, 281, 282, 283, 284, 285, 286, 287, 288, 289, 290, 291, 292};
