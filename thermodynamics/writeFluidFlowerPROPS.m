@@ -11,6 +11,7 @@ function writeFluidFlowerPROPS(tab_h2o, tab_co2, tab_sol, varargin)
         'plot', false,     ... % Plot the tables for debugging
         'dir', '',         ... % Output folder to write files to
         'units', 'metric', ... % Unit system (si, lab, metric or field)
+        'cap', true,       ... % Ensure that Rs -> 0 as p -> 0
         'nusat', 5         ... % Number of undersaturated points
     );
     for i = 1:(numel(varargin)/2)
@@ -98,10 +99,12 @@ function writeFluidFlowerPROPS(tab_h2o, tab_co2, tab_sol, varargin)
     % Make sure we don't use the tables beyond this point
     clear tab_h2o tab_co2 tab_sol
 
-    % R_s sat = rhoOS * mass_fraction_co2_in_liquid_phase / rhoGS
-    R_s = rhoOS.*X_co2./rhoGS;
-    % R_v sat = rhoGS * mass_fraction_h2o_in_vapor_phase / rhoOS
-    R_v = rhoGS.*Y_h2o./rhoOS;
+    % R_s sat = rhoOS * mass_fraction_co2_in_liquid_phase / 
+    %          (rhoGS - mass_fraction_co2_in_liquid_phase)
+    R_s = rhoOS.*X_co2./(rhoGS.*(1 - X_co2));
+    % R_v sat = rhoGS * mass_fraction_h2o_in_vapor_phase /
+    %          (rhoOS - mass_fraction_co2_in_vapor_phase)
+    R_v = rhoGS.*Y_h2o./(rhoOS.*(1 - Y_h2o));
     if do_plot
         figure(1); clf; hold on
         subplot(1, 2, 1)
@@ -154,7 +157,7 @@ function write_pvto(p, Rs, pure_water_density, water_viscosity, T, X_co2_sat, Y_
     fprintf(fn, '-- RS    PRES    FVF      VISC\n');
     fprintf(fn, 'PVTO\n');
 
-    if true
+    if opts.cap
         X_co2_min = 1e-8;
         Rs_min = rhoOS.*X_co2_min./rhoGS;
         p_zero = interp1(X_co2_sat, p, X_co2_min, 'linear', 'extrap');
@@ -247,7 +250,7 @@ function write_immiscible(p, b, mu, u, title, opts)
 end
 
 function bO = shrinkage_factor(rhoO, X_co2, rhoOS, rhoGS)
-    Rs = rhoOS.*X_co2./rhoGS;
+    Rs = rhoOS.*X_co2./((1-X_co2).*rhoGS);
     bO = rhoO./(rhoOS + Rs*rhoGS);
 end
 
