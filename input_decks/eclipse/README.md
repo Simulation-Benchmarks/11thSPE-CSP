@@ -8,3 +8,5 @@ For more information on the data, please read the comments at the top of the tex
 
 For obtaining PVT tables which are consistent with the CSP description, we refer to the script
 [make_ecl_tables.m](https://github.com/Simulation-Benchmarks/11thSPE-CSP/blob/main/thermodynamics/make_ecl_tables.m).
+
+A repository containing complete input files with some simplifications can be found in [the SPE11 decks repository](https://github.com/sintefmath/spe11-decks).
