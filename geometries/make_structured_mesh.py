@@ -20,7 +20,7 @@ import gmsh
 from make_spe11c_geo import z_offset_at
 
 
-PHYSICAL_INDEX_SEAL = 7
+PHYSICAL_INDEX_FACIES_7 = 7
 PHYSICAL_INDEX_OUTSIDE_OF_DOMAIN = 1000
 PHYSICAL_NAME_OUTSIDE_OF_DOMAIN = str(PHYSICAL_INDEX_OUTSIDE_OF_DOMAIN)
 
@@ -255,10 +255,10 @@ parser.add_argument(
     help="Specify the variant for which to produce the grid"
 )
 parser.add_argument(
-    "-r", "--remove-cells-in-seal",
+    "-r", "--remove-cells-in-facies-7",
     required=False,
     action="store_true",
-    help="Remove all cells within the seal layers"
+    help="Remove all cells within the regions of facies 7"
 )
 parser.add_argument("-nx", "--number-of-cells-x", required=True, help="Desired number of cells in x-direction")
 parser.add_argument("-ny", "--number-of-cells-y", required=True, help="Desired number of cells in y-direction")
@@ -299,9 +299,9 @@ print("Removing all cells outside of the domain")
 inside_lattice = FilteredLattice(lattice, physical_cell_indices, PHYSICAL_INDEX_OUTSIDE_OF_DOMAIN)
 inside_physical_cell_indices = inside_lattice.physical_cell_indices
 
-if args["remove_cells_in_seal"]:
-    print("Removing all cells in the seal layers")
-    filtered_lattice = FilteredLattice(inside_lattice, inside_physical_cell_indices, PHYSICAL_INDEX_SEAL)
+if args["remove_cells_in_facies_7"]:
+    print("Removing all cells in the facies 7 layers")
+    filtered_lattice = FilteredLattice(inside_lattice, inside_physical_cell_indices, PHYSICAL_INDEX_FACIES_7)
     filtered_physical_cell_indices = filtered_lattice.physical_cell_indices
 else:
     filtered_lattice = inside_lattice
