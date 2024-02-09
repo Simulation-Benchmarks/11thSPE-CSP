@@ -1,6 +1,10 @@
 
 Changes in description of SPE 11th CSP from version posted at launch:  
 
+
+09.01.2024
+* Added a link to the publised version at SPE Journal. 
+
 22.05.2023
 * Added a small gradient to SPE11C to break the symmetry of the geometry. 
 
