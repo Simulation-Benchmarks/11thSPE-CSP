@@ -133,3 +133,6 @@ __Note__: Though valid the option `--poromult` will have no effect on spe11-a ca
 The file `spe11b_structured_extruded.vtu` should be produce and can be inspected using [paraview](https://www.paraview.org/) or an other
 vtk enabled 3D reader.
 
+## Flagging boundaries
+
+In order to flag 3d boundaries on the extruded meshes (south,north,east,west,bottom and top) a `--bc` command has been added, that extend `attribute` to cell data which flag faces elements on the borders (i.e. from 8-14). Note that interior cells remain per facies. All pre-existing `cellData` (other than `attribute`)  are prolongated onto those newly introduced face element and nearest interpolated from the neighboring cell.
