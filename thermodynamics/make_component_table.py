@@ -148,8 +148,8 @@ for i in range(cmdArgs["n_temp"]):
     thermCond = np.delete(values["Therm_Cond_WmK"], phaseBoundaryIndices)
     # transform unit (kJ/kg -> J/kg)
     enthalpy *= 1000
-    cv *=1e-3
-    cp *=1e-3
+    cv *= 1000
+    cp *= 1000
     for p, rho, mu, h, alpha, cev, cep in zip(pressure, density, viscosity, enthalpy,thermCond,cv,cp):
         outFile.write(f"{temperature:.11e}, {p:.11e}, {rho:.11e}, {mu:.11e}, {h:.11e}, {alpha:.11e}, {cev:.11e}, {cep:.11e} \n")
 print(f"A file {fileName} has been generated.")
