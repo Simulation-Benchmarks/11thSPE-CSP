@@ -65,7 +65,7 @@ class spe11_preprocessing:
 
         self.precompute_fictive_volume_ration(g)
         (g, g3) = callback(g, g3, self.geom_off, self.depth_off)
-        self.build_global_ids(g3, True, True)
+        self.build_global_ids(g3,True,True)
 
         writer = vtk.vtkXMLUnstructuredGridWriter()
         writer.SetFileName(fname.split('.')[0] + '_extruded.vtu')
@@ -129,7 +129,6 @@ class spe11_preprocessing:
 
         eps = 1e-3
         for i in range(g.GetNumberOfCells()):
-
             #cells are faces (2D)
             if self.version == "B" and ( (g.GetCell(0).GetCellType() == vtk.VTK_TRIANGLE) or (g.GetCell(0).GetCellType() == vtk.VTK_QUAD) ):
                 for iedge in range(g.GetCell(i).GetNumberOfEdges()):
@@ -310,7 +309,7 @@ class spe11_preprocessing:
                 g3.GetCellData().AddArray(poro_array)
                 g3.GetCellData().AddArray(vol_array)
 
-    def paint_only(self, fname, poromult, former_tag, tag_bc : bool):
+    def paint_only(self, fname, poromult, former_tag):
         extension = fname.split('.')[-1]
 
         if extension == "vtk":
@@ -325,8 +324,6 @@ class spe11_preprocessing:
         g = r.GetOutput()
         self.precompute_fictive_volume_ration(g)
         self.paint_data(g, g, poromult, former_tag)
-        if tag_bc:
-            self.tag_bc(g)
 
         writer = vtk.vtkXMLUnstructuredGridWriter()
         writer.SetFileName(fname.split('.')[0] + '_painted.vtu')

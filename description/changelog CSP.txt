@@ -3,3 +3,24 @@ Changes in description of SPE 11th CSP from version posted at launch:
 
 22.05.2023
 * Added a small gradient to SPE11C to break the symmetry of the geometry. 
+
+04.09.2023
+Important change: 
+* Changed equation (2.3) to include porosity, in response to https://github.com/Simulation-Benchmarks/11thSPE-CSP/issues/12#issuecomment-1648239314
+* Changed proxy P4 (Section 2.5.3) to be volume (rather than surface) integral. This changes the reporting quantity by a factor 100 for SPE 11A, but does not affect 11B and 11C. 
+
+Corrections:
+* Equation (2.2): Corrected misprint (m^i_\alpha should have been \chi^i_\alpha)
+* Section 2.1: Corrected misprint in statement of molar weight of CO2 to M2 = 44.01E-3 kg/mol (from 44.1E-3 kg/mol), and removed dependency of \rho_{n,\phi} on pressure
+* Section 2.1: Corrected misprint in units of gravity
+* Equation (2.14) and Section 2.4: Included missing density in boundary condition, and made precise the inclusion of the depth of the 2D geometries. 
+* Section 2.6.2: Specified that intensive variables should be reported at cell centers (relative to the reporting grid). 
+* Section 3.5 and Section 4.5: Corrected misprint in statement of number of seconds in 1000 years 
+* Section 3.7 and 4.7: Clarified that sparse data is to be reported starting at the injection time. 
+* Section 4.7: Corrected omission of reporting grid. 
+* Renumbered figures.
+
+10.10.2024
+* Final version of the CSP description submitted to SPEJ and preprint posted on github. No further updates are anticipated.
+* Several minor changes in presentation, although no changes of substance to "input" since 04.09.2023. 
+* Some changes to the "output", especially as relates to reporting of performance data. Please read the new section 2.6 carefully. 
