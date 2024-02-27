@@ -109,7 +109,7 @@ for i in range(cmdArgs["n_temp"]):
         "PHigh": str(cmdArgs["max_press"]),
         "PInc": str(delta_pressure),
         "T": str(temperature),
-        "RefState": "DEF",
+        "RefState": "IIR",
         "TUnit": "C",
         "PUnit": "Pa",
         "DUnit": "kg/m3",

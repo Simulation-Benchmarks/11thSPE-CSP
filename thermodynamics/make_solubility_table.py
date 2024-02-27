@@ -70,7 +70,7 @@ def getCO2Densities(temperatures: ParameterRange, pressures: ParameterRange) -> 
             "PHigh": f"{pressures.max}",
             "PInc": f"{pressures.step}",
             "T": str(T),
-            "RefState": "DEF",
+            "RefState": "IIR",
             "TUnit": "C",
             "PUnit": "Pa",
             "DUnit": "kg/m3",
