@@ -60,6 +60,9 @@ def getCO2Densities(temperatures: ParameterRange, pressures: ParameterRange) -> 
     result = np.ndarray(shape=(temperatures.numSamples, pressures.numSamples))
     for i in withProgress(range(temperatures.numSamples)):
         T = temperatures[i]
+        # Below, the reference state IIR is selected, corresponding to
+        # "setting enthalpy to 200 kJ/kg and entropy to 1.0 kJ/(kg-K) for the saturated liquid at 0 °C".
+        # See https://refprop-docs.readthedocs.io/en/latest/GUI/Menu%20Commands/Options%20Menu/reference.html?highlight=IIR#reference-state
         query = {
             "Action": "Data",
             "Wide": "on",
@@ -70,7 +73,7 @@ def getCO2Densities(temperatures: ParameterRange, pressures: ParameterRange) -> 
             "PHigh": f"{pressures.max}",
             "PInc": f"{pressures.step}",
             "T": str(T),
-            "RefState": "DEF",
+            "RefState": "IIR",
             "TUnit": "C",
             "PUnit": "Pa",
             "DUnit": "kg/m3",

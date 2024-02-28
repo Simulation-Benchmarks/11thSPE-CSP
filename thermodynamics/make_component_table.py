@@ -99,6 +99,9 @@ outFile.write("# temperature [°C],     pressure [Pa],   density [kg/m3],  visco
 # get the data
 for i in range(cmdArgs["n_temp"]):
     temperature = cmdArgs["min_temp"] + i * delta_temperature
+    # Below, the reference state IIR is selected, corresponding to
+    # "setting enthalpy to 200 kJ/kg and entropy to 1.0 kJ/(kg-K) for the saturated liquid at 0 °C".
+    # See https://refprop-docs.readthedocs.io/en/latest/GUI/Menu%20Commands/Options%20Menu/reference.html?highlight=IIR#reference-state
     query = {
         "Action": "Data",
         "Wide": "on",
@@ -109,7 +112,7 @@ for i in range(cmdArgs["n_temp"]):
         "PHigh": str(cmdArgs["max_press"]),
         "PInc": str(delta_pressure),
         "T": str(temperature),
-        "RefState": "DEF",
+        "RefState": "IIR",
         "TUnit": "C",
         "PUnit": "Pa",
         "DUnit": "kg/m3",
