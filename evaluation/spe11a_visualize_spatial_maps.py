@@ -70,9 +70,7 @@ def plotColorMesh(fig, x, y, z, idx, name):
 def visualizeSpatialMaps():
     """Visualize spatial maps for the SPE11 CSP"""
 
-    font = {'family' : 'normal',
-            'weight' : 'normal',
-            'size' : 12}
+    font = {'size' : 12}
     matplotlib.rc('font', **font)
 
     parser = argparse.ArgumentParser(
@@ -107,7 +105,7 @@ def visualizeSpatialMaps():
         figTmCO2 = plt.figure(figsize=(16, 7))
 
     for i, group in zip(range(len(groups)), groups):
-        fileName = f'/mnt/k/spe11/{group.lower()}/spe11a_spatial_map_{time}h.csv'
+        fileName = f'/media/bernd/bernd/spe11/{group.lower()}/spe11a_spatial_map_{time}h.csv'
 
         p, s, mCO2, mH2O, rhoG, rhoL, tmCO2 = getFieldValues(fileName, nX, nY)
         if group.lower() == "ifpen": # did not report rhoL
@@ -133,24 +131,24 @@ def visualizeSpatialMaps():
     
     if len(groups) == 1:
         fig.suptitle(f'{groups[0]} at {time} hours')
-        fig.savefig(f'{groups[0].lower()}_{time}h.png', bbox_inches='tight')
-        print('File ' + f'{groups[0].lower()}_{time}h.png has been generated.')
+        fig.savefig(f'spe11a_{groups[0].lower()}_{time}h.png', bbox_inches='tight')
+        print('File spe11a_' + f'{groups[0].lower()}_{time}h.png has been generated.')
     else:
         figP.suptitle(f'pressure [bar] at {time} hours')
-        figP.savefig(f'pressure_{time}h.png', bbox_inches='tight')
+        figP.savefig(f'spe11a_pressure_{time}h.png', bbox_inches='tight')
         figS.suptitle(f'gas saturation [-] at {time} hours')
-        figS.savefig(f'saturation_{time}h.png', bbox_inches='tight')
+        figS.savefig(f'spe11a_saturation_{time}h.png', bbox_inches='tight')
         figMCO2.suptitle(f'CO2 mass fraction in liquid [-] at {time} hours')
-        figMCO2.savefig(f'mco2_{time}h.png', bbox_inches='tight')
+        figMCO2.savefig(f'spe11a_mco2_{time}h.png', bbox_inches='tight')
         figMH2O.suptitle(f'H2O mass fraction in gas [-] at {time} hours')
-        figMH2O.savefig(f'mh2o_{time}h.png', bbox_inches='tight')
+        figMH2O.savefig(f'spe11a_mh2o_{time}h.png', bbox_inches='tight')
         figRhoG.suptitle(f'gas phase density [kg/m3] at {time} hours')
-        figRhoG.savefig(f'rhog_{time}h.png', bbox_inches='tight')
+        figRhoG.savefig(f'spe11a_rhog_{time}h.png', bbox_inches='tight')
         figRhoL.suptitle(f'liquid phase density [kg/m3] at {time} hours')
-        figRhoL.savefig(f'rhol_{time}h.png', bbox_inches='tight')
+        figRhoL.savefig(f'spe11a_rhol_{time}h.png', bbox_inches='tight')
         figTmCO2.suptitle(f'total CO2 mass [kg] at {time} hours')
-        figTmCO2.savefig(f'tmco2_{time}h.png', bbox_inches='tight')
-        print('Files {pressure, saturation, mco2, mh2o, rhog, rhol, tmco2}' + f'_{time}h.png have been generated.')
+        figTmCO2.savefig(f'spe11a_tmco2_{time}h.png', bbox_inches='tight')
+        print('Files spe11a_{pressure, saturation, mco2, mh2o, rhog, rhol, tmco2}' + f'_{time}h.png have been generated.')
 
 if __name__ == "__main__":
     visualizeSpatialMaps()
