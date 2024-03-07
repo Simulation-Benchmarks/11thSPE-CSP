@@ -16,6 +16,7 @@ import math
 import urllib
 import requests  # pylint: disable=import-error
 import numpy as np  # pylint: disable=import-error
+import matplotlib.pyplot as plt
 
 try:
     import tqdm
@@ -187,8 +188,12 @@ parser.add_argument(
     help="The number of pressure sampling points."
     " min_press is the first sampling point, max_press the last.",
 )
+parser.add_argument(
+    "-v", "--visualize", required=False, type=bool, default=False, help="Set to true for visualizing the results."
+)
 cmdArgs = vars(parser.parse_args())
 
+vis = cmdArgs["visualize"]
 pressures = ParameterRange(
     min=cmdArgs["min_press"],
     max=cmdArgs["max_press"],
@@ -199,7 +204,7 @@ temperatures = ParameterRange(
     max=cmdArgs["max_temp"],
     numSamples=cmdArgs["n_temp"]
 )
-densities = getCO2Densities(temperatures, pressures);
+densities = getCO2Densities(temperatures, pressures)
 
 fileName = "solubilities.csv"
 outFile = open(fileName, "w")
@@ -208,21 +213,44 @@ outFile.write("# The values have been calculated by means of (11)-(14) in https:
 outFile.write("# Concerning temperature and pressure ranges, the following parameters have been used:\n")
 outFile.write(f"# min temperature = {temperatures.min}, max temperature = {temperatures.max}, #temperature sampling points = {temperatures.numSamples}\n")
 outFile.write(f"# min phase pressure = {pressures.min}, max phase pressure = {pressures.max}, #pressure sampling points = {pressures.numSamples}\n#\n")
-outFile.write("# temperature [°C], phase pressure [Pa],         y_H2O [-],         x_CO2 [-]\n")
+outFile.write("# temperature [°C], phase pressure [Pa],   y_H2O [mol/mol],   x_CO2 [mol/mol]\n")
 
 # In the following, the notation and equation numbers
 # from Spycher et al. 2003 are used.
 for i in range(temperatures.numSamples):
     T = temperatures[i]
+    yVec = []
+    xVec = []
+    pVec = []
     for j in range(pressures.numSamples):
         p = pressures[j]
+        pVec.append(p/1e5)
         rhoCO2 = densities[i][j]
         # convert temperature to Kelvin for the function calls
         A = computeA(T + 273.15, p, rhoCO2); # (11)
         B = computeB(T + 273.15, p, rhoCO2); # (12)
         y_H2O = (1 - B)/(1/A - B) # (13)
         x_CO2 = B*(1 - y_H2O) # (14)
+        yVec.append(1e3*y_H2O)
+        xVec.append(1e2*x_CO2)
 
         outFile.write(f" {T:.11e},   {p:.11e}, {y_H2O:.11e}, {x_CO2:.11e}\n")
+
+    if vis == True:
+        ax = plt.subplot(2, 1, 1)
+        ax.plot(pVec, yVec)
+        ax.set_title(f'y_H2O at {T} °C')
+        ax.set_xlabel(f'p [bar]')
+        ax.set_ylabel(f'y_H2O x 1000')
+        ax.set_ylim((0, yVec[-1]+3))
+        plt.grid(visible=True)
+        ax = plt.subplot(2, 1, 2)
+        ax.plot(pVec, xVec)
+        ax.set_title(f'x_CO2 at {T} °C')
+        ax.set_xlabel(f'p [bar]')
+        ax.set_ylabel(f'x_CO2 x 100')
+        ax.set_ylim((0, xVec[-1]+2))
+        plt.grid(visible=True)
+        plt.show()
 
 print(f"A file {fileName} has been generated.")
