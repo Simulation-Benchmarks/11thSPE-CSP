@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from groups_and_colors import groups_and_colors
 
 def assembleTimeSeries():
-    """Visualize performance time series for Case B of the 11th SPE CSP"""
+    """Visualize performance time series for Case C of the 11th SPE CSP"""
 
     parser = argparse.ArgumentParser(
         description="This script visualizes the performance time series quantities "
@@ -39,16 +39,16 @@ def assembleTimeSeries():
     for group in groups:
         if group[-2] != '-':
             if detailed == "False":
-                fileName = f'{folder}/{group.lower()}/spe11b_performance_time_series.csv'
+                fileName = f'{folder}/{group.lower()}/spe11c_performance_time_series.csv'
             else:
-                fileName = f'{folder}/{group.lower()}/spe11b_performance_time_series_detailed.csv'
+                fileName = f'{folder}/{group.lower()}/spe11c_performance_time_series_detailed.csv'
             color = groups_and_colors[group.lower()]
             ls = '-'
         else:
             if detailed == "False":
-                fileName = f'{folder}/{group[:-2].lower()}/result{group[-1]}/spe11b_performance_time_series.csv'
+                fileName = f'{folder}/{group[:-2].lower()}/result{group[-1]}/spe11c_performance_time_series.csv'
             else:
-                fileName = f'{folder}/{group[:-2].lower()}/result{group[-1]}/spe11b_performance_time_series_detailed.csv'
+                fileName = f'{folder}/{group[:-2].lower()}/result{group[-1]}/spe11c_performance_time_series_detailed.csv'
             color = groups_and_colors[group[:-2].lower()]
             if group[-1] == '1': ls = '-'
             elif group[-1] == '2': ls = '--'
@@ -92,7 +92,6 @@ def assembleTimeSeries():
     axsF.set_xlabel(r'time [y]')
     axsF.set_ylabel(r'failed steps [-]')
     axsF.set_xscale('log')
-    axsF.set_yscale('log')
     axsF.legend(loc='center left', bbox_to_anchor=(1, 0.5))
 
     axsM.set_title(r'mass balance')
@@ -144,23 +143,23 @@ def assembleTimeSeries():
     figRT.tight_layout()
 
     if detailed == "False":
-        figT.savefig('spe11b_time_series_tstep.png', bbox_inches='tight', dpi=300)
-        figF.savefig('spe11b_time_series_fsteps.png', bbox_inches='tight', dpi=300)
-        figM.savefig('spe11b_time_series_mass.png', bbox_inches='tight', dpi=300)
-        figD.savefig('spe11b_time_series_dof.png', bbox_inches='tight', dpi=300)
-        figN.savefig('spe11b_time_series_nliter.png', bbox_inches='tight', dpi=300)
-        figR.savefig('spe11b_time_series_nres.png', bbox_inches='tight', dpi=300)
-        figL.savefig('spe11b_time_series_liniter.png', bbox_inches='tight', dpi=300)
-        figRT.savefig('spe11b_time_series_runtime.png', bbox_inches='tight', dpi=300)
+        figT.savefig('spe11c_time_series_tstep.png', bbox_inches='tight', dpi=300)
+        figF.savefig('spe11c_time_series_fsteps.png', bbox_inches='tight', dpi=300)
+        figM.savefig('spe11c_time_series_mass.png', bbox_inches='tight', dpi=300)
+        figD.savefig('spe11c_time_series_dof.png', bbox_inches='tight', dpi=300)
+        figN.savefig('spe11c_time_series_nliter.png', bbox_inches='tight', dpi=300)
+        figR.savefig('spe11c_time_series_nres.png', bbox_inches='tight', dpi=300)
+        figL.savefig('spe11c_time_series_liniter.png', bbox_inches='tight', dpi=300)
+        figRT.savefig('spe11c_time_series_runtime.png', bbox_inches='tight', dpi=300)
     else:
-        figT.savefig('spe11b_time_series_tstep_detailed.png', bbox_inches='tight', dpi=300)
-        figF.savefig('spe11b_time_series_fsteps_detailed.png', bbox_inches='tight', dpi=300)
-        figM.savefig('spe11b_time_series_mass_detailed.png', bbox_inches='tight', dpi=300)
-        figD.savefig('spe11b_time_series_dof_detailed.png', bbox_inches='tight', dpi=300)
-        figN.savefig('spe11b_time_series_nliter_detailed.png', bbox_inches='tight', dpi=300)
-        figR.savefig('spe11b_time_series_nres_detailed.png', bbox_inches='tight', dpi=300)
-        figL.savefig('spe11b_time_series_liniter_detailed.png', bbox_inches='tight', dpi=300)
-        figRT.savefig('spe11b_time_series_runtime_detailed.png', bbox_inches='tight', dpi=300)
+        figT.savefig('spe11c_time_series_tstep_detailed.png', bbox_inches='tight', dpi=300)
+        figF.savefig('spe11c_time_series_fsteps_detailed.png', bbox_inches='tight', dpi=300)
+        figM.savefig('spe11c_time_series_mass_detailed.png', bbox_inches='tight', dpi=300)
+        figD.savefig('spe11c_time_series_dof_detailed.png', bbox_inches='tight', dpi=300)
+        figN.savefig('spe11c_time_series_nliter_detailed.png', bbox_inches='tight', dpi=300)
+        figR.savefig('spe11c_time_series_nres_detailed.png', bbox_inches='tight', dpi=300)
+        figL.savefig('spe11c_time_series_liniter_detailed.png', bbox_inches='tight', dpi=300)
+        figRT.savefig('spe11c_time_series_runtime_detailed.png', bbox_inches='tight', dpi=300)
 
 if __name__ == "__main__":
     assembleTimeSeries()

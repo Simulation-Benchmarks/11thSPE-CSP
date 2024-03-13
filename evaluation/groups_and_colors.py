@@ -10,7 +10,7 @@ groups_and_colors = {
     "opengosim": "xkcd:indigo",
     "opm": "xkcd:khaki",
     "pau-inria": "xkcd:lavender",
-    "petrosim": "xkcd:olive",
+    "petrosim": "xkcd:sienna", # coincides with stuttgart
     "pinch": "xkcd:orange",
     "pnnl": "xkcd:pink",
     "sintef": "xkcd:purple",

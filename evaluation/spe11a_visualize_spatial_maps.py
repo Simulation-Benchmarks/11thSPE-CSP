@@ -33,8 +33,14 @@ def getFieldValues(fileName, nX, nY):
     with open(fileName, "r") as file:
         if not (file.readline()[0]).isnumeric():
             skip_header = 1
+    if "geos" in fileName:
+        skip_header = 2
 
     csvData = np.genfromtxt(fileName, delimiter=',', skip_header=skip_header)
+    if "geos" in fileName: # remove additional y coordinate column
+        csvData = np.delete(csvData, 1, 1) 
+    elif "ut-csee-pge" in fileName: # remove additional water saturation column
+        csvData = np.delete(csvData, 4, 1) 
     csvData[:,0] = np.around(csvData[:,0], decimals=5)
     csvData[:,1] = np.around(csvData[:,1], decimals=5)
     ind = np.lexsort((csvData[:,0], csvData[:,1]))
@@ -48,10 +54,24 @@ def getFieldValues(fileName, nX, nY):
         rhoL[i, :] = csvData[i*nX:(i+1)*nX, 7] if len(csvData[0]) > 7 else 0
         tmCO2[i, :] = csvData[i*nX:(i+1)*nX, 8] if len(csvData[0]) > 8 else 0
 
+    if "ifpen" in fileName: # did not report rhoL
+        tmCO2 = rhoL
+        rhoL = np.zeros([nY, nX])
+    p[p < 1e0] = float('nan')
+    rhoG[rhoG < 1e-5] = float('nan')
+    rhoL[rhoL < 1e-5] = float('nan')
+    rhoG[s < 1e-3] = float('nan')
+    rhoL[s > 1 - 1e-3] = float('nan')
+    mH2O[s < 1e-3] = float('nan')
+    mCO2[s > 1 - 1e-3] = float('nan')
+    rhoG[s == float('nan')] = float('nan')
+    rhoL[s == float('nan')] = float('nan')
+    mH2O[s == float('nan')] = float('nan')
+    mCO2[s == float('nan')] = float('nan')
     return p, s, mCO2, mH2O, rhoG, rhoL, tmCO2
 
 def plotColorMesh(fig, x, y, z, idx, name):
-    ax = fig.add_subplot(331 + idx)
+    ax = fig.add_subplot(4, 3, 1 + idx)
     im = ax.pcolormesh(x, y, z, shading='flat', cmap='coolwarm')
     ax.axis([x.min(), x.max(), y.min(), y.max()])
     ax.axis('scaled')
@@ -65,6 +85,7 @@ def plotColorMesh(fig, x, y, z, idx, name):
     cbformat = matplotlib.ticker.ScalarFormatter()
     cbformat.set_powerlimits((-2,2))
     fig.colorbar(im, cax=cax, orientation='vertical', format=cbformat)
+    fig.tight_layout()
 
 
 def visualizeSpatialMaps():
@@ -83,9 +104,12 @@ def visualizeSpatialMaps():
                              "where X is the given time. Defaults to '24'.")
     parser.add_argument('-g','--groups', nargs='+', help='<Required> names of groups', required=True)
 
+    parser.add_argument('-f','--folder', help='path to folder containing group subfolders', required=True)
+
     cmdArgs = vars(parser.parse_args())
     time = cmdArgs["time"]
     groups = cmdArgs["groups"]
+    folder = cmdArgs["folder"]
 
     xSpace = np.arange(0.0, 2.8 + 5.0e-3, 1.0e-2)
     ySpace = np.arange(0.0, 1.2 + 5.0e-3, 1.0e-2)
@@ -105,12 +129,12 @@ def visualizeSpatialMaps():
         figTmCO2 = plt.figure(figsize=(16, 7))
 
     for i, group in zip(range(len(groups)), groups):
-        fileName = f'/media/bernd/bernd/spe11/{group.lower()}/spe11a_spatial_map_{time}h.csv'
+        if group[-2] != '-':
+            fileName = f'{folder}/{group.lower()}/spe11a_spatial_map_{time}h.csv'
+        else:
+            fileName = f'{folder}/{group[:-2].lower()}/result{group[-1]}/spe11a_spatial_map_{time}h.csv'
 
         p, s, mCO2, mH2O, rhoG, rhoL, tmCO2 = getFieldValues(fileName, nX, nY)
-        if group.lower() == "ifpen": # did not report rhoL
-            tmCO2 = rhoL
-            rhoL = np.zeros([nY, nX])
 
         if len(groups) == 1:
             plotColorMesh(fig, x, y, p/1e5, 0, "pressure [bar]")
