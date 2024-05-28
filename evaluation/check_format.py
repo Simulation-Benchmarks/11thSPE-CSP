@@ -116,7 +116,7 @@ def checkDenseData(folder, case):
                 expectedColumns = 10
             else:
                 expectedRows = 168*100*120
-                expectedColumns = 10
+                expectedColumns = 11
 
             rows = csvData.shape[0]
             columns = csvData.shape[1]
