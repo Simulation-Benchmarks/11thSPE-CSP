@@ -67,6 +67,7 @@ def plotColorMesh(fig, x, y, z, idx, name):
     cbformat = matplotlib.ticker.ScalarFormatter()
     cbformat.set_powerlimits((-2,2))
     fig.colorbar(im, cax=cax, orientation='vertical', format=cbformat)
+    fig.tight_layout()
 
 
 def visualizeSpatialMaps():
@@ -85,9 +86,12 @@ def visualizeSpatialMaps():
                              "where X is the given time. Defaults to '5'.")
     parser.add_argument('-g','--groups', nargs='+', help='<Required> names of groups', required=True)
 
+    parser.add_argument('-f','--folder', help='path to folder containing group subfolders', required=True)
+
     cmdArgs = vars(parser.parse_args())
     time = cmdArgs["time"]
     groups = cmdArgs["groups"]
+    folder = cmdArgs["folder"]
 
     xSpace = np.arange(0.0, 8.4e3 + 5.0, 1.0e1)
     ySpace = np.arange(0.0, 3.6e3 + 5.0, 3.0e1)
@@ -108,7 +112,10 @@ def visualizeSpatialMaps():
         figTemp = plt.figure(figsize=(16, 7))
 
     for i, group in zip(range(len(groups)), groups):
-        fileName = f'/media/bernd/bernd/spe11/{group.lower()}/spe11b_spatial_map_{time}y.csv'
+        if group[-2] != '-':
+            fileName = f'{folder}/{group.lower()}/spe11b_spatial_map_{time}y.csv'
+        else:
+            fileName = f'{folder}/{group[:-2].lower()}/result{group[-1]}/spe11b_spatial_map_{time}y.csv'
 
         p, s, mCO2, mH2O, rhoG, rhoL, tmCO2, temp = getFieldValues(fileName, nX, nY)
         if group.lower() == "ifpen": # did not report rhoL
