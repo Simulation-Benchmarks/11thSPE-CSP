@@ -25,7 +25,7 @@ def checkSparseData(folder, case):
         csvData = np.genfromtxt(fileName, delimiter=",", skip_header=skip_header)
 
         if len(csvData.shape) == 1:
-            print(f"  Couldn't detect any columns in {fileName}. Did you use the correct delimiter ','?")            
+            print(f"  Couldn't detect any columns in {os.path.basename(fileName)}. Did you use the correct delimiter ','?")            
             succeeded = False
         else:
             columns = csvData.shape[1]
@@ -36,7 +36,7 @@ def checkSparseData(folder, case):
                 requiredColumns = 14
 
             if columns != requiredColumns:
-                print(f"  The number of columns in {fileName} is {columns}, but should be {requiredColumns}.")
+                print(f"  The number of columns in {os.path.basename(fileName)} is {columns}, but should be {requiredColumns}.")
                 if columns < requiredColumns:
                     print(f"  If a quantity can't be reported, the respective column should be filled with entries 'n/a' or 'nan'.")
                 else:
@@ -44,7 +44,7 @@ def checkSparseData(folder, case):
                 succeeded = False
 
             if csvData[0][0] != 0:
-                print(f"  The first reported time step in {fileName} is {csvData[0][0]}, not the expected value 0.")
+                print(f"  The first reported time step in {os.path.basename(fileName)} is {csvData[0][0]}, not the expected value 0.")
                 succeeded = False
 
             if case == "a":
@@ -53,10 +53,10 @@ def checkSparseData(folder, case):
                 finalTime = 3.1536e10
 
             if abs(csvData[-1][0] - finalTime)/finalTime > 1e-6:
-                print(f"  The last reported time step in {fileName} is {csvData[-1][0]}, not the expected value {finalTime}.")
+                print(f"  The last reported time step in {os.path.basename(fileName)} is {csvData[-1][0]}, not the expected value {finalTime}.")
                 succeeded = False
     else:
-        print(f"  No sparse data file {fileName} exists.")
+        print(f"  No sparse data file {os.path.basename(fileName)} exists.")
         print(f"  Did you use the correct filename and not introduce subfolders?")
         succeeded = False
 
@@ -100,7 +100,7 @@ def checkDenseData(folder, case):
         csvData = np.genfromtxt(fileName, delimiter=',', skip_header=skip_header)
 
         if len(csvData.shape) == 1:
-            print(f"  Couldn't detect any columns in {fileName}. Did you use the correct delimiter ','?")
+            print(f"  Couldn't detect any columns in {os.path.basename(fileName)}. Did you use the correct delimiter ','?")
             succeeded = False
         else:
             csvData[:,0] = np.around(csvData[:,0], decimals=5)
@@ -109,27 +109,31 @@ def checkDenseData(folder, case):
             csvData = csvData[ind]
 
             if case == "a":
-                expectedRows = 280*120
-                expectedColumns = 9
+                requiredRows = 280*120
+                requiredColumns = 9
             elif case == "b":
-                expectedRows = 840*120
-                expectedColumns = 10
+                requiredRows = 840*120
+                requiredColumns = 10
             else:
-                expectedRows = 168*100*120
-                expectedColumns = 11
+                requiredRows = 168*100*120
+                requiredColumns = 11
 
             rows = csvData.shape[0]
             columns = csvData.shape[1]
 
-            if (rows != expectedRows):
-                print(f"  Number of reporting cells is {rows} which is not the expected number {expectedRows}.")
+            if (rows != requiredRows):
+                print(f"  The number of reporting cells in {os.path.basename(fileName)} is {rows}, but should be {requiredRows}.")
                 succeeded = False
 
-            if (columns != expectedColumns):
-                print(f"  Number of reported columns is {columns} which is not the expected number {expectedColumns}.")
+            if (columns != requiredColumns):
+                print(f"  The number of reported columns in {os.path.basename(fileName)} is {columns}, but should be {requiredColumns}.")
                 succeeded = False
+                if columns < requiredColumns:
+                    print(f"  If a quantity can't be reported, the respective column should be filled with entries 'n/a' or 'nan'.")
+                else:
+                    print("  Please delete superfluous columns.")
     else:
-        print(f"  Can't analyze in more detail, since initial file {fileName} is missing.")
+        print(f"  Can't analyze in more detail, since initial file {os.path.basename(fileName)} is missing.")
 
     return succeeded
 
@@ -140,7 +144,7 @@ def checkQuestionnaire(folder, case):
     if os.path.exists(fileName):
         return True
     else:
-        print(f"  No questionnaire {fileName} exists.")
+        print(f"  No questionnaire {os.path.basename(fileName)} exists.")
         return False
 
 def checkFormat():
