@@ -65,6 +65,9 @@ def assembleTimeSeries():
         axsA[0, 1].plot(t, 1e3*csvData[:, 4], label=group, color=color, linestyle=ls)
         axsA[1, 0].plot(t, 1e3*csvData[:, 5], label=group, color=color, linestyle=ls)
         axsA[1, 1].plot(t, 1e3*csvData[:, 6], label=group, color=color, linestyle=ls)
+        # detect if immobile CO2 has been evaluated wrong potentially
+        if max(1e3*csvData[:, 4]) > 0.05:
+            print(f"{group} potentially used wrong evaluation of immobile CO2.")
 
         axsB[0, 0].plot(t, 1e3*csvData[:, 7], label=group, color=color, linestyle=ls)
         axsB[0, 1].plot(t, 1e3*csvData[:, 8], label=group, color=color, linestyle=ls)
