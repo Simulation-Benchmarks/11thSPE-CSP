@@ -105,9 +105,42 @@ def equilibriumConstantH2O(T):
     logk0_H2O = c[0] + c[1]*TinC + c[2]*TinC*TinC + c[3]*TinC*TinC*TinC
     return math.pow(10, logk0_H2O)
 
-def fugacityCoefficientCO2(T, p, rhoCO2):
-    molarMassCO2 = 44.01e-3 # [kg/mol]
-    V = 1/(rhoCO2/molarMassCO2)*1e6 # molar volume [cm3/mol]
+# Adapted from https://github.com/mwburgoyne/pyResToolbox
+def molarVolume(T, p):
+    R = 83.1446261815324 # universal gas constant [bar.cm3/mol.K]
+    p_bar = p/1e5 # phase pressure in bar
+    RTp = R*T/p_bar
+    a_CO2 = (7.54e7 - 4.13e4*T) # mixture parameter of Redlich-Kwong equation
+    b_CO2 = 27.8 # mixture parameter of Redlich-Kwong equation
+    aT12p = a_CO2/(p_bar*T**0.5)
+    
+    # calculate coefficients for cubic equation
+    e2 = -RTp
+    e1 = -(RTp*b_CO2 - aT12p + b_CO2**2)
+    e0 = -aT12p*b_CO2
+
+    # solve the cubic equation    
+    Z = np.roots(np.array([1.0, e2, e1, e0]))
+    Z = np.array([x for x in Z if np.isreal(x)]) # Keep only real results
+    if len(Z) > 1: # Evaluate which root to use per Eqs 25 and 26 in Spycher & Pruess (2003)
+        vgas, vliq = max(Z), min(Z)
+            
+        w1 = p_bar*(vgas - vliq)
+        w2 = R*T*np.log((vgas - b_CO2)/(vliq - b_CO2)) + a_CO2/(T**0.5*b_CO2)*np.log((vgas + b_CO2)*vliq/((vliq + b_CO2)*vgas))
+            
+        if w2 - w1 > 0:
+            Z[0] = max(Z)
+        else:
+            Z[0] = min(Z)
+                
+    return np.real(Z[0])
+
+def fugacityCoefficientCO2(T, p, rhoCO2, useNist):
+    if useNist:
+        molarMassCO2 = 44.01e-3 # [kg/mol]
+        V = 1/(rhoCO2/molarMassCO2)*1e6 # molar volume [cm3/mol]
+    else:
+        V = molarVolume(T, p)
     p_bar = p/1e5 # phase pressure in bar
     a_CO2 = (7.54e7 - 4.13e4*T) # mixture parameter of Redlich-Kwong equation
     b_CO2 = 27.8 # mixture parameter of Redlich-Kwong equation
@@ -120,9 +153,12 @@ def fugacityCoefficientCO2(T, p, rhoCO2):
                - math.log(p_bar*V/(R*T))
     return math.exp(lnPhiCO2)
 
-def fugacityCoefficientH2O(T, p, rhoCO2):
-    molarMassCO2 = 44.01e-3 # [kg/mol]
-    V = 1/(rhoCO2/molarMassCO2)*1e6 # molar volume [cm3/mol]
+def fugacityCoefficientH2O(T, p, rhoCO2, useNist):
+    if useNist:
+        molarMassCO2 = 44.01e-3 # [kg/mol]
+        V = 1/(rhoCO2/molarMassCO2)*1e6 # molar volume [cm3/mol]
+    else:
+        V = molarVolume(T, p)
     p_bar = p/1e5 # phase pressure in bar
     a_CO2 = (7.54e7 - 4.13e4*T) # mixture parameter of  Redlich-Kwong equation
     a_CO2_H2O = 7.89e7 # mixture parameter of Redlich-Kwong equation
@@ -137,21 +173,21 @@ def fugacityCoefficientH2O(T, p, rhoCO2):
                - math.log(p_bar*V/(R*T))
     return math.exp(lnPhiH2O)
 
-def computeA(T, p, rhoCO2):
+def computeA(T, p, rhoCO2, useNist):
     deltaP = p/1e5 - 1 # pressure range [bar] from p0 = 1 bar to p
     v_av_H2O = 18.1 # average partial molar volume of H2O [cm3/mol]
     R = 83.1446261815324 # universal gas constant [bar.cm3/mol.K]
     k0_H2O = equilibriumConstantH2O(T) # equilibrium constant for H2O at 1 bar
-    phi_H2O = fugacityCoefficientH2O(T, p, rhoCO2) # fugacity coefficient of H2O for the water-CO2 system
+    phi_H2O = fugacityCoefficientH2O(T, p, rhoCO2, useNist) # fugacity coefficient of H2O for the water-CO2 system
     p_bar = p/1e5
     return k0_H2O/(phi_H2O*p_bar)*math.exp(deltaP*v_av_H2O/(R*T))
 
-def computeB(T, p, rhoCO2):
+def computeB(T, p, rhoCO2, useNist):
     deltaP = p/1e5 - 1 # pressure range [bar] from p0 = 1 bar to p
     v_av_CO2 = 32.6 # average partial molar volume of CO2 [cm3/mol]
     R = 83.1446261815324 # universal gas constant [bar.cm3/mol.K]
     k0_CO2 = equilibriumConstantCO2(T) # equilibrium constant for CO2 at 1 bar
-    phi_CO2 = fugacityCoefficientCO2(T, p, rhoCO2) # fugacity coefficient of CO2 for the water-CO2 system
+    phi_CO2 = fugacityCoefficientCO2(T, p, rhoCO2, useNist) # fugacity coefficient of CO2 for the water-CO2 system
     p_bar = p/1e5
     return phi_CO2*p_bar/(55.508*k0_CO2)*math.exp(-(deltaP*v_av_CO2)/(R*T))
 
@@ -189,11 +225,18 @@ parser.add_argument(
     " min_press is the first sampling point, max_press the last.",
 )
 parser.add_argument(
-    "-v", "--visualize", required=False, type=bool, default=False, help="Set to true for visualizing the results."
+    "--visualize", required=False, help="Set to true for visualizing the results.", action=argparse.BooleanOptionalAction
 )
+parser.set_defaults(visualize=False)
+parser.add_argument(
+    "-n", "--nist", required=False, help="Set to true for using the NIST database to calculate densities.", action=argparse.BooleanOptionalAction
+)
+parser.set_defaults(nist=True)
+
 cmdArgs = vars(parser.parse_args())
 
 vis = cmdArgs["visualize"]
+useNist = cmdArgs["nist"]
 pressures = ParameterRange(
     min=cmdArgs["min_press"],
     max=cmdArgs["max_press"],
@@ -204,7 +247,8 @@ temperatures = ParameterRange(
     max=cmdArgs["max_temp"],
     numSamples=cmdArgs["n_temp"]
 )
-densities = getCO2Densities(temperatures, pressures)
+if useNist:
+    densities = getCO2Densities(temperatures, pressures)
 
 fileName = "solubilities.csv"
 outFile = open(fileName, "w")
@@ -225,10 +269,13 @@ for i in range(temperatures.numSamples):
     for j in range(pressures.numSamples):
         p = pressures[j]
         pVec.append(p/1e5)
-        rhoCO2 = densities[i][j]
+        if useNist:
+            rhoCO2 = densities[i][j]
+        else:
+            rhoCO2 = 0
         # convert temperature to Kelvin for the function calls
-        A = computeA(T + 273.15, p, rhoCO2); # (11)
-        B = computeB(T + 273.15, p, rhoCO2); # (12)
+        A = computeA(T + 273.15, p, rhoCO2, useNist); # (11)
+        B = computeB(T + 273.15, p, rhoCO2, useNist); # (12)
         y_H2O = (1 - B)/(1/A - B) # (13)
         x_CO2 = B*(1 - y_H2O) # (14)
         yVec.append(1e3*y_H2O)
@@ -236,7 +283,7 @@ for i in range(temperatures.numSamples):
 
         outFile.write(f" {T:.11e},   {p:.11e}, {y_H2O:.11e}, {x_CO2:.11e}\n")
 
-    if vis == True:
+    if vis:
         ax = plt.subplot(2, 1, 1)
         ax.plot(pVec, yVec)
         ax.set_title(f'y_H2O at {T} °C')
