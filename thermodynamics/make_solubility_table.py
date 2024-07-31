@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2023 Bernd Flemisch, Dennis Gläser <bernd.flemisch@iws.uni-stuttgart.de>
+# SPDX-FileCopyrightText: 2024 Bernd Flemisch, Dennis Gläser <bernd.flemisch@iws.uni-stuttgart.de>
 #
 # SPDX-License-Identifier: MIT
 #!/usr/bin/env python3
@@ -29,8 +29,7 @@ except ImportError:
 
 class ParameterRange:
     def __init__(self, min: float, max: float, numSamples: int) -> None:
-        assert max > min
-        assert numSamples >= 2
+        assert (max > min and numSamples > 1) or (max == min and numSamples == 1)
         self._min = min
         self._max = max
         self._numSamples = numSamples
@@ -52,46 +51,10 @@ class ParameterRange:
 
     @property
     def step(self) -> float:
-        return (self._max - self._min)/float(self._numSamples - 1)
-
-
-def getCO2Densities(temperatures: ParameterRange, pressures: ParameterRange) -> np.ndarray:
-    """Return the CO2 densities for the given temperature and pressure ranges"""
-    print("Retrieving CO2 densities for the requested p/T ranges")
-    result = np.ndarray(shape=(temperatures.numSamples, pressures.numSamples))
-    for i in withProgress(range(temperatures.numSamples)):
-        T = temperatures[i]
-        # Below, the reference state IIR is selected, corresponding to
-        # "setting enthalpy to 200 kJ/kg and entropy to 1.0 kJ/(kg-K) for the saturated liquid at 0 °C".
-        # See https://refprop-docs.readthedocs.io/en/latest/GUI/Menu%20Commands/Options%20Menu/reference.html?highlight=IIR#reference-state
-        query = {
-            "Action": "Data",
-            "Wide": "on",
-            "ID": "C124389",
-            "Type": "IsoTherm",
-            "Digits": "12",
-            "PLow": f"{pressures.min}",
-            "PHigh": f"{pressures.max}",
-            "PInc": f"{pressures.step}",
-            "T": str(T),
-            "RefState": "IIR",
-            "TUnit": "C",
-            "PUnit": "Pa",
-            "DUnit": "kg/m3",
-        }
-        response = requests.get(
-            "https://webbook.nist.gov/cgi/fluid.cgi?" + urllib.parse.urlencode(query)
-        )
-        response.encoding = "utf-8"
-        text = response.text
-        values = np.genfromtxt(StringIO(text), delimiter="\t", names=True)
-        phaseColIdx = list(values.dtype.names).index("Phase")
-        phase = np.genfromtxt(StringIO(text), delimiter="\t", dtype=str, skip_header=1, usecols=[phaseColIdx])
-        phaseTransitionForward = np.append((phase[:-1] != phase[1:]), False)
-        phaseTransitionBackward = np.insert((phase[1:] != phase[:-1]), 0, False)
-        isNotPhaseTransition = np.invert(np.bitwise_or(phaseTransitionForward, phaseTransitionBackward))
-        result[i] = values["Density_kgm3"][isNotPhaseTransition]
-    return result
+        if self._numSamples == 1:
+            return 0
+        else:
+            return (self._max - self._min)/float(self._numSamples - 1)
 
 def equilibriumConstantCO2(T):
     TinC = T - 273.15 # temperature in °C
@@ -135,12 +98,8 @@ def molarVolume(T, p):
                 
     return np.real(Z[0])
 
-def fugacityCoefficientCO2(T, p, rhoCO2, useNist):
-    if useNist:
-        molarMassCO2 = 44.01e-3 # [kg/mol]
-        V = 1/(rhoCO2/molarMassCO2)*1e6 # molar volume [cm3/mol]
-    else:
-        V = molarVolume(T, p)
+def fugacityCoefficientCO2(T, p):
+    V = molarVolume(T, p)
     p_bar = p/1e5 # phase pressure in bar
     a_CO2 = (7.54e7 - 4.13e4*T) # mixture parameter of Redlich-Kwong equation
     b_CO2 = 27.8 # mixture parameter of Redlich-Kwong equation
@@ -153,12 +112,8 @@ def fugacityCoefficientCO2(T, p, rhoCO2, useNist):
                - math.log(p_bar*V/(R*T))
     return math.exp(lnPhiCO2)
 
-def fugacityCoefficientH2O(T, p, rhoCO2, useNist):
-    if useNist:
-        molarMassCO2 = 44.01e-3 # [kg/mol]
-        V = 1/(rhoCO2/molarMassCO2)*1e6 # molar volume [cm3/mol]
-    else:
-        V = molarVolume(T, p)
+def fugacityCoefficientH2O(T, p):
+    V = molarVolume(T, p)
     p_bar = p/1e5 # phase pressure in bar
     a_CO2 = (7.54e7 - 4.13e4*T) # mixture parameter of  Redlich-Kwong equation
     a_CO2_H2O = 7.89e7 # mixture parameter of Redlich-Kwong equation
@@ -173,21 +128,21 @@ def fugacityCoefficientH2O(T, p, rhoCO2, useNist):
                - math.log(p_bar*V/(R*T))
     return math.exp(lnPhiH2O)
 
-def computeA(T, p, rhoCO2, useNist):
+def computeA(T, p):
     deltaP = p/1e5 - 1 # pressure range [bar] from p0 = 1 bar to p
     v_av_H2O = 18.1 # average partial molar volume of H2O [cm3/mol]
     R = 83.1446261815324 # universal gas constant [bar.cm3/mol.K]
     k0_H2O = equilibriumConstantH2O(T) # equilibrium constant for H2O at 1 bar
-    phi_H2O = fugacityCoefficientH2O(T, p, rhoCO2, useNist) # fugacity coefficient of H2O for the water-CO2 system
+    phi_H2O = fugacityCoefficientH2O(T, p) # fugacity coefficient of H2O for the water-CO2 system
     p_bar = p/1e5
     return k0_H2O/(phi_H2O*p_bar)*math.exp(deltaP*v_av_H2O/(R*T))
 
-def computeB(T, p, rhoCO2, useNist):
+def computeB(T, p):
     deltaP = p/1e5 - 1 # pressure range [bar] from p0 = 1 bar to p
     v_av_CO2 = 32.6 # average partial molar volume of CO2 [cm3/mol]
     R = 83.1446261815324 # universal gas constant [bar.cm3/mol.K]
     k0_CO2 = equilibriumConstantCO2(T) # equilibrium constant for CO2 at 1 bar
-    phi_CO2 = fugacityCoefficientCO2(T, p, rhoCO2, useNist) # fugacity coefficient of CO2 for the water-CO2 system
+    phi_CO2 = fugacityCoefficientCO2(T, p) # fugacity coefficient of CO2 for the water-CO2 system
     p_bar = p/1e5
     return phi_CO2*p_bar/(55.508*k0_CO2)*math.exp(-(deltaP*v_av_CO2)/(R*T))
 
@@ -228,15 +183,10 @@ parser.add_argument(
     "--visualize", required=False, help="Set to true for visualizing the results.", action=argparse.BooleanOptionalAction
 )
 parser.set_defaults(visualize=False)
-parser.add_argument(
-    "-n", "--nist", required=False, help="Set to true for using the NIST database to calculate densities.", action=argparse.BooleanOptionalAction
-)
-parser.set_defaults(nist=True)
 
 cmdArgs = vars(parser.parse_args())
 
 vis = cmdArgs["visualize"]
-useNist = cmdArgs["nist"]
 pressures = ParameterRange(
     min=cmdArgs["min_press"],
     max=cmdArgs["max_press"],
@@ -247,8 +197,6 @@ temperatures = ParameterRange(
     max=cmdArgs["max_temp"],
     numSamples=cmdArgs["n_temp"]
 )
-if useNist:
-    densities = getCO2Densities(temperatures, pressures)
 
 fileName = "solubilities.csv"
 outFile = open(fileName, "w")
@@ -269,13 +217,9 @@ for i in range(temperatures.numSamples):
     for j in range(pressures.numSamples):
         p = pressures[j]
         pVec.append(p/1e5)
-        if useNist:
-            rhoCO2 = densities[i][j]
-        else:
-            rhoCO2 = 0
         # convert temperature to Kelvin for the function calls
-        A = computeA(T + 273.15, p, rhoCO2, useNist); # (11)
-        B = computeB(T + 273.15, p, rhoCO2, useNist); # (12)
+        A = computeA(T + 273.15, p); # (11)
+        B = computeB(T + 273.15, p); # (12)
         y_H2O = (1 - B)/(1/A - B) # (13)
         x_CO2 = B*(1 - y_H2O) # (14)
         yVec.append(1e3*y_H2O)
