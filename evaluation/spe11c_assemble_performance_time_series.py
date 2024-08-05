@@ -66,8 +66,6 @@ def assembleTimeSeries():
 
         csvData = np.genfromtxt(fileName, delimiter=delimiter, skip_header=skip_header)
         t = csvData[:, 0]/60/60/24/365
-        if group == "IFPEN":
-            t = t - 1000
 
         # scale time to days
         axsT.plot(t, csvData[:, 1]/60/60/24, label=group, color=color, linestyle=ls)

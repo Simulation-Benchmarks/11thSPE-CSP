@@ -74,14 +74,10 @@ def assembleTimeSeries():
         axsB[1, 0].plot(t, 1e3*csvData[:, 9], label=group, color=color, linestyle=ls)
         axsB[1, 1].plot(t, 1e3*csvData[:, 10], label=group, color=color, linestyle=ls)
 
-        if group.lower() != "slb":
-            axsC.plot(t, csvData[:, 11], label=group, color=color, linestyle=ls)
+        axsC.plot(t, csvData[:, 11], label=group, color=color, linestyle=ls)
 
         # scale mass to grams
-        if group.lower() != "slb":
-            axsT.plot(t, 1e3*csvData[:, 12], label=group, color=color, linestyle=ls)
-        else:
-            axsT.plot(t, 1e3*csvData[:, 11], label=group, color=color, linestyle=ls)
+        axsT.plot(t, 1e3*csvData[:, 12], label=group, color=color, linestyle=ls)
 
     axsP[0].set_title(r'sensor 1')
     axsP[0].set_xlabel(r'time [h]')

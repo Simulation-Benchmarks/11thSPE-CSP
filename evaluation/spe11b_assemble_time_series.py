@@ -55,49 +55,28 @@ def assembleTimeSeries():
 
         csvData = np.genfromtxt(fileName, delimiter=delimiter, skip_header=skip_header)
         t = csvData[:, 0]/60/60/24/365
-        if group == "IFPEN" or group == "OpenGoSim":
-            t = t - 1000
 
         # scale pressure to bars
         axsP[0].plot(t, 1e-5*csvData[:, 1], label=group, color=color, linestyle=ls)
         axsP[1].plot(t, 1e-5*csvData[:, 2], label=group, color=color, linestyle=ls)
 
-        if group == "PNNL":
-            continue
-
         # scale mass to kilotons
         axsA[0, 0].plot(t, 1e-6*csvData[:, 3], label=group, color=color, linestyle=ls)
         axsA[0, 1].plot(t, 1e-6*csvData[:, 4], label=group, color=color, linestyle=ls)
         axsA[1, 0].plot(t, 1e-6*csvData[:, 5], label=group, color=color, linestyle=ls)
-        if group != "Kiel":
-            axsA[1, 1].plot(t, 1e-6*csvData[:, 6], label=group, color=color, linestyle=ls)
+        axsA[1, 1].plot(t, 1e-6*csvData[:, 6], label=group, color=color, linestyle=ls)
 
-        if group == "Kiel":
-            axsB[0, 0].plot(t, 1e-6*csvData[:, 6], label=group, color=color, linestyle=ls)
-            axsB[0, 1].plot(t, 1e-6*csvData[:, 7], label=group, color=color, linestyle=ls)
-            axsB[1, 0].plot(t, 1e-6*csvData[:, 8], label=group, color=color, linestyle=ls)
-        else:
-            axsB[0, 0].plot(t, 1e-6*csvData[:, 7], label=group, color=color, linestyle=ls)
-            axsB[0, 1].plot(t, 1e-6*csvData[:, 8], label=group, color=color, linestyle=ls)
-            axsB[1, 0].plot(t, 1e-6*csvData[:, 9], label=group, color=color, linestyle=ls)
-            axsB[1, 1].plot(t, 1e-6*csvData[:, 10], label=group, color=color, linestyle=ls)
+        axsB[0, 0].plot(t, 1e-6*csvData[:, 7], label=group, color=color, linestyle=ls)
+        axsB[0, 1].plot(t, 1e-6*csvData[:, 8], label=group, color=color, linestyle=ls)
+        axsB[1, 0].plot(t, 1e-6*csvData[:, 9], label=group, color=color, linestyle=ls)
+        axsB[1, 1].plot(t, 1e-6*csvData[:, 10], label=group, color=color, linestyle=ls)
 
         # scale length to meters
-        if group == "Kiel":
-            axsC.plot(t, 1e-3*csvData[:, 9], label=group, color=color, linestyle=ls)
-        else:
-            axsC.plot(t, 1e-3*csvData[:, 11], label=group, color=color, linestyle=ls)
+        axsC.plot(t, 1e-3*csvData[:, 11], label=group, color=color, linestyle=ls)
 
         # scale mass to tons
-        if group == "Kiel":
-            axsT[0].plot(t, 1e-3*csvData[:, 10], label=group, color=color, linestyle=ls)
-        else:
-            axsT[0].plot(t, 1e-3*csvData[:, 12], label=group, color=color, linestyle=ls)
-
-        if group == "Kiel":
-            axsT[1].plot(t, 1e-3*csvData[:, 11], label=group, color=color, linestyle=ls)
-        elif group != "GEOS" and group != "UT-GCCC" and group != "NORCE-UiB" and group != "Compass" and group != "Pau-INRIA":
-            axsT[1].plot(t, 1e-3*csvData[:, 13], label=group, color=color, linestyle=ls)
+        axsT[0].plot(t, 1e-3*csvData[:, 12], label=group, color=color, linestyle=ls)
+        axsT[1].plot(t, 1e-3*csvData[:, 13], label=group, color=color, linestyle=ls)
 
     axsP[0].set_title(r'sensor 1')
     axsP[0].set_xlabel(r'time [y]')

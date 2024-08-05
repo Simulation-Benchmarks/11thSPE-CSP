@@ -55,8 +55,6 @@ def assembleTimeSeries():
 
         csvData = np.genfromtxt(fileName, delimiter=delimiter, skip_header=skip_header)
         t = csvData[:, 0]/60/60/24/365
-        if group == "IFPEN" or group == "OpenGoSim":
-            t = t - 1000
 
         # scale pressure to bars
         axsP[0].plot(t, 1e-5*csvData[:, 1], label=group, color=color, linestyle=ls)
@@ -78,8 +76,7 @@ def assembleTimeSeries():
 
         # scale mass to megatons
         axsT[0].plot(t, 1e-9*csvData[:, 12], label=group, color=color, linestyle=ls)
-        if group != "GEOS":
-            axsT[1].plot(t, 1e-9*csvData[:, 13], label=group, color=color, linestyle=ls)
+        axsT[1].plot(t, 1e-9*csvData[:, 13], label=group, color=color, linestyle=ls)
 
     axsP[0].set_title(r'sensor 1')
     axsP[0].set_xlabel(r'time [y]')

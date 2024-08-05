@@ -33,12 +33,8 @@ def getFieldValues(fileName, nX, nY):
     with open(fileName, "r") as file:
         if not (file.readline()[0]).isnumeric():
             skip_header = 1
-    if "geos" in fileName:
-        skip_header = 2
 
     csvData = np.genfromtxt(fileName, delimiter=',', skip_header=skip_header)
-    if "geos" in fileName: # remove additional y coordinate column
-        csvData = np.delete(csvData, 1, 1) 
     csvData[:,0] = np.around(csvData[:,0], decimals=5)
     csvData[:,1] = np.around(csvData[:,1], decimals=5)
     ind = np.lexsort((csvData[:,0], csvData[:,1]))
@@ -52,9 +48,6 @@ def getFieldValues(fileName, nX, nY):
         rhoL[i, :] = csvData[i*nX:(i+1)*nX, 7] if len(csvData[0]) > 7 else 0
         tmCO2[i, :] = csvData[i*nX:(i+1)*nX, 8] if len(csvData[0]) > 8 else 0
 
-    if "ifpen" in fileName: # did not report rhoL
-        tmCO2 = rhoL
-        rhoL = np.zeros([nY, nX])
     p[p < 1e0] = float('nan')
     rhoG[rhoG < 1e-5] = float('nan')
     rhoL[rhoL < 1e-5] = float('nan')

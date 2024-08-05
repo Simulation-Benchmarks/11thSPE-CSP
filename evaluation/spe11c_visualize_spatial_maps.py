@@ -34,21 +34,14 @@ def getFieldValues(fileName, nX, nY):
     with open(fileName, "r") as file:
         if not (file.readline()[0]).isnumeric():
             skip_header = 1
-    if "geos" in fileName:
-        skip_header = 2
 
     delimiter = ','
 
     csvData = np.genfromtxt(fileName, delimiter=delimiter, skip_header=skip_header)
-    if "geos" in fileName: # remove additional y coordinate column
-        csvData = np.delete(csvData, 1, 1) 
     csvData[:,0] = np.around(csvData[:,0], decimals=5)
     csvData[:,1] = np.around(csvData[:,1], decimals=5)
     csvData[:,2] = np.around(csvData[:,2], decimals=5)
-    if "opengosim" in fileName:
-        mask = (abs(csvData[:, 1] - 2500) < 1e-4)
-    else:
-        mask = (abs(csvData[:, 1] - 2475) < 1e-4)
+    mask = (abs(csvData[:, 1] - 2475) < 1e-4)
     csvData = csvData[mask, :]
     ind = np.lexsort((csvData[:,0], csvData[:,2]))
     csvData = csvData[ind]
@@ -62,10 +55,6 @@ def getFieldValues(fileName, nX, nY):
         tmCO2[i, :] = csvData[i*nX:(i+1)*nX, 9] if len(csvData[0]) > 9 else 0
         temp[i, :] = csvData[i*nX:(i+1)*nX, 10] if len(csvData[0]) > 10 else 0
 
-    if "ifpen" in fileName: # did not report rhoL
-        temp = tmCO2
-        tmCO2 = rhoL
-        rhoL = np.zeros([nY, nX])
     p[p < 1e0] = float('nan')
     rhoG[rhoG < 1e-5] = float('nan')
     rhoL[rhoL < 1e-5] = float('nan')
