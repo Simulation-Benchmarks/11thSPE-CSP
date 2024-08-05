@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+import os
 import argparse
 import numpy as np
 import matplotlib
@@ -36,11 +38,11 @@ def calculateConvection():
         integral = []
         for h in range(121):
             if group[-2] != '-':
-                fileName = f'{folder}/{group.lower()}/spe11a_spatial_map_{h}h.csv'
+                fileName = os.path.join(folder, group.lower(), f'spe11a_spatial_map_{h}h.csv')
                 color = groups_and_colors[group.lower()]
                 ls = '-'
             else:
-                fileName = f'{folder}/{group[:-2].lower()}/result{group[-1]}/spe11a_spatial_map_{h}h.csv'
+                fileName = os.path.join(folder, group[:-2].lower(), f'result{group[-1]}', f'spe11a_spatial_map_{h}h.csv')
                 color = groups_and_colors[group[:-2].lower()]
                 if group[-1] == '1': ls = '-'
                 elif group[-1] == '2': ls = '--'

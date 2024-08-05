@@ -39,16 +39,16 @@ def assembleTimeSeries():
     for group in groups:
         if group[-2] != '-':
             if detailed == "False":
-                fileName = f'{folder}/{group.lower()}/spe11c_performance_time_series.csv'
+                fileName = os.path.join(folder, group.lower(), 'spe11c_performance_time_series.csv')
             else:
-                fileName = f'{folder}/{group.lower()}/spe11c_performance_time_series_detailed.csv'
+                fileName = os.path.join(folder, group.lower(), 'spe11c_performance_time_series_detailed.csv')
             color = groups_and_colors[group.lower()]
             ls = '-'
         else:
             if detailed == "False":
-                fileName = f'{folder}/{group[:-2].lower()}/result{group[-1]}/spe11c_performance_time_series.csv'
+                fileName = os.path.join(folder, group[:-2].lower(), f'result{group[-1]}', 'spe11c_performance_time_series.csv')
             else:
-                fileName = f'{folder}/{group[:-2].lower()}/result{group[-1]}/spe11c_performance_time_series_detailed.csv'
+                fileName = os.path.join(folder, group[:-2].lower(), f'result{group[-1]}', f'spe11c_performance_time_series_detailed.csv')
             color = groups_and_colors[group[:-2].lower()]
             if group[-1] == '1': ls = '-'
             elif group[-1] == '2': ls = '--'

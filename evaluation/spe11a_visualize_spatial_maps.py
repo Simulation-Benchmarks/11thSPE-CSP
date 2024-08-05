@@ -121,9 +121,9 @@ def visualizeSpatialMaps():
 
     for i, group in zip(range(len(groups)), groups):
         if group[-2] != '-':
-            fileName = f'{folder}/{group.lower()}/spe11a_spatial_map_{time}h.csv'
+            fileName = os.path.join(folder, group.lower(), f'spe11a_spatial_map_{time}h.csv')
         else:
-            fileName = f'{folder}/{group[:-2].lower()}/result{group[-1]}/spe11a_spatial_map_{time}h.csv'
+            fileName = os.path.join(folder, group[:-2].lower(), f'result{group[-1]}', f'spe11a_spatial_map_{time}h.csv')
 
         p, s, mCO2, mH2O, rhoG, rhoL, tmCO2 = getFieldValues(fileName, nX, nY)
 

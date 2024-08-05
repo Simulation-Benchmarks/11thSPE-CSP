@@ -33,11 +33,11 @@ def assembleTimeSeries():
 
     for group in groups:
         if group[-2] != '-':
-            fileName = folder + "/" + group.lower() + "/spe11b_time_series.csv"
+            fileName = os.path.join(folder, group.lower(), "spe11b_time_series.csv")
             color = groups_and_colors[group.lower()]
             ls = '-'
         else:
-            fileName = folder + "/" + group[:-2].lower() + "/result" + group[-1] + "/spe11b_time_series.csv"
+            fileName = os.path.join(folder, group[:-2].lower(), f"result{group[-1]}", "spe11b_time_series.csv")
             color = groups_and_colors[group[:-2].lower()]
             if group[-1] == '1': ls = '-'
             elif group[-1] == '2': ls = '--'

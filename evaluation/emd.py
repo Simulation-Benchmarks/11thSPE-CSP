@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # Test script for the Earth movers distance to measure differences in distributions in 2d.
 import ot
 import argparse
