@@ -175,6 +175,7 @@ def assembleTimeSeries():
     axsT.set_xlabel(r'time [h]')
     axsT.set_ylabel(r'mass [g]')
     axsT.set_xlim(1e-1, 7260.0/60)
+    axsT.set_ylim(0, 0.65)
     axsT.set_xscale(r'log')
     axsT.legend(loc='center left', bbox_to_anchor=(1, 0.5))
     figT.savefig('spe11a_time_series_seal.png', bbox_inches='tight', dpi=300)

@@ -2,7 +2,8 @@ groups_and_colors = {
     "calgary": "xkcd:blue",
     "compass": "xkcd:green",
     "csiro": "xkcd:red",
-    "ctc-cne": "xkcd:aquamarin",
+    "ctc-cne": "xkcd:black",
+    "delft-darts": "xkcd:salmon", # coincides with slb
     "geos": "xkcd:cyan",
     "ifpen": "xkcd:darkgreen",
     "kiel": "xkcd:fuchsia",

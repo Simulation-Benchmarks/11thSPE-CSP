@@ -52,8 +52,6 @@ def assembleTimeSeries():
                 skip_header = 1
 
         delimiter = ','
-        if group == "Calgary":
-            delimiter = ' '
 
         csvData = np.genfromtxt(fileName, delimiter=delimiter, skip_header=skip_header)
         t = csvData[:, 0]/60/60/24/365
@@ -98,7 +96,7 @@ def assembleTimeSeries():
 
         if group == "Kiel":
             axsT[1].plot(t, 1e-3*csvData[:, 11], label=group, color=color, linestyle=ls)
-        elif group != "GEOS" and group != "UT-GCCC" and group != "NORCE-UiB":
+        elif group != "GEOS" and group != "UT-GCCC" and group != "NORCE-UiB" and group != "Compass" and group != "Pau-INRIA":
             axsT[1].plot(t, 1e-3*csvData[:, 13], label=group, color=color, linestyle=ls)
 
     axsP[0].set_title(r'sensor 1')
@@ -106,7 +104,7 @@ def assembleTimeSeries():
     axsP[0].set_ylabel(r'pressure [bar]')
     axsP[0].set_xscale(r'log')
     axsP[0].set_xlim((1e0, 1e3))
-    axsP[0].set_ylim((270, 410))
+    axsP[0].set_ylim((270, 450))
     axsP[1].set_title(r'sensor 2')
     axsP[1].set_xlabel(r'time [y]')
     axsP[1].set_xscale(r'log')
@@ -114,7 +112,7 @@ def assembleTimeSeries():
     axsP[1].yaxis.tick_right()
     axsP[1].yaxis.set_label_position('right')
     axsP[1].set_xlim((1e0, 1e3))
-    axsP[1].set_ylim((210, 350))
+    axsP[1].set_ylim((210, 400))
     handles, labels = axsP[1].get_legend_handles_labels()
     figP.legend(handles, labels, loc='center left', bbox_to_anchor=(1, 0.5))
     figP.tight_layout()

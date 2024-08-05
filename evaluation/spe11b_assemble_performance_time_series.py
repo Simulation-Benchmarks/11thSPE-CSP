@@ -86,6 +86,7 @@ def assembleTimeSeries():
     axsT.set_ylabel(r'step size [d]')
     axsT.set_xscale('log')
     axsT.set_yscale('log')
+    axsT.set_xlim([1e-1, 1e3])
     axsT.legend(loc='center left', bbox_to_anchor=(1, 0.5))
 
     axsF.set_title(r'number of failed time steps')
@@ -93,12 +94,14 @@ def assembleTimeSeries():
     axsF.set_ylabel(r'failed steps [-]')
     axsF.set_xscale('log')
     axsF.set_yscale('log')
+    axsF.set_xlim([1e-1, 1e3])
     axsF.legend(loc='center left', bbox_to_anchor=(1, 0.5))
 
     axsM.set_title(r'mass balance')
     axsM.set_xlabel(r'time [y]')
     axsM.set_ylabel(r'mass [kt]')
     axsM.set_xscale('log')
+    axsM.set_xlim([1e-1, 1e3])
     axsM.legend(loc='center left', bbox_to_anchor=(1, 0.5))
 
     axsD.set_title(r'degrees of freedom')
@@ -106,6 +109,7 @@ def assembleTimeSeries():
     axsD.set_ylabel(r'dof [-]')
     axsD.set_xscale('log')
     axsD.set_yscale('log')
+    axsD.set_xlim([1e-1, 1e3])
     axsD.legend(loc='center left', bbox_to_anchor=(1, 0.5))
 
     axsN.set_title(r'number of nonlinear iterations')
@@ -113,6 +117,7 @@ def assembleTimeSeries():
     axsN.set_ylabel(r'nonlinear iterations [-]')
     axsN.set_xscale('log')
     axsN.set_yscale('log')
+    axsN.set_xlim([1e-1, 1e3])
     axsN.legend(loc='center left', bbox_to_anchor=(1, 0.5))
 
     axsR.set_title(r'number of local residual evaluations')
@@ -120,6 +125,7 @@ def assembleTimeSeries():
     axsR.set_ylabel(r'residual evaluations [-]')
     axsR.set_xscale('log')
     axsR.set_yscale('log')
+    axsR.set_xlim([1e-1, 1e3])
     axsR.legend(loc='center left', bbox_to_anchor=(1, 0.5))
 
     axsL.set_title(r'number of linear iterations')
@@ -127,6 +133,7 @@ def assembleTimeSeries():
     axsL.set_ylabel(r'linear iterations [-]')
     axsL.set_xscale('log')
     axsL.set_yscale('log')
+    axsL.set_xlim([1e-1, 1e3])
     axsL.legend(loc='center left', bbox_to_anchor=(1, 0.5))
 
     axsRT[0].set_title(r'runtime')
@@ -134,11 +141,13 @@ def assembleTimeSeries():
     axsRT[0].set_ylabel(r'runtime [s]')
     axsRT[0].set_xscale('log')
     axsRT[0].set_yscale('log')
+    axsRT[0].set_xlim([1e-1, 1e3])
     axsRT[1].set_title(r'time spent in linear solver')
     axsRT[1].set_xlabel(r'time [y]')
     axsRT[1].set_ylabel(r'runtime [s]')
     axsRT[1].set_xscale('log')
     axsRT[1].set_yscale('log')
+    axsRT[1].set_xlim([1e-1, 1e3])
     handles, labels = axsRT[1].get_legend_handles_labels()
     figRT.legend(handles, labels, loc='center left', bbox_to_anchor=(1, 0.5))
     figRT.tight_layout()

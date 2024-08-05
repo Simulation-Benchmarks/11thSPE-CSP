@@ -107,7 +107,7 @@ def assembleTimeSeries():
     axsD.set_xscale('log')
     axsD.set_yscale('log')
     axsD.set_xlim((9e-2, 2e2))
-    axsD.set_ylim((1e5, 1e7))
+    axsD.set_ylim((1e4, 1e7))
     axsD.legend(loc='center left', bbox_to_anchor=(1, 0.5))
 
     axsN.set_title(r'number of nonlinear iterations')
