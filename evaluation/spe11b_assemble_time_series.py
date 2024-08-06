@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2024 Bernd Flemisch <bernd.flemisch@iws.uni-stuttgart.de>
+#
+# SPDX-License-Identifier: MIT
 #!/usr/bin/env python3
 import os
 import argparse
@@ -16,10 +19,13 @@ def assembleTimeSeries():
 
     parser.add_argument('-g','--groups', nargs='+', help='names of groups', required=True)
 
-    parser.add_argument('-f','--folder', help='path to folder containing group subfolders', required=True)
+    parser.add_argument('-gf','--groupfolders', nargs='+', help='paths to group folders', required=False)
+
+    parser.add_argument('-f','--folder', help='path to folder containing group subfolders', required=False)
 
     cmdArgs = vars(parser.parse_args())
     groups = cmdArgs["groups"]
+    groupFolders = cmdArgs["groupfolders"]
     folder = cmdArgs["folder"]
 
     font = {'size' : 12}
@@ -31,19 +37,29 @@ def assembleTimeSeries():
     figC, axsC = plt.subplots(figsize=(5, 3))
     figT, axsT = plt.subplots(1, 2, figsize=(9, 3))
 
-    for group in groups:
+    for i, group in zip(range(len(groups)), groups):
+        color = f'C{i}'
+
+        if groupFolders:
+            baseFolder = groupFolders[i]
+
         if group[-2] != '-':
-            fileName = os.path.join(folder, group.lower(), "spe11b_time_series.csv")
-            color = groups_and_colors[group.lower()]
+            if not groupFolders:
+                baseFolder = os.path.join(folder, group.lower())
+            if group.lower() in groups_and_colors:
+                color = groups_and_colors[group.lower()]
             ls = '-'
         else:
-            fileName = os.path.join(folder, group[:-2].lower(), f"result{group[-1]}", "spe11b_time_series.csv")
-            color = groups_and_colors[group[:-2].lower()]
+            if not groupFolders:
+                baseFolder = os.path.join(folder, group[:-2].lower(), f'result{group[-1]}')
+            if group[:-2].lower() in groups_and_colors:
+                color = groups_and_colors[group[:-2].lower()]
             if group[-1] == '1': ls = '-'
             elif group[-1] == '2': ls = '--'
             elif group[-1] == '3': ls = '-.'
             elif group[-1] == '4': ls = ':'
 
+        fileName = os.path.join(baseFolder, 'spe11b_time_series.csv')
         print(f'Processing {fileName}.')
 
         skip_header = 0

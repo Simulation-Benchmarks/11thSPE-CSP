@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2024 Bernd Flemisch <bernd.flemisch@iws.uni-stuttgart.de>
+#
+# SPDX-License-Identifier: MIT
 #!/usr/bin/env python3
 
 """"
@@ -50,9 +53,9 @@ def getFieldValues(fileName, nX, nY):
 
     return cvol, arat, co2_max_norm_res, h2o_max_norm_res, co2_mb_error, h2o_mb_error, post_est
 
-def plotColorMesh(fig, x, y, z, idx, name):
-    ax = fig.add_subplot(1, 2, 1 + idx)
-    im = ax.pcolormesh(x, y, z, shading='flat', cmap='coolwarm')
+def plotColorMesh(fig, x, y, z, idx, name, pRows, pCols):
+    ax = fig.add_subplot(pRows, pCols, 1 + idx)
+    im = ax.pcolormesh(x, y, z, shading='flat', cmap='viridis')
     ax.axis([x.min(), x.max(), y.min(), y.max()])
     ax.axis('scaled')
     ax.set_title(f'{name}')
@@ -68,8 +71,8 @@ def plotColorMesh(fig, x, y, z, idx, name):
     fig.tight_layout()#rect=[0, 0.03, 1, 0.95])
 
 
-def visualizeSpatialMaps():
-    """Visualize spatial maps for the SPE11 CSP"""
+def visualizePerformanceSpatialMaps():
+    """Visualize performance spatial maps for Case B of the 11th SPE CSP"""
 
     font = {'size' : 14}
     matplotlib.rc('font', **font)
@@ -82,13 +85,17 @@ def visualizeSpatialMaps():
                         help="The time in years at which the spatial maps should be evaluated. "
                              "Assumes that the files are named ' spe11b_spatial_map_<X>y.csv', "
                              "where X is the given time. Defaults to '24'.")
-    parser.add_argument('-g','--groups', nargs='+', help='<Required> names of groups', required=True)
 
-    parser.add_argument('-f','--folder', help='path to folder containing group subfolders', required=True)
+    parser.add_argument('-g','--groups', nargs='+', help='names of groups', required=True)
+
+    parser.add_argument('-gf','--groupfolders', nargs='+', help='paths to group folders', required=False)
+
+    parser.add_argument('-f','--folder', help='path to folder containing group subfolders', required=False)
 
     cmdArgs = vars(parser.parse_args())
     time = cmdArgs["time"]
     groups = cmdArgs["groups"]
+    groupFolders = cmdArgs["groupfolders"]
     folder = cmdArgs["folder"]
 
     xSpace = np.arange(0.0, 8.4e3 + 5.0, 1.0e1)
@@ -108,30 +115,58 @@ def visualizeSpatialMaps():
         figH2OMBE = plt.figure(figsize=(14, 8))
         figPostEst = plt.figure(figsize=(14, 8))
 
-    for i, group in zip(range(len(groups)), groups):
-        if group[-2] != '-':
-            fileName = os.path.join(folder, group.lower(), f'spe11b_performance_spatial_map_{time}y.csv')
-        else:
-            fileName = os.path.join(folder, group[:-2].lower(), f'result{group[-1]}', f'spe11b_performance_spatial_map_{time}y.csv')
+    if len(groups) == 1:
+        pRows = 3
+        pCols = 3
+    elif len(groups) < 3:
+        pRows = 1
+        pCols = 2
+    elif len(groups) < 5:
+        pRows = 2
+        pCols = 2
+    elif len(groups) < 7:
+        pRows = 2
+        pCols = 3
+    elif len(groups) < 10:
+        pRows = 3
+        pCols = 3
+    elif len(groups) < 13:
+        pRows = 3
+        pCols = 4
+    else:
+        pRows = 4
+        pCols = 4
 
+    for i, group in zip(range(len(groups)), groups):
+        if groupFolders:
+            baseFolder = groupFolders[i]
+
+        if group[-2] != '-':
+            if not groupFolders:
+                baseFolder = os.path.join(folder, group.lower())
+        else:
+            if not groupFolders:
+                baseFolder = os.path.join(folder, group[:-2].lower(), f'result{group[-1]}')
+
+        fileName = os.path.join(baseFolder, f'spe11b_performance_spatial_map_{time}y.csv')
         cvol, arat, co2_max_norm_res, h2o_max_norm_res, co2_mb_error, h2o_mb_error, post_est = getFieldValues(fileName, nX, nY)
 
         if len(groups) == 1:
-            plotColorMesh(fig, x, y, cvol, 0, r"cell volume [m$^3$]")
-            plotColorMesh(fig, x, y, arat, 1, "aspect ratio [-]")
-            plotColorMesh(fig, x, y, co2_max_norm_res, 2, "CO2 maximum normalized residual [-]")
-            plotColorMesh(fig, x, y, h2o_max_norm_res, 3, "H2O maximum normalized residual [-]")
-            plotColorMesh(fig, x, y, co2_mb_error, 4, "CO2 mass-balance error [-]")
-            plotColorMesh(fig, x, y, h2o_mb_error, 5, "H2O mass-balance error [-]")
-            plotColorMesh(fig, x, y, post_est, 6, "a posteriori error estimate [-]")
+            plotColorMesh(fig, x, y, cvol, 0, r"cell volume [m$^3$]", pRows, pCols)
+            plotColorMesh(fig, x, y, arat, 1, "aspect ratio [-]", pRows, pCols)
+            plotColorMesh(fig, x, y, co2_max_norm_res, 2, "CO2 maximum normalized residual [-]", pRows, pCols)
+            plotColorMesh(fig, x, y, h2o_max_norm_res, 3, "H2O maximum normalized residual [-]", pRows, pCols)
+            plotColorMesh(fig, x, y, co2_mb_error, 4, "CO2 mass-balance error [-]", pRows, pCols)
+            plotColorMesh(fig, x, y, h2o_mb_error, 5, "H2O mass-balance error [-]", pRows, pCols)
+            plotColorMesh(fig, x, y, post_est, 6, "a posteriori error estimate [-]", pRows, pCols)
         else:
-            plotColorMesh(figCVol, x, y, cvol, i, group)
-            plotColorMesh(figARat, x, y, arat, i, group)
-            plotColorMesh(figCO2MNR, x, y, co2_max_norm_res, i, group)
-            plotColorMesh(figH2OMNR, x, y, h2o_max_norm_res, i, group)
-            plotColorMesh(figCO2MBE, x, y, co2_mb_error, i, group)
-            plotColorMesh(figH2OMBE, x, y, h2o_mb_error, i, group)
-            plotColorMesh(figPostEst, x, y, post_est, i, group)
+            plotColorMesh(figCVol, x, y, cvol, i, group, pRows, pCols)
+            plotColorMesh(figARat, x, y, arat, i, group, pRows, pCols)
+            plotColorMesh(figCO2MNR, x, y, co2_max_norm_res, i, group, pRows, pCols)
+            plotColorMesh(figH2OMNR, x, y, h2o_max_norm_res, i, group, pRows, pCols)
+            plotColorMesh(figCO2MBE, x, y, co2_mb_error, i, group, pRows, pCols)
+            plotColorMesh(figH2OMBE, x, y, h2o_mb_error, i, group, pRows, pCols)
+            plotColorMesh(figPostEst, x, y, post_est, i, group, pRows, pCols)
     
     if len(groups) == 1:
         fig.suptitle(f'{groups[0]} at {time} years')
@@ -155,4 +190,4 @@ def visualizeSpatialMaps():
         print('Files spe11b_{cvol, arat, {co2, h2o}_max_norm_res, {co2, h2o}_mb_error, post_est}' + f'_{time}y.png have been generated.')
 
 if __name__ == "__main__":
-    visualizeSpatialMaps()
+    visualizePerformanceSpatialMaps()
