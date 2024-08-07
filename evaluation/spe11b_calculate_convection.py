@@ -6,7 +6,7 @@ import os
 import argparse
 import numpy as np
 import matplotlib
-from spe11a_visualize_spatial_maps import getFieldValues
+from spe11b_visualize_spatial_maps import getFieldValues
 import matplotlib.pyplot as plt
 from groups_and_colors import groups_and_colors
 import sys
@@ -14,7 +14,7 @@ sys.path.append('..')
 import thermodynamics.make_solubility_table as solubility
 
 def calculateConvection():
-    """Calculate the convection integral for Case A of the 11th SPE CSP"""
+    """Calculate the convection integral for Case B of the 11th SPE CSP"""
 
     font = {'size' : 12}
     matplotlib.rc('font', **font)
@@ -37,9 +37,9 @@ def calculateConvection():
 
     fig, axs = plt.subplots(figsize=(5, 3))
 
-    nX = 280
+    nX = 840
     nY = 120
-    deltaX = deltaY = 1.0e-2
+    deltaX = deltaY = 1.0e1
 
     for i, group in zip(range(len(groups)), groups):
         color = f'C{i}'
@@ -48,7 +48,7 @@ def calculateConvection():
             baseFolder = groupFolders[i]
 
         integral = []
-        for h in range(121):
+        for year in range(0, 1001, 5):
             if group[-2] != '-':
                 if not groupFolders:
                     baseFolder = os.path.join(folder, group.lower())
@@ -65,17 +65,20 @@ def calculateConvection():
                 elif group[-1] == '3': ls = '-.'
                 elif group[-1] == '4': ls = ':'
 
-            fileName = os.path.join(baseFolder, f'spe11a_spatial_map_{h}h.csv')
-            p, s, mCO2, mH2O, rhoG, rhoL, tmCO2 = getFieldValues(fileName, nX, nY)
-            mCO2InBoxC = mCO2[9:41, 109:261]
-            pInBoxC = p[9:41, 109:261]
+            fileName = os.path.join(baseFolder, f'spe11b_spatial_map_{year}y.csv')
+            p, s, mCO2, mH2O, rhoG, rhoL, tmCO2, temp = getFieldValues(fileName, nX, nY)
+            mCO2InBoxC = mCO2[9:41, 329:781]
+            pInBoxC = p[9:41, 329:781]
+            tInBoxC = temp[9:41, 329:781]
             nXBoxC = len(mCO2InBoxC[0])
             nYBoxC = len(mCO2InBoxC)
 
-            # Calculate CO2 solubility for the mean pressure in Box C at T = 20 °C.
+            # Calculate CO2 solubility for the mean pressure and temperature in Box C.
             pMean = np.nanmean(pInBoxC)
-            A = solubility.computeA(293.15, pMean)
-            B = solubility.computeB(293.15, pMean)
+            tMean = np.nanmean(tInBoxC)
+            # The solubility functions expect temperature in Kelvin.
+            A = solubility.computeA(tMean + 273.15, pMean)
+            B = solubility.computeB(tMean + 273.15, pMean)
             y_H2O = (1 - B)/(1/A - B)
             xCO2_mol_mol = B*(1 - y_H2O)
             xCO2_kg_kg = 44/18*xCO2_mol_mol # convert from mol/mol to kg/kg
@@ -85,16 +88,17 @@ def calculateConvection():
             gradX = np.nan_to_num(gradX)
             gradY = np.nan_to_num(gradY)
             norm = np.sqrt((np.square(gradX) + np.square(gradY)))
-            integral.append(deltaX*deltaY*np.sum(norm))
+            # scale integral values to km
+            integral.append(1e-3*deltaX*deltaY*np.sum(norm))
 
-        axs.plot(range(121), integral, label=group, color=color, linestyle=ls)
+        axs.plot(range(0, 1001, 5), integral, label=group, color=color, linestyle=ls)
 
     axs.legend(loc='center left', bbox_to_anchor=(1, 0.5))
     axs.set_title(r'Box C: convection from spatial maps')
-    axs.set_xlabel(r'time [h]')
-    axs.set_ylabel(r'$M$ [m]')
+    axs.set_xlabel(r'time [y]')
+    axs.set_ylabel(r'$M$ [km]')
     axs.set_xscale('log')
-    fig.savefig('spe11a_convection_from_spatial_maps.png', bbox_inches='tight', dpi=300)
+    fig.savefig('spe11b_convection_from_spatial_maps.png', bbox_inches='tight', dpi=300)
 
 if __name__ == "__main__":
     calculateConvection()
