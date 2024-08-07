@@ -1,3 +1,8 @@
+# SPDX-FileCopyrightText: 2024 Bernd Flemisch <bernd.flemisch@iws.uni-stuttgart.de>
+#
+# SPDX-License-Identifier: MIT
+#!/usr/bin/env python3
+
 groups_and_colors = {
     "calgary": "xkcd:blue",
     "compass": "xkcd:green",
