@@ -176,7 +176,8 @@ def visualizeSpatialMaps():
             plotColorMesh(fig, x, y, 1e3*mH2O, 3, "H2O mass frac in gas [g/kg]", 0, 4, pRows, pCols)
             plotColorMesh(fig, x, y, rhoG, 4, "gas phase density [kg/m3]", 0.85e3, 1.05e3, pRows, pCols)
             plotColorMesh(fig, x, y, rhoL, 5, "liquid phase density [kg/m3]", 0.99e3, 1.025e3, pRows, pCols)
-            plotColorMesh(fig, x, y, tmCO2, 6, "total CO2 mass [t]", 0, 25, pRows, pCols)
+            # scale mass to tons
+            plotColorMesh(fig, x, y, 1e-3*tmCO2, 6, "total CO2 mass [t]", 0, 25, pRows, pCols)
             plotColorMesh(fig, x, y, temp, 7, "temperature [°C]", 15, 70, pRows, pCols)
         else:
             # scale pressure to bars
