@@ -70,7 +70,16 @@ def getFieldValues(fileName, nX, nY):
 
 def plotColorMesh(fig, x, y, z, idx, name, vmin, vmax, pRows, pCols):
     ax = fig.add_subplot(pRows, pCols, 1 + idx)
-    im = ax.pcolormesh(x, y, z, shading='flat', cmap='viridis', vmin=vmin, vmax=vmax)
+    if vmax == vmin:
+        if name == 'Kiel':
+            im = ax.pcolormesh(2*x[:, 0:int(len(x[0])/2 + 1)], y[:, 0:int(len(x[0])/2 + 1)], z[:, 0:int(len(x[0])/2)], shading='flat', cmap='viridis')
+        else:
+            im = ax.pcolormesh(x, y, z, shading='flat', cmap='viridis')
+    else:
+        if name == 'Kiel':
+            im = ax.pcolormesh(2*x[:, 0:int(len(x[0])/2 + 1)], y[:, 0:int(len(x[0])/2 + 1)], z[:, 0:int(len(x[0])/2)], shading='flat', cmap='viridis', vmin=vmin, vmax=vmax)
+        else:
+            im = ax.pcolormesh(x, y, z, shading='flat', cmap='viridis', vmin=vmin, vmax=vmax)
     ax.axis([x.min(), x.max(), y.min(), y.max()])
     ax.axis('scaled')
     ax.set_title(f'{name}')
@@ -149,9 +158,12 @@ def visualizeSpatialMaps():
     elif len(groups) < 13:
         pRows = 3
         pCols = 4
-    else:
+    elif len(groups) < 17:
         pRows = 4
         pCols = 4
+    else:
+        pRows = 4
+        pCols = 5
 
     for i, group in zip(range(len(groups)), groups):
         if groupFolders:
@@ -159,10 +171,10 @@ def visualizeSpatialMaps():
 
         if group[-2] != '-':
             if not groupFolders:
-                baseFolder = os.path.join(folder, group.lower())
+                baseFolder = os.path.join(folder, group.lower(), 'spe11b')
         else:
             if not groupFolders:
-                baseFolder = os.path.join(folder, group[:-2].lower(), f'result{group[-1]}')
+                baseFolder = os.path.join(folder, group[:-2].lower(), 'spe11b', f'result{group[-1]}')
 
         fileName = os.path.join(baseFolder, f'spe11b_spatial_map_{time}y.csv')
         p, s, mCO2, mH2O, rhoG, rhoL, tmCO2, temp = getFieldValues(fileName, nX, nY)
@@ -181,7 +193,7 @@ def visualizeSpatialMaps():
             plotColorMesh(fig, x, y, temp, 7, "temperature [°C]", 15, 70, pRows, pCols)
         else:
             # scale pressure to bars
-            plotColorMesh(figP, x, y, 1e-5*p, i, group, 300, 450, pRows, pCols)
+            plotColorMesh(figP, x, y, 1e-5*p, i, group, 200, 500, pRows, pCols)
             plotColorMesh(figS, x, y, s, i, group, 0, 1, pRows, pCols)
             # scale mass fractions to g/kg
             plotColorMesh(figMCO2, x, y, 1e3*mCO2, i, group, 0, 70, pRows, pCols)
@@ -190,7 +202,7 @@ def visualizeSpatialMaps():
             plotColorMesh(figRhoL, x, y, rhoL, i, group, 0.99e3, 1.025e3, pRows, pCols)
             # scale mass to tons
             plotColorMesh(figTmCO2, x, y, 1e-3*tmCO2, i, group, 0, 25, pRows, pCols)
-            plotColorMesh(figTemp, x, y, temp, i, group, 15, 70, pRows, pCols)
+            plotColorMesh(figTemp, x, y, temp, i, group, 15, 75, pRows, pCols)
     
     if len(groups) == 1:
         fig.suptitle(f'{groups[0]} at {time} years')

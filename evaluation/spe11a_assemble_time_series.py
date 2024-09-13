@@ -45,13 +45,13 @@ def assembleTimeSeries():
 
         if group[-2] != '-':
             if not groupFolders:
-                baseFolder = os.path.join(folder, group.lower())
+                baseFolder = os.path.join(folder, group.lower(), 'spe11a')
             if group.lower() in groups_and_colors:
                 color = groups_and_colors[group.lower()]
             ls = '-'
         else:
             if not groupFolders:
-                baseFolder = os.path.join(folder, group[:-2].lower(), f'result{group[-1]}')
+                baseFolder = os.path.join(folder, group[:-2].lower(), 'spe11a', f'result{group[-1]}')
             if group[:-2].lower() in groups_and_colors:
                 color = groups_and_colors[group[:-2].lower()]
             if group[-1] == '1': ls = '-'
@@ -83,7 +83,7 @@ def assembleTimeSeries():
         axsA[1, 1].plot(t, 1e3*csvData[:, 6], label=group, color=color, linestyle=ls)
         # detect if immobile CO2 has been evaluated wrong potentially
         if max(1e3*csvData[:, 4]) > 0.05:
-            print(f"{group} potentially used wrong evaluation of immobile CO2.")
+            print(f"{group} potentially used inconsistent evaluation of immobile CO2.")
 
         axsB[0, 0].plot(t, 1e3*csvData[:, 7], label=group, color=color, linestyle=ls)
         axsB[0, 1].plot(t, 1e3*csvData[:, 8], label=group, color=color, linestyle=ls)
@@ -99,12 +99,12 @@ def assembleTimeSeries():
     axsP[0].set_xlabel(r'time [h]')
     axsP[0].set_ylabel(r'pressure [bar]')
     axsP[0].set_xlim(1e-1, 7260.0/60)
-    axsP[0].set_ylim(1.13, 1.2)
+    #axsP[0].set_ylim(1.13, 1.2)
     axsP[0].set_xscale(r'log')
     axsP[1].set_title(r'sensor 2')
     axsP[1].set_xlabel(r'time [h]')
     axsP[1].set_xlim(1e-1, 7260.0/60)
-    axsP[1].set_ylim(1.09, 1.16)
+    #axsP[1].set_ylim(1.09, 1.16)
     axsP[1].set_xscale(r'log')
     axsP[1].set_ylabel(r'pressure [bar]')
     axsP[1].yaxis.tick_right()
@@ -135,6 +135,7 @@ def assembleTimeSeries():
     axsA[1, 1].set_title(r'Box A: CO2 in the seal facies')
     axsA[1, 1].set_xlabel(r'time [h]')
     axsA[1, 1].set_xlim(1e-1, 7260.0/60)
+    axsA[1, 1].set_ylim(-0.01, 0.25)
     axsA[1, 1].set_ylabel(r'mass [g]')
     axsA[1, 1].yaxis.tick_right()
     axsA[1, 1].yaxis.set_label_position('right')
@@ -146,7 +147,7 @@ def assembleTimeSeries():
     axsB[0, 0].set_title(r'Box B: mobile gaseous CO2')
     axsB[0, 0].set_ylabel(r'mass [g]')
     axsB[0, 0].set_xlim(2e0, 7260.0/60)
-    axsB[0, 0].set_ylim(-0.01, 0.15)
+    axsB[0, 0].set_ylim(-0.01, 0.28)
     axsB[0, 0].set_xticklabels([])
     axsB[0, 0].set_xscale(r'log')
     axsB[0, 1].set_title(r'Box B: immobile gaseous CO2')

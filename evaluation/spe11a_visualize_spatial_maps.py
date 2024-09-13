@@ -66,7 +66,10 @@ def getFieldValues(fileName, nX, nY):
 
 def plotColorMesh(fig, x, y, z, idx, name, vmin, vmax, pRows, pCols):
     ax = fig.add_subplot(pRows, pCols, 1 + idx)
-    im = ax.pcolormesh(x, y, z, shading='flat', cmap='viridis', vmin=vmin, vmax=vmax)
+    if vmax == vmin:
+        im = ax.pcolormesh(x, y, z, shading='flat', cmap='viridis')
+    else:
+        im = ax.pcolormesh(x, y, z, shading='flat', cmap='viridis', vmin=vmin, vmax=vmax)
     ax.axis([x.min(), x.max(), y.min(), y.max()])
     ax.axis('scaled')
     ax.set_title(f'{name}')
@@ -154,25 +157,25 @@ def visualizeSpatialMaps():
 
         if group[-2] != '-':
             if not groupFolders:
-                baseFolder = os.path.join(folder, group.lower())
+                baseFolder = os.path.join(folder, group.lower(), 'spe11a')
         else:
             if not groupFolders:
-                baseFolder = os.path.join(folder, group[:-2].lower(), f'result{group[-1]}')
+                baseFolder = os.path.join(folder, group[:-2].lower(), 'spe11a', f'result{group[-1]}')
 
         fileName = os.path.join(baseFolder, f'spe11a_spatial_map_{time}h.csv')
         p, s, mCO2, mH2O, rhoG, rhoL, tmCO2 = getFieldValues(fileName, nX, nY)
 
         if len(groups) == 1:
             # scale pressure to bars
-            plotColorMesh(fig, x, y, 1e-5*p, 0, "pressure [bar]", 1.1, 1.22, pRows, pCols)
-            plotColorMesh(fig, x, y, s, 1, "gas saturation [-]", 0, 1, pRows, pCols)
+            plotColorMesh(fig, x, y, 1e-5*p, 0, "pressure [bar]", 1.1, 1.1, pRows, pCols)
+            plotColorMesh(fig, x, y, s, 1, "gas saturation [-]", 0, 0, pRows, pCols)
             # scale mass fractions to g/kg
-            plotColorMesh(fig, x, y, 1e3*mCO2, 2, "CO2 mass frac in liquid [g/kg]", 0, 2, pRows, pCols)
-            plotColorMesh(fig, x, y, 1e3*mH2O, 3, "H2O mass frac in gas [g/kg]", 8.1, 8.7, pRows, pCols)
-            plotColorMesh(fig, x, y, rhoG, 4, "gas phase density [kg/m3]", 2.0, 2.2, pRows, pCols)
-            plotColorMesh(fig, x, y, rhoL, 5, "liquid phase density [kg/m3]", 9.982e2, 9.987e2, pRows, pCols)
+            plotColorMesh(fig, x, y, 1e3*mCO2, 2, "CO2 mass frac in liquid [g/kg]", 0, 0, pRows, pCols)
+            plotColorMesh(fig, x, y, 1e3*mH2O, 3, "H2O mass frac in gas [g/kg]", 8.1, 8.1, pRows, pCols)
+            plotColorMesh(fig, x, y, rhoG, 4, "gas phase density [kg/m3]", 2.0, 2.0, pRows, pCols)
+            plotColorMesh(fig, x, y, rhoL, 5, "liquid phase density [kg/m3]", 9.982e2, 9.982e2, pRows, pCols)
             # scale mass to grams
-            plotColorMesh(fig, x, y, 1e3*tmCO2, 6, "total CO2 mass [g]", 0, 1e-3, pRows, pCols)
+            plotColorMesh(fig, x, y, 1e3*tmCO2, 6, "total CO2 mass [g]", 0, 0, pRows, pCols)
         else:
             # scale pressure to bars
             plotColorMesh(figP, x, y, 1e-5*p, i, group, 1.1, 1.22, pRows, pCols)
@@ -181,7 +184,7 @@ def visualizeSpatialMaps():
             plotColorMesh(figMCO2, x, y, 1e3*mCO2, i, group, 0, 2, pRows, pCols)
             plotColorMesh(figMH2O, x, y, 1e3*mH2O, i, group, 8.1, 8.7, pRows, pCols)
             plotColorMesh(figRhoG, x, y, rhoG, i, group, 2.0, 2.2, pRows, pCols)
-            plotColorMesh(figRhoL, x, y, rhoL, i, group, 9.982e2, 9.987e2, pRows, pCols)
+            plotColorMesh(figRhoL, x, y, rhoL, i, group, 9.973e2, 9.987e2, pRows, pCols)
             # scale mass to grams
             plotColorMesh(figTmCO2, x, y, 1e3*tmCO2, i, group, 0, 1e-3, pRows, pCols)
     

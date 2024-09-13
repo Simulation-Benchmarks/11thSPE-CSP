@@ -57,13 +57,13 @@ def assemblePerformanceTimeSeries():
 
         if group[-2] != '-':
             if not groupFolders:
-                baseFolder = os.path.join(folder, group.lower())
+                baseFolder = os.path.join(folder, group.lower(), 'spe11c')
             if group.lower() in groups_and_colors:
                 color = groups_and_colors[group.lower()]
             ls = '-'
         else:
             if not groupFolders:
-                baseFolder = os.path.join(folder, group[:-2].lower(), f'result{group[-1]}')
+                baseFolder = os.path.join(folder, group[:-2].lower(), 'spe11c', f'result{group[-1]}')
             if group[:-2].lower() in groups_and_colors:
                 color = groups_and_colors[group[:-2].lower()]
             if group[-1] == '1': ls = '-'

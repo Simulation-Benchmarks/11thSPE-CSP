@@ -8,21 +8,20 @@ groups_and_colors = {
     "compass": "xkcd:green",
     "csiro": "xkcd:red",
     "ctc-cne": "xkcd:black",
-    "delft-darts": "xkcd:salmon", # coincides with slb
+    "delft-darts": "xkcd:orange",
     "geos": "xkcd:cyan",
-    "ifpen": "xkcd:darkgreen",
+    "ifpen": "xkcd:forest green",
+    "kfupm": "xkcd:golden yellow",
     "kiel": "xkcd:fuchsia",
     "norce-uib": "xkcd:gold",
     "opengosim": "xkcd:indigo",
     "opm": "xkcd:khaki",
     "pau-inria": "xkcd:lavender",
-    "petrosim": "xkcd:sienna", # coincides with stuttgart
-    "pinch": "xkcd:orange",
     "pnnl": "xkcd:pink",
+    "rice": "xkcd:yellowgreen",
     "sintef": "xkcd:purple",
     "slb": "xkcd:salmon",
     "stuttgart": "xkcd:sienna",
     "tetratech-rps": "xkcd:teal",
-    "ut-csee-pge": "xkcd:wheat",
-    "ut-gccc": "xkcd:yellowgreen"
+    "ut-csee-pge": "xkcd:drab"
 }

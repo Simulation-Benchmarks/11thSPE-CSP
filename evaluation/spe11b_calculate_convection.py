@@ -51,13 +51,13 @@ def calculateConvection():
         for year in range(0, 1001, 5):
             if group[-2] != '-':
                 if not groupFolders:
-                    baseFolder = os.path.join(folder, group.lower())
+                    baseFolder = os.path.join(folder, group.lower(), 'spe11b')
                 if group.lower() in groups_and_colors:
                     color = groups_and_colors[group.lower()]
                 ls = '-'
             else:
                 if not groupFolders:
-                    baseFolder = os.path.join(folder, group[:-2].lower(), f'result{group[-1]}')
+                    baseFolder = os.path.join(folder, group[:-2].lower(), 'spe11b', f'result{group[-1]}')
                 if group[:-2].lower() in groups_and_colors:
                     color = groups_and_colors[group[:-2].lower()]
                 if group[-1] == '1': ls = '-'
@@ -81,7 +81,7 @@ def calculateConvection():
             B = solubility.computeB(tMean + 273.15, pMean)
             y_H2O = (1 - B)/(1/A - B)
             xCO2_mol_mol = B*(1 - y_H2O)
-            xCO2_kg_kg = 44/18*xCO2_mol_mol # convert from mol/mol to kg/kg
+            xCO2_kg_kg = 44*xCO2_mol_mol/(44*xCO2_mol_mol + 18*(1 - xCO2_mol_mol)) # convert from mol/mol to kg/kg
 
             gradX = 0.5/deltaX/xCO2_kg_kg*(mCO2InBoxC[1:nYBoxC-1, 2:nXBoxC] - mCO2InBoxC[1:nYBoxC-1, 0:nXBoxC-2])
             gradY = 0.5/deltaY/xCO2_kg_kg*(mCO2InBoxC[2:nYBoxC, 1:nXBoxC-1] - mCO2InBoxC[0:nYBoxC-2, 1:nXBoxC-1])

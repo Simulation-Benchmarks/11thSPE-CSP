@@ -45,13 +45,13 @@ def assembleTimeSeries():
 
         if group[-2] != '-':
             if not groupFolders:
-                baseFolder = os.path.join(folder, group.lower())
+                baseFolder = os.path.join(folder, group.lower(), 'spe11b')
             if group.lower() in groups_and_colors:
                 color = groups_and_colors[group.lower()]
             ls = '-'
         else:
             if not groupFolders:
-                baseFolder = os.path.join(folder, group[:-2].lower(), f'result{group[-1]}')
+                baseFolder = os.path.join(folder, group[:-2].lower(), 'spe11b', f'result{group[-1]}')
             if group[:-2].lower() in groups_and_colors:
                 color = groups_and_colors[group[:-2].lower()]
             if group[-1] == '1': ls = '-'
@@ -81,6 +81,9 @@ def assembleTimeSeries():
         axsA[0, 1].plot(t, 1e-6*csvData[:, 4], label=group, color=color, linestyle=ls)
         axsA[1, 0].plot(t, 1e-6*csvData[:, 5], label=group, color=color, linestyle=ls)
         axsA[1, 1].plot(t, 1e-6*csvData[:, 6], label=group, color=color, linestyle=ls)
+        # detect if immobile CO2 has been evaluated wrong potentially
+        if max(1e-6*csvData[:, 4]) > 1:
+            print(f"{group} potentially used inconsistent evaluation of immobile CO2.")
 
         axsB[0, 0].plot(t, 1e-6*csvData[:, 7], label=group, color=color, linestyle=ls)
         axsB[0, 1].plot(t, 1e-6*csvData[:, 8], label=group, color=color, linestyle=ls)
@@ -99,7 +102,7 @@ def assembleTimeSeries():
     axsP[0].set_ylabel(r'pressure [bar]')
     axsP[0].set_xscale(r'log')
     axsP[0].set_xlim((1e0, 1e3))
-    axsP[0].set_ylim((270, 450))
+    #axsP[0].set_ylim((270, 450))
     axsP[1].set_title(r'sensor 2')
     axsP[1].set_xlabel(r'time [y]')
     axsP[1].set_xscale(r'log')
@@ -107,7 +110,7 @@ def assembleTimeSeries():
     axsP[1].yaxis.tick_right()
     axsP[1].yaxis.set_label_position('right')
     axsP[1].set_xlim((1e0, 1e3))
-    axsP[1].set_ylim((210, 400))
+    #axsP[1].set_ylim((210, 400))
     handles, labels = axsP[1].get_legend_handles_labels()
     figP.legend(handles, labels, loc='center left', bbox_to_anchor=(1, 0.5))
     figP.tight_layout()
@@ -115,7 +118,7 @@ def assembleTimeSeries():
 
     axsA[0, 0].set_title(r'Box A: mobile gaseous CO2')
     axsA[0, 0].set_ylabel(r'mass [kt]')
-    axsA[0, 0].set_ylim(0, 5e1)
+    axsA[0, 0].set_ylim(-0.5, 4e1)
     axsA[0, 0].set_xticklabels([])
     axsA[0, 0].set_xscale(r'log')
     axsA[0, 0].set_xlim((1e0, 1e3))
@@ -191,7 +194,7 @@ def assembleTimeSeries():
     axsT[0].set_title(r'CO2 in sealing units')
     axsT[0].set_xlabel(r'time [y]')
     axsT[0].set_ylabel(r'mass [t]')
-    axsT[0].set_ylim(0, 5e2)
+    axsT[0].set_ylim(0, 1e3)
     axsT[0].set_xscale(r'log')
     axsT[0].set_xlim((1e0, 1e3))
     axsT[1].set_title(r'CO2 in boundary volumes')
@@ -201,7 +204,7 @@ def assembleTimeSeries():
     axsT[1].set_xscale(r'log')
     axsT[1].yaxis.tick_right()
     axsT[1].yaxis.set_label_position('right')
-    axsT[1].set_xlim((4e2, 1e3))
+    axsT[1].set_xlim((5e2, 1e3))
     handles, labels = axsT[1].get_legend_handles_labels()
     figT.legend(handles, labels, loc='center left', bbox_to_anchor=(1, 0.5))
     figT.tight_layout()
