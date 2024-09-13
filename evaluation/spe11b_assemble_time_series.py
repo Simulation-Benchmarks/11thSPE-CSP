@@ -73,29 +73,42 @@ def assembleTimeSeries():
         t = csvData[:, 0]/60/60/24/365
 
         # scale pressure to bars
-        axsP[0].plot(t, 1e-5*csvData[:, 1], label=group, color=color, linestyle=ls)
-        axsP[1].plot(t, 1e-5*csvData[:, 2], label=group, color=color, linestyle=ls)
+        if len(csvData[0]) > 1:
+            axsP[0].plot(t, 1e-5*csvData[:, 1], label=group, color=color, linestyle=ls)
+        if len(csvData[0]) > 2:
+            axsP[1].plot(t, 1e-5*csvData[:, 2], label=group, color=color, linestyle=ls)
 
         # scale mass to kilotons
-        axsA[0, 0].plot(t, 1e-6*csvData[:, 3], label=group, color=color, linestyle=ls)
-        axsA[0, 1].plot(t, 1e-6*csvData[:, 4], label=group, color=color, linestyle=ls)
-        axsA[1, 0].plot(t, 1e-6*csvData[:, 5], label=group, color=color, linestyle=ls)
-        axsA[1, 1].plot(t, 1e-6*csvData[:, 6], label=group, color=color, linestyle=ls)
+        if len(csvData[0]) > 3:
+            axsA[0, 0].plot(t, 1e-6*csvData[:, 3], label=group, color=color, linestyle=ls)
+        if len(csvData[0]) > 4:
+            axsA[0, 1].plot(t, 1e-6*csvData[:, 4], label=group, color=color, linestyle=ls)
+        if len(csvData[0]) > 5:
+            axsA[1, 0].plot(t, 1e-6*csvData[:, 5], label=group, color=color, linestyle=ls)
+        if len(csvData[0]) > 6:
+            axsA[1, 1].plot(t, 1e-6*csvData[:, 6], label=group, color=color, linestyle=ls)
         # detect if immobile CO2 has been evaluated wrong potentially
         if max(1e-6*csvData[:, 4]) > 1:
             print(f"{group} potentially used inconsistent evaluation of immobile CO2.")
 
-        axsB[0, 0].plot(t, 1e-6*csvData[:, 7], label=group, color=color, linestyle=ls)
-        axsB[0, 1].plot(t, 1e-6*csvData[:, 8], label=group, color=color, linestyle=ls)
-        axsB[1, 0].plot(t, 1e-6*csvData[:, 9], label=group, color=color, linestyle=ls)
-        axsB[1, 1].plot(t, 1e-6*csvData[:, 10], label=group, color=color, linestyle=ls)
+        if len(csvData[0]) > 7:
+            axsB[0, 0].plot(t, 1e-6*csvData[:, 7], label=group, color=color, linestyle=ls)
+        if len(csvData[0]) > 8:
+            axsB[0, 1].plot(t, 1e-6*csvData[:, 8], label=group, color=color, linestyle=ls)
+        if len(csvData[0]) > 9:
+            axsB[1, 0].plot(t, 1e-6*csvData[:, 9], label=group, color=color, linestyle=ls)
+        if len(csvData[0]) > 10:
+            axsB[1, 1].plot(t, 1e-6*csvData[:, 10], label=group, color=color, linestyle=ls)
 
         # scale length to meters
-        axsC.plot(t, 1e-3*csvData[:, 11], label=group, color=color, linestyle=ls)
+        if len(csvData[0]) > 11:
+            axsC.plot(t, 1e-3*csvData[:, 11], label=group, color=color, linestyle=ls)
 
         # scale mass to tons
-        axsT[0].plot(t, 1e-3*csvData[:, 12], label=group, color=color, linestyle=ls)
-        axsT[1].plot(t, 1e-3*csvData[:, 13], label=group, color=color, linestyle=ls)
+        if len(csvData[0]) > 12:
+            axsT[0].plot(t, 1e-3*csvData[:, 12], label=group, color=color, linestyle=ls)
+        if len(csvData[0]) > 13:
+            axsT[1].plot(t, 1e-3*csvData[:, 13], label=group, color=color, linestyle=ls)
 
     axsP[0].set_title(r'sensor 1')
     axsP[0].set_xlabel(r'time [y]')
@@ -123,7 +136,7 @@ def assembleTimeSeries():
     axsA[0, 0].set_xscale(r'log')
     axsA[0, 0].set_xlim((1e0, 1e3))
     axsA[0, 1].set_title(r'Box A: immobile gaseous CO2')
-    axsA[0, 1].set_ylim(0, 6e0)
+#    axsA[0, 1].set_ylim(0, 6e0)
     axsA[0, 1].set_xticklabels([])
     axsA[0, 1].set_ylabel(r'mass [kt]')
     axsA[0, 1].yaxis.tick_right()

@@ -201,8 +201,8 @@ def visualizeSpatialMaps():
             plotColorMesh(figRhoG, x, y, rhoG, i, group, 0.85e3, 1.05e3, pRows, pCols)
             plotColorMesh(figRhoL, x, y, rhoL, i, group, 0.99e3, 1.025e3, pRows, pCols)
             # scale mass to tons
-            plotColorMesh(figTmCO2, x, y, 1e-3*tmCO2, i, group, 0, 25, pRows, pCols)
-            plotColorMesh(figTemp, x, y, temp, i, group, 15, 75, pRows, pCols)
+            plotColorMesh(figTmCO2, x, y, 1e-3*tmCO2, i, group, 0, 3, pRows, pCols)
+            plotColorMesh(figTemp, x, y, temp, i, group, 15, 70, pRows, pCols)
     
     if len(groups) == 1:
         fig.suptitle(f'{groups[0]} at {time} years')
