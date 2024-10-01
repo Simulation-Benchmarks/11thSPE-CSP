@@ -65,7 +65,7 @@ def calculateL2Differences():
         gradYI = 0.5/deltaY*(pI[2:nY, 1:nX-1] - pI[0:nY-2, 1:nX-1])
 
         for j, groupJ in zip(range(numGroups), groups):
-            if j < i:
+            if j <= i:
                 continue
 
             if groupFolders:
