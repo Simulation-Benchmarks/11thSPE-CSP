@@ -71,15 +71,9 @@ def getFieldValues(fileName, nX, nY):
 def plotColorMesh(fig, x, y, z, idx, name, vmin, vmax, pRows, pCols):
     ax = fig.add_subplot(pRows, pCols, 1 + idx)
     if vmax == vmin:
-        if name == 'Kiel':
-            im = ax.pcolormesh(2*x[:, 0:int(len(x[0])/2 + 1)], y[:, 0:int(len(x[0])/2 + 1)], z[:, 0:int(len(x[0])/2)], shading='flat', cmap='viridis')
-        else:
-            im = ax.pcolormesh(x, y, z, shading='flat', cmap='viridis')
+        im = ax.pcolormesh(x, y, z, shading='flat', cmap='viridis')
     else:
-        if name == 'Kiel':
-            im = ax.pcolormesh(2*x[:, 0:int(len(x[0])/2 + 1)], y[:, 0:int(len(x[0])/2 + 1)], z[:, 0:int(len(x[0])/2)], shading='flat', cmap='viridis', vmin=vmin, vmax=vmax)
-        else:
-            im = ax.pcolormesh(x, y, z, shading='flat', cmap='viridis', vmin=vmin, vmax=vmax)
+        im = ax.pcolormesh(x, y, z, shading='flat', cmap='viridis', vmin=vmin, vmax=vmax)
     ax.axis([x.min(), x.max(), y.min(), y.max()])
     ax.axis('scaled')
     ax.set_title(f'{name}')
@@ -131,14 +125,14 @@ def visualizeSpatialMaps():
     if len(groups) == 1:
         fig = plt.figure(figsize=(14, 8))
     else:
-        figP = plt.figure(figsize=(14, 8))
-        figS = plt.figure(figsize=(14, 8))
-        figMCO2 = plt.figure(figsize=(14, 8))
-        figMH2O = plt.figure(figsize=(14, 8))
-        figRhoG = plt.figure(figsize=(14, 8))
-        figRhoL = plt.figure(figsize=(14, 8))
-        figTmCO2 = plt.figure(figsize=(14, 8))
-        figTemp = plt.figure(figsize=(14, 8))
+        figP = plt.figure(figsize=(14, 12))
+        figS = plt.figure(figsize=(14, 12))
+        figMCO2 = plt.figure(figsize=(14, 12))
+        figMH2O = plt.figure(figsize=(14, 12))
+        figRhoG = plt.figure(figsize=(14, 12))
+        figRhoL = plt.figure(figsize=(14, 12))
+        figTmCO2 = plt.figure(figsize=(14, 12))
+        figTemp = plt.figure(figsize=(14, 12))
 
     if len(groups) == 1:
         pRows = 3
@@ -161,8 +155,17 @@ def visualizeSpatialMaps():
     elif len(groups) < 17:
         pRows = 4
         pCols = 4
-    else:
+    elif len(groups) < 21:
         pRows = 4
+        pCols = 5
+    elif len(groups) < 26:
+        pRows = 5
+        pCols = 5
+    elif len(groups) < 31:
+        pRows = 6
+        pCols = 5
+    else:
+        pRows = 7
         pCols = 5
 
     for i, group in zip(range(len(groups)), groups):

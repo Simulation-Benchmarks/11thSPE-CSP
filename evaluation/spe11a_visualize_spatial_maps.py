@@ -147,9 +147,12 @@ def visualizeSpatialMaps():
     elif len(groups) < 13:
         pRows = 3
         pCols = 4
-    else:
+    elif len(groups) < 17:
         pRows = 4
         pCols = 4
+    else:
+        pRows = 4
+        pCols = 5
 
     for i, group in zip(range(len(groups)), groups):
         if groupFolders:
