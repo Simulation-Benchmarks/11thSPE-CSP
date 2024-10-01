@@ -37,6 +37,10 @@ def calculateL2Differences():
     nY = 120
     deltaX = deltaY = 1.0e1
 
+    # select file that contains impermeable cells with 'nan' pressure values
+    fileNameSLB = os.path.join(folder, 'slb', 'spe11b', f'spe11b_spatial_map_{year}y.csv')
+    pSLB, s, mCO2, mH2O, rhoG, rhoL, tmCO2, temp = getFieldValues(fileNameSLB, nX, nY)
+
     l2Norm = np.zeros((numGroups, numGroups))
     h1SemiNorm = np.zeros((numGroups, numGroups))
 
@@ -53,6 +57,9 @@ def calculateL2Differences():
 
         fileNameI = os.path.join(baseFolderI, f'spe11b_spatial_map_{year}y.csv')
         pI, s, mCO2, mH2O, rhoG, rhoL, tmCO2, temp = getFieldValues(fileNameI, nX, nY)
+
+        # set values to 'nan' for impermeable cells
+        pI[pSLB == float('nan')] = float('nan')
 
         gradXI = 0.5/deltaX*(pI[1:nY-1, 2:nX] - pI[1:nY-1, 0:nX-2])
         gradYI = 0.5/deltaY*(pI[2:nY, 1:nX-1] - pI[0:nY-2, 1:nX-1])
@@ -75,6 +82,7 @@ def calculateL2Differences():
             pJ, s, mCO2, mH2O, rhoG, rhoL, tmCO2, temp = getFieldValues(fileNameJ, nX, nY)
 
             pDiff = pI - pJ
+            # set difference to zero for impermeable cells
             pDiff = np.nan_to_num(pDiff)
             l2Norm[i, j] = l2Norm[j, i] = np.sqrt(deltaX*deltaY*np.sum(np.square(pDiff)))
 
@@ -82,12 +90,17 @@ def calculateL2Differences():
             gradYJ = 0.5/deltaY*(pJ[2:nY, 1:nX-1] - pJ[0:nY-2, 1:nX-1])
             gradXDiff = gradXI - gradXJ
             gradYDiff = gradYI - gradYJ
+            # set difference to zero for impermeable and their neighboring cells
             gradXDiff = np.nan_to_num(gradXDiff)
             gradYDiff = np.nan_to_num(gradYDiff)
             h1SemiNorm[i, j] = h1SemiNorm[j, i] = np.sqrt(deltaX*deltaY*(np.sum(np.square(gradXDiff)) + np.sum(np.square(gradYDiff))))
 
-    print(l2Norm)
-    print(h1SemiNorm)
+
+    for i, groupI in zip(range(numGroups), groups):
+        print(groupI, l2Norm[i])
+
+    for i, groupI in zip(range(numGroups), groups):
+        print(groupI, h1SemiNorm[i])
 
 
 if __name__ == "__main__":
