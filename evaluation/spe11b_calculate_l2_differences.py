@@ -8,6 +8,9 @@ import numpy as np
 import matplotlib
 from spe11b_visualize_spatial_maps import getFieldValues
 
+def myStr(value):
+    return f'{value:.4e}'
+
 def calculateL2Differences():
     """Calculate the L2 pressure differences for Case B of the 11th SPE CSP"""
 
@@ -41,8 +44,11 @@ def calculateL2Differences():
     fileNameSLB = os.path.join(folder, 'slb', 'spe11b', f'spe11b_spatial_map_{year}y.csv')
     pSLB, s, mCO2, mH2O, rhoG, rhoL, tmCO2, temp = getFieldValues(fileNameSLB, nX, nY)
 
-    l2Norm = np.zeros((numGroups, numGroups))
-    h1SemiNorm = np.zeros((numGroups, numGroups))
+    l2NormP = np.zeros((numGroups, numGroups))
+    l2SemiNormP = np.zeros((numGroups, numGroups))
+    h1SemiNormP = np.zeros((numGroups, numGroups))
+    l2NormT = np.zeros((numGroups, numGroups))
+    l2SemiNormT = np.zeros((numGroups, numGroups))
 
     for i, groupI in zip(range(numGroups), groups):
         if groupFolders:
@@ -56,10 +62,16 @@ def calculateL2Differences():
                 baseFolderI = os.path.join(folder, groupI[:-2].lower(), 'spe11b', f'result{groupI[-1]}')
 
         fileNameI = os.path.join(baseFolderI, f'spe11b_spatial_map_{year}y.csv')
-        pI, s, mCO2, mH2O, rhoG, rhoL, tmCO2, temp = getFieldValues(fileNameI, nX, nY)
+        pI, s, mCO2, mH2O, rhoG, rhoL, tmCO2, tempI = getFieldValues(fileNameI, nX, nY)
 
         # set values to 'nan' for impermeable cells
         pI[pSLB == float('nan')] = float('nan')
+        tempI[pSLB == float('nan')] = float('nan')
+
+        pIMean = np.nanmean(pI)
+        pIVariation = pI - pIMean
+        tempIMean = np.nanmean(tempI)
+        tempIVariation = tempI - tempIMean
 
         gradXI = 0.5/deltaX*(pI[1:nY-1, 2:nX] - pI[1:nY-1, 0:nX-2])
         gradYI = 0.5/deltaY*(pI[2:nY, 1:nX-1] - pI[0:nY-2, 1:nX-1])
@@ -79,12 +91,28 @@ def calculateL2Differences():
                     baseFolderJ = os.path.join(folder, groupJ[:-2].lower(), 'spe11b', f'result{groupJ[-1]}')
 
             fileNameJ = os.path.join(baseFolderJ, f'spe11b_spatial_map_{year}y.csv')
-            pJ, s, mCO2, mH2O, rhoG, rhoL, tmCO2, temp = getFieldValues(fileNameJ, nX, nY)
+            pJ, s, mCO2, mH2O, rhoG, rhoL, tmCO2, tempJ = getFieldValues(fileNameJ, nX, nY)
 
             pDiff = pI - pJ
             # set difference to zero for impermeable cells
             pDiff = np.nan_to_num(pDiff)
-            l2Norm[i, j] = l2Norm[j, i] = np.sqrt(deltaX*deltaY*np.sum(np.square(pDiff)))
+            l2NormP[i, j] = l2NormP[j, i] = np.sqrt(deltaX*deltaY*np.sum(np.square(pDiff)))
+
+            tempDiff = tempI - tempJ
+            tempDiff = np.nan_to_num(tempDiff)
+            l2NormT[i, j] = l2NormT[j, i] = np.sqrt(deltaX*deltaY*np.sum(np.square(tempDiff)))
+
+            pJMean = np.nanmean(pJ)
+            pJVariation = pJ - pJMean
+            pVariationDiff = pIVariation - pJVariation
+            pVariationDiff = np.nan_to_num(pVariationDiff)
+            l2SemiNormP[i, j] = l2SemiNormP[j, i] = np.sqrt(deltaX*deltaY*np.sum(np.square(pVariationDiff)))
+
+            tempJMean = np.nanmean(tempJ)
+            tempJVariation = tempJ - tempJMean
+            tempVariationDiff = tempIVariation - tempJVariation
+            tempVariationDiff = np.nan_to_num(tempVariationDiff)
+            l2SemiNormT[i, j] = l2SemiNormT[j, i] = np.sqrt(deltaX*deltaY*np.sum(np.square(tempVariationDiff)))
 
             gradXJ = 0.5/deltaX*(pJ[1:nY-1, 2:nX] - pJ[1:nY-1, 0:nX-2])
             gradYJ = 0.5/deltaY*(pJ[2:nY, 1:nX-1] - pJ[0:nY-2, 1:nX-1])
@@ -93,14 +121,36 @@ def calculateL2Differences():
             # set difference to zero for impermeable and their neighboring cells
             gradXDiff = np.nan_to_num(gradXDiff)
             gradYDiff = np.nan_to_num(gradYDiff)
-            h1SemiNorm[i, j] = h1SemiNorm[j, i] = np.sqrt(deltaX*deltaY*(np.sum(np.square(gradXDiff)) + np.sum(np.square(gradYDiff))))
-
-
-    for i, groupI in zip(range(numGroups), groups):
-        print(groupI, l2Norm[i])
+            h1SemiNormP[i, j] = h1SemiNormP[j, i] = np.sqrt(deltaX*deltaY*(np.sum(np.square(gradXDiff)) + np.sum(np.square(gradYDiff))))
 
     for i, groupI in zip(range(numGroups), groups):
-        print(groupI, h1SemiNorm[i])
+        if groupI[-2] == '-':
+            groups[i] = groupI[:-2] + groupI[-1]
+
+    with open(f'spe11b_pressure_l2_diff_{year}y.csv', 'w') as f:
+        print('#', ', '.join(map(str, groups)), file=f)
+        for i, groupI in zip(range(numGroups), groups):
+            print(groupI + ',', ', '.join(map(myStr, l2NormP[i])), file=f)
+
+    with open(f'spe11b_pressure_l2semi_diff_{year}y.csv', 'w') as f:
+        print('#', ', '.join(map(str, groups)), file=f)
+        for i, groupI in zip(range(numGroups), groups):
+            print(groupI + ',', ', '.join(map(myStr, l2SemiNormP[i])), file=f)
+
+    with open(f'spe11b_pressure_h1semi_diff_{year}y.csv', 'w') as f:
+        print('#', ', '.join(map(str, groups)), file=f)
+        for i, groupI in zip(range(numGroups), groups):
+            print(groupI + ',', ', '.join(map(myStr, h1SemiNormP[i])), file=f)
+
+    with open(f'spe11b_temperature_l2_diff_{year}y.csv', 'w') as f:
+        print('#', ', '.join(map(str, groups)), file=f)
+        for i, groupI in zip(range(numGroups), groups):
+            print(groupI + ',', ', '.join(map(myStr, l2NormT[i])), file=f)
+
+    with open(f'spe11b_temperature_l2semi_diff_{year}y.csv', 'w') as f:
+        print('#', ', '.join(map(str, groups)), file=f)
+        for i, groupI in zip(range(numGroups), groups):
+            print(groupI + ',', ', '.join(map(myStr, l2SemiNormT[i])), file=f)
 
 
 if __name__ == "__main__":
