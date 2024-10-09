@@ -18,19 +18,19 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 #np.set_printoptions(threshold=sys.maxsize)
 
 def getFieldValues(fileName, nX, nY):
-    p = np.zeros([nY, nX])
-    s = np.zeros([nY, nX])
-    mCO2 = np.zeros([nY, nX])
-    mH2O = np.zeros([nY, nX])
-    rhoG = np.zeros([nY, nX])
-    rhoL = np.zeros([nY, nX])
-    tmCO2 = np.zeros([nY, nX])
-    temp = np.zeros([nY, nX])
+    p = np.zeros([nY, nX]); p[:] = np.nan
+    s = np.zeros([nY, nX]); s[:] = np.nan
+    mCO2 = np.zeros([nY, nX]); mCO2[:] = np.nan
+    mH2O = np.zeros([nY, nX]); mH2O[:] = np.nan
+    rhoG = np.zeros([nY, nX]); rhoG[:] = np.nan
+    rhoL = np.zeros([nY, nX]); rhoL[:] = np.nan
+    tmCO2 = np.zeros([nY, nX]); tmCO2[:] = np.nan
+    temp = np.zeros([nY, nX]); temp[:] = np.nan
 
     if os.path.isfile(fileName):
         print(f'Processing {fileName}.')
     else:
-        print(f'No file {fileName} found. Returning 0 values.')
+        print(f'No file {fileName} found. Returning nans.')
         return p, s, mCO2, mH2O, rhoG, rhoL, tmCO2, temp
 
     skip_header = 0
@@ -65,10 +65,10 @@ def getFieldValues(fileName, nX, nY):
     rhoL[s > 1 - 1e-3] = float('nan')
     mH2O[s < 1e-3] = float('nan')
     mCO2[s > 1 - 1e-3] = float('nan')
-    rhoG[s == float('nan')] = float('nan')
-    rhoL[s == float('nan')] = float('nan')
-    mH2O[s == float('nan')] = float('nan')
-    mCO2[s == float('nan')] = float('nan')
+    rhoG[np.isnan(s)] = float('nan')
+    rhoL[np.isnan(s)] = float('nan')
+    mH2O[np.isnan(s)] = float('nan')
+    mCO2[np.isnan(s)] = float('nan')
     return p, s, mCO2, mH2O, rhoG, rhoL, tmCO2, temp
 
 def plotColorMesh(fig, x, y, z, idx, name, vmin, vmax, pRows, pCols):

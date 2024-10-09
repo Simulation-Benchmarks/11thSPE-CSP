@@ -65,8 +65,8 @@ def calculateL2Differences():
         pI, s, mCO2, mH2O, rhoG, rhoL, tmCO2, tempI = getFieldValues(fileNameI, nX, nY)
 
         # set values to 'nan' for impermeable cells
-        pI[pSLB == float('nan')] = float('nan')
-        tempI[pSLB == float('nan')] = float('nan')
+        pI[np.isnan(pSLB)] = float('nan')
+        tempI[np.isnan(pSLB)] = float('nan')
 
         pIMean = np.nanmean(pI)
         pIVariation = pI - pIMean
@@ -92,6 +92,8 @@ def calculateL2Differences():
 
             fileNameJ = os.path.join(baseFolderJ, f'spe11b_spatial_map_{year}y.csv')
             pJ, s, mCO2, mH2O, rhoG, rhoL, tmCO2, tempJ = getFieldValues(fileNameJ, nX, nY)
+            pJ[np.isnan(pSLB)] = float('nan')
+            tempJ[np.isnan(pSLB)] = float('nan')
 
             pDiff = pI - pJ
             # set difference to zero for impermeable cells

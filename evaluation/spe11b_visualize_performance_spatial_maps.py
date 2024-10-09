@@ -55,7 +55,9 @@ def getFieldValues(fileName, nX, nY):
 
 def plotColorMesh(fig, x, y, z, idx, name, pRows, pCols):
     ax = fig.add_subplot(pRows, pCols, 1 + idx)
-    im = ax.pcolormesh(x, y, z, shading='flat', cmap='viridis')
+    vmin = np.percentile(z, 1)
+    vmax = np.percentile(z, 99)
+    im = ax.pcolormesh(x, y, z, shading='flat', cmap='viridis', vmin=vmin, vmax=vmax)
     ax.axis([x.min(), x.max(), y.min(), y.max()])
     ax.axis('scaled')
     ax.set_title(f'{name}')
@@ -143,10 +145,10 @@ def visualizePerformanceSpatialMaps():
 
         if group[-2] != '-':
             if not groupFolders:
-                baseFolder = os.path.join(folder, group.lower())
+                baseFolder = os.path.join(folder, group.lower(), 'spe11b')
         else:
             if not groupFolders:
-                baseFolder = os.path.join(folder, group[:-2].lower(), f'result{group[-1]}')
+                baseFolder = os.path.join(folder, group[:-2].lower(), 'spe11b', f'result{group[-1]}')
 
         fileName = os.path.join(baseFolder, f'spe11b_performance_spatial_map_{time}y.csv')
         cvol, arat, co2_max_norm_res, h2o_max_norm_res, co2_mb_error, h2o_mb_error, post_est = getFieldValues(fileName, nX, nY)
@@ -160,13 +162,13 @@ def visualizePerformanceSpatialMaps():
             plotColorMesh(fig, x, y, h2o_mb_error, 5, "H2O mass-balance error [-]", pRows, pCols)
             plotColorMesh(fig, x, y, post_est, 6, "a posteriori error estimate [-]", pRows, pCols)
         else:
-            plotColorMesh(figCVol, x, y, cvol, i, group, pRows, pCols)
-            plotColorMesh(figARat, x, y, arat, i, group, pRows, pCols)
-            plotColorMesh(figCO2MNR, x, y, co2_max_norm_res, i, group, pRows, pCols)
-            plotColorMesh(figH2OMNR, x, y, h2o_max_norm_res, i, group, pRows, pCols)
-            plotColorMesh(figCO2MBE, x, y, co2_mb_error, i, group, pRows, pCols)
-            plotColorMesh(figH2OMBE, x, y, h2o_mb_error, i, group, pRows, pCols)
-            plotColorMesh(figPostEst, x, y, post_est, i, group, pRows, pCols)
+            plotColorMesh(figCVol, x, y, np.abs(cvol), i, group, pRows, pCols)
+            plotColorMesh(figARat, x, y, np.abs(arat), i, group, pRows, pCols)
+            plotColorMesh(figCO2MNR, x, y, np.abs(co2_max_norm_res), i, group, pRows, pCols)
+            plotColorMesh(figH2OMNR, x, y, np.abs(h2o_max_norm_res), i, group, pRows, pCols)
+            plotColorMesh(figCO2MBE, x, y, np.abs(co2_mb_error), i, group, pRows, pCols)
+            plotColorMesh(figH2OMBE, x, y, np.abs(h2o_mb_error), i, group, pRows, pCols)
+            plotColorMesh(figPostEst, x, y, np.abs(post_est), i, group, pRows, pCols)
     
     if len(groups) == 1:
         fig.suptitle(f'{groups[0]} at {time} years')
