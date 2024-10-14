@@ -121,13 +121,13 @@ def visualizeSpatialMaps():
     if len(groups) == 1:
         fig = plt.figure(figsize=(14, 8))
     else:
-        figP = plt.figure(figsize=(16, 8))
-        figS = plt.figure(figsize=(16, 8))
-        figMCO2 = plt.figure(figsize=(16, 8))
-        figMH2O = plt.figure(figsize=(16, 8))
-        figRhoG = plt.figure(figsize=(16, 8))
-        figRhoL = plt.figure(figsize=(16, 8))
-        figTmCO2 = plt.figure(figsize=(16, 8))
+        figP = plt.figure(figsize=(15, 9))
+        figS = plt.figure(figsize=(15, 9))
+        figMCO2 = plt.figure(figsize=(15, 9))
+        figMH2O = plt.figure(figsize=(15, 9))
+        figRhoG = plt.figure(figsize=(15, 9))
+        figRhoL = plt.figure(figsize=(15, 9))
+        figTmCO2 = plt.figure(figsize=(15, 9))
 
     if len(groups) == 1:
         pRows = 3
@@ -150,9 +150,16 @@ def visualizeSpatialMaps():
     elif len(groups) < 17:
         pRows = 4
         pCols = 4
-    else:
+    elif len(groups) < 21:
         pRows = 4
         pCols = 5
+    else:
+        pRows = 5
+        pCols = 5
+
+    # select file that contains impermeable cells with 'nan' pressure values
+    fileNameSLB = os.path.join(folder, 'slb', 'spe11a', 'result1', f'spe11a_spatial_map_{time}h.csv')
+    pSLB, s, mCO2, mH2O, rhoG, rhoL, tmCO2 = getFieldValues(fileNameSLB, nX, nY)
 
     for i, group in zip(range(len(groups)), groups):
         if groupFolders:
@@ -167,6 +174,13 @@ def visualizeSpatialMaps():
 
         fileName = os.path.join(baseFolder, f'spe11a_spatial_map_{time}h.csv')
         p, s, mCO2, mH2O, rhoG, rhoL, tmCO2 = getFieldValues(fileName, nX, nY)
+        p[np.isnan(pSLB)] = float('nan')
+        s[np.isnan(pSLB)] = float('nan')
+        mCO2[np.isnan(pSLB)] = float('nan')
+        mH2O[np.isnan(pSLB)] = float('nan')
+        rhoG[np.isnan(pSLB)] = float('nan')
+        rhoL[np.isnan(pSLB)] = float('nan')
+        tmCO2[np.isnan(pSLB)] = float('nan')
 
         if len(groups) == 1:
             # scale pressure to bars
