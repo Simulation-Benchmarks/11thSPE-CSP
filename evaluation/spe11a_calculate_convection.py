@@ -30,6 +30,10 @@ def calculateConvection():
 
     parser.add_argument('-f','--folder', help='path to folder containing group subfolders', required=False)
 
+    parser.add_argument('-nt','--numtimesteps', help='number of time steps excluding the initial one', required=False, type=int, default=120)
+
+    parser.add_argument('-dt','--timestepsize', help='size of the time step in hours between two spatial maps', required=False, type=int, default=1)
+
     cmdArgs = vars(parser.parse_args())
     groups = cmdArgs["groups"]
     groupFolders = cmdArgs["groupfolders"]
@@ -37,18 +41,30 @@ def calculateConvection():
 
     fig, axs = plt.subplots(figsize=(5, 3))
 
+    numGroups = len(groups)
+    numTimeSteps = cmdArgs["numtimesteps"]
+    dt = cmdArgs["timestepsize"]
+    secondsPerHour = 3600
+    table = np.zeros((numTimeSteps+1, numGroups+1))
+    table[:, 0] = range(0, (numTimeSteps*dt+1)*secondsPerHour, dt*secondsPerHour)
+
     nX = 280
     nY = 120
     deltaX = deltaY = 1.0e-2
 
-    for i, group in zip(range(len(groups)), groups):
+    header = 'time [s]'
+    for i, group in zip(range(numGroups), groups):
+        if group[-2] == '-':
+            header = header + ', ' + group[:-2].lower() + group[-1]
+        else:
+            header = header + ', ' + group.lower()
         color = f'C{i}'
 
         if groupFolders:
             baseFolder = groupFolders[i]
 
         integral = []
-        for h in range(121):
+        for hour in range(0, numTimeSteps*dt+1, dt):
             if group[-2] != '-':
                 if not groupFolders:
                     baseFolder = os.path.join(folder, group.lower(), 'spe11a')
@@ -65,7 +81,11 @@ def calculateConvection():
                 elif group[-1] == '3': ls = '-.'
                 elif group[-1] == '4': ls = ':'
 
-            fileName = os.path.join(baseFolder, f'spe11a_spatial_map_{h}h.csv')
+            fileName = os.path.join(baseFolder, f'spe11a_spatial_map_{hour}h.csv')
+            if not os.path.isfile(fileName):
+                integral.append(float('nan'))
+                continue
+
             p, s, mCO2, mH2O, rhoG, rhoL, tmCO2 = getFieldValues(fileName, nX, nY)
             mCO2InBoxC = mCO2[9:41, 109:261]
             pInBoxC = p[9:41, 109:261]
@@ -87,14 +107,18 @@ def calculateConvection():
             norm = np.sqrt((np.square(gradX) + np.square(gradY)))
             integral.append(deltaX*deltaY*np.sum(norm))
 
-        axs.plot(range(121), integral, label=group, color=color, linestyle=ls)
+        axs.plot(range(0, numTimeSteps*dt+1, dt), integral, label=group, color=color, linestyle=ls)
 
-    axs.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+        table[:, i+1] = integral
+
+    axs.legend(loc='center left', bbox_to_anchor=(1, 0.5), ncol=2)
     axs.set_title(r'Box C: convection from spatial maps')
     axs.set_xlabel(r'time [h]')
     axs.set_ylabel(r'$M$ [m]')
     axs.set_xscale('log')
     fig.savefig('spe11a_convection_from_spatial_maps.png', bbox_inches='tight', dpi=300)
+
+    np.savetxt('spe11a_convection_from_spatial_maps.csv', table, fmt='%.5e', delimiter=', ', header=header)
 
 if __name__ == "__main__":
     calculateConvection()
