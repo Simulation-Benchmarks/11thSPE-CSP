@@ -193,7 +193,6 @@ def visualizeSpatialMaps():
         rhoL[np.isnan(pSLB)] = float('nan')
         tmCO2[np.isnan(pSLB)] = float('nan')
 
-
         if len(groups) == 1:
             # scale pressure to bars
             plotColorMesh(fig, x, y, 1e-5*p, 0, "pressure [bar]", 300, 450, pRows, pCols)

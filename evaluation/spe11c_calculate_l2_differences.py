@@ -30,7 +30,7 @@ def getFieldValues(fileName, nX, nY, nZ):
 
     csvData = np.genfromtxt(fileName, delimiter=delimiter, skip_header=skip_header)
     csvData[:,0] = np.around(csvData[:,0], decimals=5)
-    csvData[:,1] = np.around(csvData[:,1], decimals=5)
+    csvData[:,1] = np.around(csvData[:,1], decimals=3)
     csvData[:,2] = np.around(csvData[:,2], decimals=5)
     ind = np.lexsort((csvData[:,2], csvData[:,1], csvData[:,0]))
     csvData = csvData[ind]
