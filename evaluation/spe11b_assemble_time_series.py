@@ -100,7 +100,7 @@ def assembleTimeSeries():
         if len(csvData[0]) > 10:
             axsB[1, 1].plot(t, 1e-6*csvData[:, 10], label=group, color=color, linestyle=ls)
 
-        # scale length to meters
+        # scale length to kilometers
         if len(csvData[0]) > 11:
             axsC.plot(t, 1e-3*csvData[:, 11], label=group, color=color, linestyle=ls)
 
