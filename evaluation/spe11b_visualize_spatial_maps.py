@@ -86,7 +86,7 @@ def plotColorMesh(fig, x, y, z, idx, name, vmin, vmax, pRows, pCols):
     cbformat = matplotlib.ticker.ScalarFormatter()
     cbformat.set_powerlimits((-2,2))
     fig.colorbar(im, cax=cax, orientation='vertical', format=cbformat)
-    fig.tight_layout()#rect=[0, 0.03, 1, 0.95])
+    fig.tight_layout()
 
 
 def visualizeSpatialMaps():
