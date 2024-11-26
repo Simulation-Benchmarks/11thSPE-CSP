@@ -38,6 +38,14 @@ def _get_variant_geo_file(variant: str) -> str:
     return f"spe11{variant.lower()}.geo"
 
 
+def _get_domain_dimensions(variant: str) -> tuple:
+    return {
+        "A": ((0.0, 0.0, 0.0), (2.8, 1.2, 0.0)),
+        "B": ((0.0, 0.0, 0.0), (8400, 1200.0, 0.0)),
+        "C": ((0.0, 0.0, 0.0), (8400.0, 5000.0, 1354.0))
+    }[variant]
+
+
 class StructuredLattice:
     def __init__(self, min: tuple, max: tuple, num_cells: tuple) -> None:
         self._num_cells = num_cells
@@ -284,7 +292,7 @@ gmsh_cell_type = (
 
 physical_index_mapper = PhysicalIndexMapper(variant)
 lattice: StructuredLattice | FilteredLattice = StructuredLattice(
-    *_get_bounding_box(gmsh.model),
+    *_get_domain_dimensions(variant),
     num_cells=num_cells
 )
 num_cells_total = lattice.number_of_cells
