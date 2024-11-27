@@ -121,22 +121,22 @@ def calculateL2Differences():
             groups[i] = groupI[:-2] + groupI[-1]
 
     with open(f'spe11a_pressure_l2_diff_{hour}h.csv', 'w') as f:
-        print('#', ', '.join(map(str, groups)), file=f)
+        print('#, ', ', '.join(map(str, groups)), file=f)
         for i, groupI in zip(range(numGroups), groups):
             print(groupI + ',', ', '.join(map(myStr, l2NormP[i])), file=f)
 
     with open(f'spe11a_pressure_l2semi_diff_{hour}h.csv', 'w') as f:
-        print('#', ', '.join(map(str, groups)), file=f)
+        print('#, ', ', '.join(map(str, groups)), file=f)
         for i, groupI in zip(range(numGroups), groups):
             print(groupI + ',', ', '.join(map(myStr, l2SemiNormP[i])), file=f)
 
     with open(f'spe11a_pressure_h1semi_diff_{hour}h.csv', 'w') as f:
-        print('#', ', '.join(map(str, groups)), file=f)
+        print('#, ', ', '.join(map(str, groups)), file=f)
         for i, groupI in zip(range(numGroups), groups):
             print(groupI + ',', ', '.join(map(myStr, h1SemiNormP[i])), file=f)
 
     with open(f'spe11a_tmco2_l2_diff_{hour}h.csv', 'w') as f:
-        print('#', ', '.join(map(str, groups)), file=f)
+        print('#, ', ', '.join(map(str, groups)), file=f)
         for i, groupI in zip(range(numGroups), groups):
             print(groupI + ',', ', '.join(map(myStr, l2NormM[i])), file=f)
 

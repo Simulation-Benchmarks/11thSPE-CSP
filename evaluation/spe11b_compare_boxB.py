@@ -20,9 +20,12 @@ def compareConvection():
 
     parser.add_argument('-f','--folder', help='path to folder containing group subfolders', required=False)
 
+    parser.add_argument('-t','--tablefolder', help='path to folder containing calculated tables')
+
     cmdArgs = vars(parser.parse_args())
     groups = cmdArgs["groups"]
     folder = cmdArgs["folder"]
+    tableFolder = cmdArgs["tablefolder"]
 
     font = {'size' : 12}
     matplotlib.rc('font', **font)
@@ -32,14 +35,14 @@ def compareConvection():
     figD, axsD = plt.subplots(1, 2, figsize=(9, 3))
     figS, axsS = plt.subplots(1, 2, figsize=(9, 3))
 
-    mobileFromSpatialMapsFileName = 'spe11b_mobile_boxB_from_spatial_maps.csv'
+    mobileFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11b_mobile_boxB_from_spatial_maps.csv')
     mobileFromSpatialMaps = np.genfromtxt(mobileFromSpatialMapsFileName, delimiter=',', names=True)
     tSpatialMaps = mobileFromSpatialMaps['time_s']/60/60/24/365
-    immobileFromSpatialMapsFileName = 'spe11b_immobile_boxB_from_spatial_maps.csv'
+    immobileFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11b_immobile_boxB_from_spatial_maps.csv')
     immobileFromSpatialMaps = np.genfromtxt(immobileFromSpatialMapsFileName, delimiter=',', names=True)
-    dissolvedFromSpatialMapsFileName = 'spe11b_dissolved_boxB_from_spatial_maps.csv'
+    dissolvedFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11b_dissolved_boxB_from_spatial_maps.csv')
     dissolvedFromSpatialMaps = np.genfromtxt(dissolvedFromSpatialMapsFileName, delimiter=',', names=True)
-    sealFromSpatialMapsFileName = 'spe11b_seal_boxB_from_spatial_maps.csv'
+    sealFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11b_seal_boxB_from_spatial_maps.csv')
     sealFromSpatialMaps = np.genfromtxt(sealFromSpatialMapsFileName, delimiter=',', names=True)
 
     for i, group in zip(range(len(groups)), groups):
@@ -90,12 +93,12 @@ def compareConvection():
     axsM[0].set_ylabel(r'mass [kt]')
     axsM[0].set_xscale(r'log')
     axsM[0].set_xlim((1e0, 1e3))
-#    axsM[0].set_ylim((-1e0, 42))
+    axsM[0].set_ylim((-1e-1, 9e0))
     axsM[1].set_title(r'from spatial maps')
     axsM[1].set_ylabel(r'mass [kt]')
     axsM[1].set_xscale(r'log')
     axsM[1].set_xlim((1e0, 1e3))
-#    axsM[1].set_ylim((-1e0, 42))
+    axsM[1].set_ylim((-1e-1, 9e0))
     axsM[1].yaxis.tick_right()
     axsM[1].yaxis.set_label_position('right')
     figM.suptitle(r'Box B: mobile gaseous CO2')
@@ -108,12 +111,12 @@ def compareConvection():
     axsI[0].set_ylabel(r'mass [kt]')
     axsI[0].set_xscale(r'log')
     axsI[0].set_xlim((1e0, 1e3))
-#    axsI[0].set_ylim((-1e-2, 9e-1))
+    axsI[0].set_ylim((-1e-1, 1.5e0))
     axsI[1].set_title(r'from spatial maps')
     axsI[1].set_ylabel(r'mass [kt]')
     axsI[1].set_xscale(r'log')
     axsI[1].set_xlim((1e0, 1e3))
-#    axsI[1].set_ylim((-1e-2, 9e-1))
+    axsI[1].set_ylim((-1e-1, 1.5e0))
     axsI[1].yaxis.tick_right()
     axsI[1].yaxis.set_label_position('right')
     figI.suptitle(r'Box B: immobile gaseous CO2')
@@ -126,12 +129,12 @@ def compareConvection():
     axsD[0].set_ylabel(r'mass [kt]')
     axsD[0].set_xscale(r'log')
     axsD[0].set_xlim((1e0, 1e3))
-#    axsD[0].set_ylim((-5e-1, 1.7e1))
+    axsD[0].set_ylim((-1e-1, 5.0e0))
     axsD[1].set_title(r'from spatial maps')
     axsD[1].set_ylabel(r'mass [kt]')
     axsD[1].set_xscale(r'log')
     axsD[1].set_xlim((1e0, 1e3))
-#    axsD[1].set_ylim((-5e-1, 1.7e1))
+    axsD[1].set_ylim((-1e-1, 5.0e0))
     axsD[1].yaxis.tick_right()
     axsD[1].yaxis.set_label_position('right')
     figD.suptitle(r'Box B: dissolved CO2')
@@ -144,12 +147,12 @@ def compareConvection():
     axsS[0].set_ylabel(r'mass [kt]')
     axsS[0].set_xscale(r'log')
     axsS[0].set_xlim((1e0, 1e3))
-#    axsS[0].set_ylim((-5e-2, 1.0e0))
+    axsS[0].set_ylim((-1e-1, 2.3e0))
     axsS[1].set_title(r'from spatial maps')
     axsS[1].set_ylabel(r'mass [kt]')
     axsS[1].set_xscale(r'log')
     axsS[1].set_xlim((1e0, 1e3))
-#    axsS[1].set_ylim((-5e-2, 1.0e0))
+    axsS[1].set_ylim((-1e-1, 2.3e0))
     axsS[1].yaxis.tick_right()
     axsS[1].yaxis.set_label_position('right')
     figS.suptitle(r'Box B: CO2 in the seal facies')
