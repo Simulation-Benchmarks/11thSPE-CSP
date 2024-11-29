@@ -32,7 +32,12 @@ def getFieldValues(fileName, nX, nY, nZ):
 
     delimiter = ','
 
-    csvData = np.genfromtxt(fileName, delimiter=delimiter, skip_header=skip_header)
+    try:
+        csvData = np.genfromtxt(fileName, delimiter=delimiter, skip_header=skip_header)
+    except:
+        print(f'Reading into table from file {fileName} failed.')
+        return p, mCO2, temp
+
     csvData[:,0] = np.around(csvData[:,0], decimals=5)
     csvData[:,1] = np.around(csvData[:,1], decimals=3)
     csvData[:,2] = np.around(csvData[:,2], decimals=5)
@@ -40,7 +45,7 @@ def getFieldValues(fileName, nX, nY, nZ):
     csvData = csvData[ind]
 
     if len(np.unique(csvData[:,0])) != nX or len(np.unique(csvData[:,1])) != nY:
-        print('Cannot find unique x or y coordinates. Returning nans.')
+        print(f'Cannot find unique x ({len(np.unique(csvData[:,0]))} instead of {nX}) or y ({len(np.unique(csvData[:,1]))} instead of {nY}) coordinates. Returning nans.')
         return p, mCO2, temp
 
     for i in np.arange(0, nX):
@@ -129,6 +134,10 @@ def calculateConvection():
                 continue
 
             p, mCO2, temp = getFieldValues(fileName, nX, nY, nZ)
+            if np.isnan(p).all():
+                integral.append(float('nan'))
+                continue
+                
             mCO2InBoxC = mCO2[66:156, :, 20:50]
             pInBoxC = p[66:156, :, 20:50]
             tInBoxC = temp[66:156, :, 20:50]

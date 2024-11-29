@@ -1,3 +1,8 @@
+# SPDX-FileCopyrightText: 2024 Bernd Flemisch <bernd.flemisch@iws.uni-stuttgart.de>
+#
+# SPDX-License-Identifier: MIT
+#!/usr/bin/env python3
+import os
 import numpy as np
 import argparse
 import matplotlib
@@ -15,10 +20,14 @@ parser = argparse.ArgumentParser(
 
 parser.add_argument('-g','--groups', nargs='+', help='names of groups', required=True)
 
+parser.add_argument('-t','--tablefolder', help='path to folder containing calculated tables')
+
 cmdArgs = vars(parser.parse_args())
 groups = cmdArgs["groups"]
+tableFolder = cmdArgs["tablefolder"]
 
-csvData = np.genfromtxt('spe11c_convection_from_spatial_maps.csv', delimiter=',', skip_header=1)
+fromSpatialMapsFileName = os.path.join(tableFolder, 'spe11c_convection_from_spatial_maps.csv')
+csvData = np.genfromtxt(fromSpatialMapsFileName, delimiter=',', skip_header=1)
 t = csvData[:, 0]/60/60/24/365
 
 fig, axs = plt.subplots(figsize=(5, 3))
@@ -46,4 +55,5 @@ axs.set_title(r'Box C: convection from spatial maps')
 axs.set_xlabel(r'time [y]')
 axs.set_ylabel(r'$M$ [km$^2$]')
 axs.set_xscale('log')
+axs.set_xlim((5e0, 1e3))
 fig.savefig('spe11c_convection_from_spatial_maps.png', bbox_inches='tight', dpi=300)

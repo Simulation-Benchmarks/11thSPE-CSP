@@ -67,8 +67,7 @@ def calculateCO2Distribution():
     nY = 120
     deltaX = deltaY = deltaZ = 1.0e-2
 
-    facies = np.flipud(np.load("spe11b_facies.npy"))
-    facies = facies[:, 1:nX*3:3]
+    facies = np.flipud(np.load("spe11a_facies.npy"))
     porosity = np.zeros((nY, nX))
     porosity[facies == 1] = 0.44
     porosity[facies == 2] = 0.43
