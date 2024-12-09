@@ -20,16 +20,19 @@ def compareConvection():
 
     parser.add_argument('-f','--folder', help='path to folder containing group subfolders', required=False)
 
+    parser.add_argument('-t','--tablefolder', help='path to folder containing calculated tables')
+
     cmdArgs = vars(parser.parse_args())
     groups = cmdArgs["groups"]
     folder = cmdArgs["folder"]
+    tableFolder = cmdArgs["tablefolder"]
 
     font = {'size' : 12}
     matplotlib.rc('font', **font)
 
     fig, axs = plt.subplots(figsize=(5, 3))
 
-    fromSpatialMapsFileName = os.path.join(folder, 'evaluation', 'spe11b_convection_from_spatial_maps.csv')
+    fromSpatialMapsFileName = os.path.join(tableFolder, 'spe11b_convection_from_spatial_maps.csv')
     fromSpatialMaps = np.genfromtxt(fromSpatialMapsFileName, delimiter=',', names=True)
     tSpatialMaps = fromSpatialMaps['time_s']/60/60/24/365
 
@@ -71,9 +74,8 @@ def compareConvection():
     axs.set_xlabel(r'time [y]')
     axs.set_ylabel(r'$M$ [km]')
     axs.set_xscale(r'log')
-    axs.set_yscale(r'log')
-    axs.set_xlim((1e0, 1e3))
-    axs.set_ylim((1e-3, 1.2e1))
+    axs.set_xlim((1e1, 1e3))
+    axs.set_ylim((-1e-1, 8.0e0))
     axs.legend(loc='center left', bbox_to_anchor=(1, 0.5))
     fig.savefig('spe11b_compare_convection.png', bbox_inches='tight', dpi=300)
 

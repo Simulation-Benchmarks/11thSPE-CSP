@@ -35,7 +35,7 @@ def getFieldValues(fileName, nX, nY, nZ):
     try:
         csvData = np.genfromtxt(fileName, delimiter=delimiter, skip_header=skip_header)
     except:
-        print(f'Reading into table from file {fileName} failed.')
+        print(f'Reading into table from file {fileName} failed. Returning nans.')
         return p, mCO2, temp
 
     csvData[:,0] = np.around(csvData[:,0], decimals=5)
@@ -45,15 +45,14 @@ def getFieldValues(fileName, nX, nY, nZ):
     csvData = csvData[ind]
 
     if len(np.unique(csvData[:,0])) != nX or len(np.unique(csvData[:,1])) != nY:
-        print(f'Cannot find unique x ({len(np.unique(csvData[:,0]))} instead of {nX}) or y ({len(np.unique(csvData[:,1]))} instead of {nY}) coordinates. Returning nans.')
+        print(f'Cannot find unique x ({len(np.unique(csvData[:,0]))} instead of {nX})', end=' ')
+        print(f'or y ({len(np.unique(csvData[:,1]))} instead of {nY}) coordinates. Returning nans.')
         return p, mCO2, temp
 
-    for i in np.arange(0, nX):
-        for j in np.arange(0, nY):
-            p[i, j, :] = csvData[(i*nY + j)*nZ:(i*nY + j + 1)*nZ, 3] if len(csvData[0]) > 3 else float('nan')
-            s[i, j, :] = csvData[(i*nY + j)*nZ:(i*nY + j + 1)*nZ, 4] if len(csvData[0]) > 4 else float('nan')
-            mCO2[i, j, :] = csvData[(i*nY + j)*nZ:(i*nY + j + 1)*nZ, 5] if len(csvData[0]) > 5 else float('nan')
-            temp[i, j, :] = csvData[(i*nY + j)*nZ:(i*nY + j + 1)*nZ, 10] if len(csvData[0]) > 10 else float('nan')
+    p = np.reshape(csvData[:, 3], (nX, nY, nZ)) if len(csvData[0]) > 3 else float('nan')
+    s = np.reshape(csvData[:, 4], (nX, nY, nZ)) if len(csvData[0]) > 4 else float('nan')
+    mCO2 = np.reshape(csvData[:, 5], (nX, nY, nZ)) if len(csvData[0]) > 5 else float('nan')
+    temp = np.reshape(csvData[:, 10], (nX, nY, nZ)) if len(csvData[0]) > 10 else float('nan')
 
     p[p < 1e0] = float('nan')
     mCO2[s > 1 - 1e-5] = float('nan')
@@ -101,33 +100,31 @@ def calculateConvection():
 
     header = 'time [s]'
     for i, group in zip(range(numGroups), groups):
-        if group[-2] == '-':
-            header = header + ', ' + group[:-2].lower() + group[-1]
-        else:
-            header = header + ', ' + group.lower()
         color = f'C{i}'
 
         if groupFolders:
             baseFolder = groupFolders[i]
 
+        if group[-2] == '-':
+            header = header + ', ' + group[:-2].lower() + group[-1]
+            if not groupFolders:
+                baseFolder = os.path.join(folder, group[:-2].lower(), 'spe11c', f'result{group[-1]}')
+            if group[:-2].lower() in groups_and_colors:
+                color = groups_and_colors[group[:-2].lower()]
+            if group[-1] == '1': ls = '-'
+            elif group[-1] == '2': ls = '--'
+            elif group[-1] == '3': ls = '-.'
+            elif group[-1] == '4': ls = ':'
+        else:
+            header = header + ', ' + group.lower()
+            if not groupFolders:
+                baseFolder = os.path.join(folder, group.lower(), 'spe11c')
+            if group.lower() in groups_and_colors:
+                color = groups_and_colors[group.lower()]
+            ls = '-'
+
         integral = []
         for year in timeSteps:
-            if group[-2] != '-':
-                if not groupFolders:
-                    baseFolder = os.path.join(folder, group.lower(), 'spe11c')
-                if group.lower() in groups_and_colors:
-                    color = groups_and_colors[group.lower()]
-                ls = '-'
-            else:
-                if not groupFolders:
-                    baseFolder = os.path.join(folder, group[:-2].lower(), 'spe11c', f'result{group[-1]}')
-                if group[:-2].lower() in groups_and_colors:
-                    color = groups_and_colors[group[:-2].lower()]
-                if group[-1] == '1': ls = '-'
-                elif group[-1] == '2': ls = '--'
-                elif group[-1] == '3': ls = '-.'
-                elif group[-1] == '4': ls = ':'
-
             fileName = os.path.join(baseFolder, f'spe11c_spatial_map_{year}y.csv')
             if not os.path.isfile(fileName):
                 integral.append(float('nan'))
@@ -138,9 +135,9 @@ def calculateConvection():
                 integral.append(float('nan'))
                 continue
                 
-            mCO2InBoxC = mCO2[66:156, :, 20:50]
-            pInBoxC = p[66:156, :, 20:50]
-            tInBoxC = temp[66:156, :, 20:50]
+            mCO2InBoxC = mCO2[66:156, :, 13:43]
+            pInBoxC = p[66:156, :, 13:43]
+            tInBoxC = temp[66:156, :, 13:43]
             nXBoxC = len(mCO2InBoxC)
             nYBoxC = len(mCO2InBoxC[0])
             nZBoxC = len(mCO2InBoxC[0][0])
