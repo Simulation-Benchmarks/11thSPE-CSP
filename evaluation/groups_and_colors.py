@@ -2,6 +2,8 @@
 #
 # SPDX-License-Identifier: MIT
 #!/usr/bin/env python3
+import matplotlib
+import matplotlib.pyplot as plt
 
 groups_and_colors = {
     "calgary": "#000000",
@@ -12,7 +14,7 @@ groups_and_colors = {
     "geos": "#FF4A46",
     "ifpen": "#008941",
     "kfupm": "#006FA6",
-    "opengosim": "#FFDBE5",
+    "opengosim": "#EFCBD5",#"#FFDBE5",
     "opm": "#7A4900",
     "pau-inria": "#0000A6",
     "pflotran": "#63FFAC",
@@ -23,3 +25,27 @@ groups_and_colors = {
     "tetratech": "#809693",
     "ut-csee": "#4FC601"
 }
+
+def plotColors():
+    fig, axs = plt.subplots(figsize=(6, 3))
+
+    dx = 0.6
+    pad = 0.5*(1 - dx)
+
+    for i, group in zip(range(len(groups_and_colors)), groups_and_colors):
+        color = groups_and_colors[group]
+        x = (i%6) + pad
+        y = int(i/6) + pad
+
+        rect = matplotlib.patches.Rectangle((x, y), dx, dx, color=color)
+        axs.add_patch(rect)
+        axs.text(x + 0.5*dx, y - 1.1*pad, group, horizontalalignment='center', verticalalignment='bottom')
+
+    axs.set_xlim((0, 6))
+    axs.set_ylim((0, 3))
+    axs.axis('off')
+
+    fig.savefig('groups_and_colors.png', bbox_inches='tight', dpi=300)
+
+if __name__ == "__main__":
+    plotColors()
