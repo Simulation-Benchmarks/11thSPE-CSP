@@ -65,7 +65,7 @@ def calculateL2Differences():
     parser.add_argument('-t','--time', help='time in years', required=True)
 
     cmdArgs = vars(parser.parse_args())
-    groups = cmdArgs["groups"]
+    groups = [x.lower() for x in cmdArgs["groups"]]
     groupFolders = cmdArgs["groupfolders"]
     folder = cmdArgs["folder"]
     year = cmdArgs["time"]
@@ -91,12 +91,12 @@ def calculateL2Differences():
         if groupFolders:
             baseFolder = groupFolders[i]
 
-        if group[-2] != '-':
+        if not group[-1].isnumeric():
             if not groupFolders:
-                baseFolder = os.path.join(folder, group.lower(), 'spe11c')
+                baseFolder = os.path.join(folder, group, 'spe11c')
         else:
             if not groupFolders:
-                baseFolder = os.path.join(folder, group[:-2].lower(), 'spe11c', f'result{group[-1]}')
+                baseFolder = os.path.join(folder, group[:-1], 'spe11c', f'result{group[-1]}')
 
         fileName = os.path.join(baseFolder, f'spe11c_spatial_map_{year}y.csv')
         p[:, i], tmCO2[:, i], temp[:, i] = getFieldValues(fileName, nX, nY, nZ)
@@ -150,10 +150,6 @@ def calculateL2Differences():
             tempVariationDiff = tempIVariation - tempJVariation
             tempVariationDiff = np.nan_to_num(tempVariationDiff)
             l2SemiNormT[i, j] = l2SemiNormT[j, i] = np.sqrt(cellVolume*np.sum(np.square(tempVariationDiff)))
-
-    for i, groupI in zip(range(numGroups), groups):
-        if groupI[-2] == '-':
-            groups[i] = groupI[:-2] + groupI[-1]
 
     with open(f'spe11c_pressure_l2_diff_{year}y.csv', 'w') as f:
         print('#', ', '.join(map(str, groups)), file=f)

@@ -126,7 +126,7 @@ def visualizeSpatialMaps():
 
     cmdArgs = vars(parser.parse_args())
     time = cmdArgs["time"]
-    groups = cmdArgs["groups"]
+    groups = [x.lower() for x in cmdArgs["groups"]]
     groupFolders = cmdArgs["groupfolders"]
     folder = cmdArgs["folder"]
     cutPlane = cmdArgs["cutplane"]
@@ -184,12 +184,12 @@ def visualizeSpatialMaps():
         if groupFolders:
             baseFolder = groupFolders[i]
 
-        if group[-2] != '-':
+        if not group[-1].isnumeric():
             if not groupFolders:
-                baseFolder = os.path.join(folder, group.lower(), 'spe11c')
+                baseFolder = os.path.join(folder, group, 'spe11c')
         else:
             if not groupFolders:
-                baseFolder = os.path.join(folder, group[:-2].lower(), 'spe11c', f'result{group[-1]}')
+                baseFolder = os.path.join(folder, group[:-1], 'spe11c', f'result{group[-1]}')
 
         fileName = os.path.join(baseFolder, f'spe11c_spatial_map_{time}y.csv')
         p3, s3, mCO23, mH2O3, rhoG3, rhoL3, tmCO23, temp3 = getFieldValues(fileName, nX, nY, nZ)

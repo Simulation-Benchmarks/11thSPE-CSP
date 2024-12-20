@@ -23,7 +23,7 @@ def compareConvection():
     parser.add_argument('-t','--tablefolder', help='path to folder containing calculated tables')
 
     cmdArgs = vars(parser.parse_args())
-    groups = cmdArgs["groups"]
+    groups = [x.lower() for x in cmdArgs["groups"]]
     folder = cmdArgs["folder"]
     tableFolder = cmdArgs["tablefolder"]
 
@@ -43,14 +43,14 @@ def compareConvection():
     for i, group in zip(range(len(groups)), groups):
         color = f'C{i}'
 
-        if group[-2] != '-':
-            baseFolder = os.path.join(folder, group.lower(), 'spe11c')
-            if group.lower() in groups_and_colors:
-                color = groups_and_colors[group.lower()]
+        if not group[-1].isnumeric():
+            baseFolder = os.path.join(folder, group, 'spe11c')
+            if group in groups_and_colors:
+                color = groups_and_colors[group]
         else:
-            baseFolder = os.path.join(folder, group[:-2].lower(), 'spe11c', f'result{group[-1]}')
-            if group[:-2].lower() in groups_and_colors:
-                color = groups_and_colors[group[:-2].lower()]
+            baseFolder = os.path.join(folder, group[:-1], 'spe11c', f'result{group[-1]}')
+            if group[:-1] in groups_and_colors:
+                color = groups_and_colors[group[:-1]]
 
         fileName = os.path.join(baseFolder, 'spe11c_time_series.csv')
         print(f'Processing {fileName}.')
@@ -67,7 +67,7 @@ def compareConvection():
         if len(csvData[0]) > 11:
             axs.plot(t, 1e-6*csvData[:, 11], label=group + ' reported', color=color, linestyle='-')
 
-        columnName = group.lower().replace('-', '')
+        columnName = group.replace('-', '')
         axs.plot(tSpatialMaps, 1e-6*fromSpatialMaps[columnName], label=group + ' calculated', color=color, linestyle='--')
 
     axs.set_title(r'Box C: convection')

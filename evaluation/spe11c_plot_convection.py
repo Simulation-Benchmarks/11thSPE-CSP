@@ -23,7 +23,7 @@ parser.add_argument('-g','--groups', nargs='+', help='names of groups', required
 parser.add_argument('-t','--tablefolder', help='path to folder containing calculated tables')
 
 cmdArgs = vars(parser.parse_args())
-groups = cmdArgs["groups"]
+groups = [x.lower() for x in cmdArgs["groups"]]
 tableFolder = cmdArgs["tablefolder"]
 
 fromSpatialMapsFileName = os.path.join(tableFolder, 'spe11c_convection_from_spatial_maps.csv')
@@ -35,13 +35,13 @@ fig, axs = plt.subplots(figsize=(5, 3))
 for i, group in zip(range(len(groups)), groups):
     color = f'C{i}'
 
-    if group[-2] != '-':
-        if group.lower() in groups_and_colors:
-            color = groups_and_colors[group.lower()]
+    if not group[-1].isnumeric():
+        if group in groups_and_colors:
+            color = groups_and_colors[group]
         ls = '-'
     else:
-        if group[:-2].lower() in groups_and_colors:
-            color = groups_and_colors[group[:-2].lower()]
+        if group[:-1] in groups_and_colors:
+            color = groups_and_colors[group[:-1]]
         if group[-1] == '1': ls = '-'
         elif group[-1] == '2': ls = '--'
         elif group[-1] == '3': ls = '-.'

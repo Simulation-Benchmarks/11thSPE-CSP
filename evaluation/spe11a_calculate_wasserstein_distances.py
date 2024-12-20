@@ -23,7 +23,7 @@ def calculateWassersteinDistances():
     parser.add_argument('--hours', nargs='+', help='hour(s) for which to calculate the distances', type=int, required=False, default=24)
 
     cmdArgs = vars(parser.parse_args())
-    groups = cmdArgs["groups"]
+    groups = [x.lower() for x in cmdArgs["groups"]]
     groupFolders = cmdArgs["groupfolders"]
     folder = cmdArgs["folder"]
     hours = cmdArgs["hours"]
@@ -45,10 +45,10 @@ def calculateWassersteinDistances():
                 if groupFolders:
                     baseFolderI = groupFolders[iGroup]
                 else:
-                    if groupI[-2] != '-':
-                        baseFolderI = os.path.join(folder, groupI.lower())
+                    if not groupI[-1].isnumeric():
+                        baseFolderI = os.path.join(folder, groupI)
                     else:
-                        baseFolderI = os.path.join(folder, groupI[:-2].lower(), f'result{groupI[-1]}')
+                        baseFolderI = os.path.join(folder, groupI[:-1], f'result{groupI[-1]}')
 
                 fileNameI = os.path.join(baseFolderI, f'spe11a_spatial_map_{hourI}h.csv')
                 if (os.path.exists(fileNameI)):
@@ -60,10 +60,10 @@ def calculateWassersteinDistances():
                         if groupFolders:
                             baseFolderJ = groupFolders[jGroup]
                         else:
-                            if groupJ[-2] != '-':
-                                baseFolderJ = os.path.join(folder, groupJ.lower())
+                            if not groupJ[-1].isnumeric():
+                                baseFolderJ = os.path.join(folder, groupJ)
                             else:
-                                baseFolderJ = os.path.join(folder, groupJ[:-2].lower(), f'result{groupJ[-1]}')
+                                baseFolderJ = os.path.join(folder, groupJ[:-1], f'result{groupJ[-1]}')
 
                         fileNameJ = os.path.join(baseFolderJ, f'spe11a_spatial_map_{hourJ}h.csv')
                         if (os.path.exists(fileNameJ)):

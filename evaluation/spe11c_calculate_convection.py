@@ -78,7 +78,7 @@ def calculateConvection():
     parser.add_argument('-f','--folder', help='path to folder containing group subfolders', required=False)
 
     cmdArgs = vars(parser.parse_args())
-    groups = cmdArgs["groups"]
+    groups = [x.lower() for x in cmdArgs["groups"]]
     groupFolders = cmdArgs["groupfolders"]
     folder = cmdArgs["folder"]
 
@@ -101,26 +101,25 @@ def calculateConvection():
     header = 'time [s]'
     for i, group in zip(range(numGroups), groups):
         color = f'C{i}'
+        header = header + ', ' + group
 
         if groupFolders:
             baseFolder = groupFolders[i]
 
-        if group[-2] == '-':
-            header = header + ', ' + group[:-2].lower() + group[-1]
+        if group[-1].isnumeric():
             if not groupFolders:
-                baseFolder = os.path.join(folder, group[:-2].lower(), 'spe11c', f'result{group[-1]}')
-            if group[:-2].lower() in groups_and_colors:
-                color = groups_and_colors[group[:-2].lower()]
+                baseFolder = os.path.join(folder, group[:-1], 'spe11c', f'result{group[-1]}')
+            if group[:-1] in groups_and_colors:
+                color = groups_and_colors[group[:-1]]
             if group[-1] == '1': ls = '-'
             elif group[-1] == '2': ls = '--'
             elif group[-1] == '3': ls = '-.'
             elif group[-1] == '4': ls = ':'
         else:
-            header = header + ', ' + group.lower()
             if not groupFolders:
-                baseFolder = os.path.join(folder, group.lower(), 'spe11c')
-            if group.lower() in groups_and_colors:
-                color = groups_and_colors[group.lower()]
+                baseFolder = os.path.join(folder, group, 'spe11c')
+            if group in groups_and_colors:
+                color = groups_and_colors[group]
             ls = '-'
 
         integral = []

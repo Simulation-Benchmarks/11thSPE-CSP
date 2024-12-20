@@ -15,6 +15,8 @@ import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
+import seaborn as sns
+import groups_and_colors
 np.set_printoptions(threshold=sys.maxsize)
 
 def getFieldValues(fileName, nX, nY):
@@ -55,25 +57,38 @@ def getFieldValues(fileName, nX, nY):
         tmCO2[i, :] = csvData[i*nX:(i+1)*nX, 8] if len(csvData[0]) > 8 else 0
         temp[i, :] = csvData[i*nX:(i+1)*nX, 9] if len(csvData[0]) > 9 else 0
 
-    p[p < 1e0] = float('nan')
-    rhoG[rhoG < 1e-5] = float('nan')
-    rhoL[rhoL < 1e-5] = float('nan')
-    rhoG[s < 1e-3] = float('nan')
-    rhoL[s > 1 - 1e-3] = float('nan')
-    mH2O[s < 1e-3] = float('nan')
-    mCO2[s > 1 - 1e-3] = float('nan')
-    rhoG[np.isnan(s)] = float('nan')
-    rhoL[np.isnan(s)] = float('nan')
-    mH2O[np.isnan(s)] = float('nan')
-    mCO2[np.isnan(s)] = float('nan')
+    p[p < 1e0] = np.nan
+    rhoG[rhoG < 1e-5] = np.nan
+    rhoL[rhoL < 1e-5] = np.nan
+    rhoG[s < 1e-3] = -1
+    rhoL[s > 1 - 1e-3] = np.nan
+    mH2O[s < 1e-3] = -1
+    mCO2[s > 1 - 1e-3] = np.nan
+    rhoG[np.isnan(s)] = np.nan
+    rhoL[np.isnan(s)] = np.nan
+    mH2O[np.isnan(s)] = np.nan
+    mCO2[np.isnan(s)] = np.nan
     return p, s, mCO2, mH2O, rhoG, rhoL, tmCO2, temp
 
-def plotColorMesh(fig, x, y, z, idx, name, vmin, vmax, pRows, pCols):
+def plotColorMesh(fig, x, y, z, idx, name, pRows, pCols, cmap='viridis', vmin=None, vmax=None):
+    if isinstance(cmap, str):
+        cmap = matplotlib.colormaps[cmap]
+    cmap.set_bad([0.5, 0.5, 0.5])
+    cmap.set_under([1, 1, 1])
+
+    if not vmin:
+        vmin = np.nanmin(np.where(z > 0, z, np.inf))
+        print(vmin)
+
+    if not vmax:
+        vmax = np.nanmax(z)
+        print(vmax)
+
     ax = fig.add_subplot(pRows, pCols, 1 + idx)
     if vmax == vmin:
-        im = ax.pcolormesh(x, y, z, shading='flat', cmap='viridis')
+        im = ax.pcolormesh(x, y, z, shading='flat', cmap=cmap)
     else:
-        im = ax.pcolormesh(x, y, z, shading='flat', cmap='viridis', vmin=vmin, vmax=vmax)
+        im = ax.pcolormesh(x, y, z, shading='flat', cmap=cmap, vmin=vmin, vmax=vmax)
     ax.axis([x.min(), x.max(), y.min(), y.max()])
     ax.axis('scaled')
     ax.set_title(f'{name}')
@@ -112,7 +127,7 @@ def visualizeSpatialMaps():
 
     cmdArgs = vars(parser.parse_args())
     time = cmdArgs["time"]
-    groups = cmdArgs["groups"]
+    groups = [x.lower() for x in cmdArgs["groups"]]
     groupFolders = cmdArgs["groupfolders"]
     folder = cmdArgs["folder"]
 
@@ -170,41 +185,43 @@ def visualizeSpatialMaps():
 
     # select file that contains impermeable cells with 'nan' pressure values
     fileNameSLB = os.path.join(folder, 'slb', 'spe11b', f'spe11b_spatial_map_{time}y.csv')
-    pSLB, s, mCO2, mH2O, rhoG, rhoL, tmCO2, temp = getFieldValues(fileNameSLB, nX, nY)
+    pSLB, sSLB, mCO2, mH2O, rhoG, rhoL, tmCO2, temp = getFieldValues(fileNameSLB, nX, nY)
 
     for i, group in zip(range(len(groups)), groups):
         if groupFolders:
             baseFolder = groupFolders[i]
 
-        if group[-2] != '-':
+        if not group[-1].isnumeric():
             if not groupFolders:
-                baseFolder = os.path.join(folder, group.lower(), 'spe11b')
+                baseFolder = os.path.join(folder, group, 'spe11b')
         else:
             if not groupFolders:
-                baseFolder = os.path.join(folder, group[:-2].lower(), 'spe11b', f'result{group[-1]}')
+                baseFolder = os.path.join(folder, group[:-1], 'spe11b', f'result{group[-1]}')
 
         fileName = os.path.join(baseFolder, f'spe11b_spatial_map_{time}y.csv')
         p, s, mCO2, mH2O, rhoG, rhoL, tmCO2, temp = getFieldValues(fileName, nX, nY)
-        p[np.isnan(pSLB)] = float('nan')
-        s[np.isnan(pSLB)] = float('nan')
-        mCO2[np.isnan(pSLB)] = float('nan')
-        mH2O[np.isnan(pSLB)] = float('nan')
-        rhoG[np.isnan(pSLB)] = float('nan')
-        rhoL[np.isnan(pSLB)] = float('nan')
-        tmCO2[np.isnan(pSLB)] = float('nan')
+        p[np.isnan(pSLB)] = np.nan
+        s[np.isnan(pSLB)] = np.nan
+        mCO2[np.isnan(pSLB)] = np.nan
+        mH2O[np.isnan(pSLB)] = np.nan
+        rhoG[np.isnan(pSLB)] = np.nan
+        rhoL[np.isnan(pSLB)] = np.nan
+        tmCO2[np.isnan(pSLB)] = np.nan
+
+        cmap = groups_and_colors.mass_cmap
 
         if len(groups) == 1:
             # scale pressure to bars
-            plotColorMesh(fig, x, y, 1e-5*p, 0, "pressure [bar]", 300, 450, pRows, pCols)
-            plotColorMesh(fig, x, y, s, 1, "gas saturation [-]", 0, 1, pRows, pCols)
+            plotColorMesh(fig, x, y, 1e-5*p, 0, "pressure [bar]", pRows, pCols)
+            plotColorMesh(fig, x, y, s, 1, "gas saturation [-]", pRows, pCols, cmap)
             # scale mass fractions to g/kg
-            plotColorMesh(fig, x, y, 1e3*mCO2, 2, "CO2 mass frac in liquid [g/kg]", 0, 70, pRows, pCols)
-            plotColorMesh(fig, x, y, 1e3*mH2O, 3, "H2O mass frac in gas [g/kg]", 0, 4, pRows, pCols)
-            plotColorMesh(fig, x, y, rhoG, 4, "gas phase density [kg/m3]", 0.85e3, 1.05e3, pRows, pCols)
-            plotColorMesh(fig, x, y, rhoL, 5, "liquid phase density [kg/m3]", 0.99e3, 1.025e3, pRows, pCols)
+            plotColorMesh(fig, x, y, 1e3*mCO2, 2, "CO2 mass frac in liquid [g/kg]", pRows, pCols, cmap)
+            plotColorMesh(fig, x, y, 1e3*mH2O, 3, "H2O mass frac in gas [g/kg]", pRows, pCols, 'icefire')
+            plotColorMesh(fig, x, y, rhoG, 4, "gas phase density [kg/m3]", pRows, pCols, 'icefire')
+            plotColorMesh(fig, x, y, rhoL, 5, "liquid phase density [kg/m3]", pRows, pCols, 'icefire')
             # scale mass to tons
-            plotColorMesh(fig, x, y, 1e-3*tmCO2, 6, "total CO2 mass [t]", 0, 25, pRows, pCols)
-            plotColorMesh(fig, x, y, temp, 7, "temperature [°C]", 15, 70, pRows, pCols)
+            plotColorMesh(fig, x, y, 1e-3*tmCO2, 6, "total CO2 mass [t]", pRows, pCols, cmap)
+            plotColorMesh(fig, x, y, temp, 7, "temperature [°C]", pRows, pCols, 'coolwarm')
         else:
             # scale pressure to bars
             plotColorMesh(figP, x, y, 1e-5*p, i, group, 200, 500, pRows, pCols)

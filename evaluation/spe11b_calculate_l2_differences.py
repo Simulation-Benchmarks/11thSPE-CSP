@@ -30,7 +30,7 @@ def calculateL2Differences():
     parser.add_argument('-t','--time', help='time in years', required=True)
 
     cmdArgs = vars(parser.parse_args())
-    groups = cmdArgs["groups"]
+    groups = [x.lower() for x in cmdArgs["groups"]]
     groupFolders = cmdArgs["groupfolders"]
     folder = cmdArgs["folder"]
     year = cmdArgs["time"]
@@ -55,15 +55,22 @@ def calculateL2Differences():
         if groupFolders:
             baseFolderI = groupFolders[i]
 
-        if groupI[-2] != '-':
+        if not groupI[-1].isnumeric():
             if not groupFolders:
-                baseFolderI = os.path.join(folder, groupI.lower(), 'spe11b')
+                baseFolderI = os.path.join(folder, groupI, 'spe11b')
         else:
             if not groupFolders:
-                baseFolderI = os.path.join(folder, groupI[:-2].lower(), 'spe11b', f'result{groupI[-1]}')
+                baseFolderI = os.path.join(folder, groupI[:-1], 'spe11b', f'result{groupI[-1]}')
 
+        fileNameI0 = os.path.join(baseFolderI, f'spe11b_spatial_map_0y.csv')
+        pI, s, mCO2, mH2O, rhoG, rhoL, tmCO2I0, tempI = getFieldValues(fileNameI0, nX, nY)
+ 
         fileNameI = os.path.join(baseFolderI, f'spe11b_spatial_map_{year}y.csv')
         pI, s, mCO2, mH2O, rhoG, rhoL, tmCO2I, tempI = getFieldValues(fileNameI, nX, nY)
+
+        # subtract possibly added initial artificial CO2 mass
+        tmCO2I = tmCO2I - tmCO2I0
+        tmCO2I[tmCO2I < 0] = 0
 
         # set values to 'nan' for impermeable cells
         pI[np.isnan(pSLB)] = float('nan')
@@ -84,15 +91,23 @@ def calculateL2Differences():
             if groupFolders:
                 baseFolderJ = groupFolders[j]
 
-            if groupJ[-2] != '-':
+            if not groupJ[-1].isnumeric():
                 if not groupFolders:
-                    baseFolderJ = os.path.join(folder, groupJ.lower(), 'spe11b')
+                    baseFolderJ = os.path.join(folder, groupJ, 'spe11b')
             else:
                 if not groupFolders:
-                    baseFolderJ = os.path.join(folder, groupJ[:-2].lower(), 'spe11b', f'result{groupJ[-1]}')
+                    baseFolderJ = os.path.join(folder, groupJ[:-1], 'spe11b', f'result{groupJ[-1]}')
 
+            fileNameJ0 = os.path.join(baseFolderJ, f'spe11b_spatial_map_0y.csv')
+            pJ, s, mCO2, mH2O, rhoG, rhoL, tmCO2J0, tempJ = getFieldValues(fileNameJ0, nX, nY)
+ 
             fileNameJ = os.path.join(baseFolderJ, f'spe11b_spatial_map_{year}y.csv')
             pJ, s, mCO2, mH2O, rhoG, rhoL, tmCO2J, tempJ = getFieldValues(fileNameJ, nX, nY)
+
+            # subtract possibly added initial artificial CO2 mass
+            tmCO2J = tmCO2J - tmCO2J0
+            tmCO2J[tmCO2J < 0] = 0
+
             pJ[np.isnan(pSLB)] = float('nan')
             tmCO2J[np.isnan(pSLB)] = float('nan')
 
@@ -129,10 +144,6 @@ def calculateL2Differences():
             gradXDiff = np.nan_to_num(gradXDiff)
             gradYDiff = np.nan_to_num(gradYDiff)
             h1SemiNormP[i, j] = h1SemiNormP[j, i] = np.sqrt(deltaX*deltaY*(np.sum(np.square(gradXDiff)) + np.sum(np.square(gradYDiff))))
-
-    for i, groupI in zip(range(numGroups), groups):
-        if groupI[-2] == '-':
-            groups[i] = groupI[:-2] + groupI[-1]
 
     with open(f'spe11b_pressure_l2_diff_{year}y.csv', 'w') as f:
         print('#', ', '.join(map(str, groups)), file=f)

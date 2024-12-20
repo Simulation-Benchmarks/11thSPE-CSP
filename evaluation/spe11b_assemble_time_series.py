@@ -17,16 +17,25 @@ def assembleTimeSeries():
                     "as required by the CSP description."
     )
 
-    parser.add_argument('-g','--groups', nargs='+', help='names of groups', required=True)
+    parser.add_argument('-g','--groups', nargs='+', help='names of groups, taking reported numbers', required=True)
 
     parser.add_argument('-gf','--groupfolders', nargs='+', help='paths to group folders', required=False)
 
     parser.add_argument('-f','--folder', help='path to folder containing group subfolders', required=False)
 
+    parser.add_argument('-c','--calculated', nargs='+', help='names of groups, taking calculated numbers for Boxes A and B')
+
+    parser.add_argument('-t','--tablefolder', help='path to folder containing calculated tables')
+
     cmdArgs = vars(parser.parse_args())
-    groups = cmdArgs["groups"]
+    groups = [x.lower() for x in [x.lower() for x in cmdArgs["groups"]]]
     groupFolders = cmdArgs["groupfolders"]
     folder = cmdArgs["folder"]
+    calculated = []
+    if cmdArgs["calculated"]:
+        calculated = [x.lower() for x in cmdArgs["calculated"]]
+        groups = sorted(groups + calculated)
+        tableFolder = cmdArgs["tablefolder"]
 
     font = {'size' : 12}
     matplotlib.rc('font', **font)
@@ -37,23 +46,46 @@ def assembleTimeSeries():
     figC, axsC = plt.subplots(figsize=(5, 3))
     figT, axsT = plt.subplots(1, 2, figsize=(9, 3))
 
+    if calculated:
+        mobileFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11b_mobile_boxA_from_spatial_maps.csv')
+        mobileFromSpatialMapsA = np.genfromtxt(mobileFromSpatialMapsFileName, delimiter=',', names=True)
+        tSpatialMaps = mobileFromSpatialMapsA['time_s']/60/60/24/365
+        immobileFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11b_immobile_boxA_from_spatial_maps.csv')
+        immobileFromSpatialMapsA = np.genfromtxt(immobileFromSpatialMapsFileName, delimiter=',', names=True)
+        dissolvedFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11b_dissolved_boxA_from_spatial_maps.csv')
+        dissolvedFromSpatialMapsA = np.genfromtxt(dissolvedFromSpatialMapsFileName, delimiter=',', names=True)
+        sealFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11b_seal_boxA_from_spatial_maps.csv')
+        sealFromSpatialMapsA = np.genfromtxt(sealFromSpatialMapsFileName, delimiter=',', names=True)
+
+        mobileFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11b_mobile_boxB_from_spatial_maps.csv')
+        mobileFromSpatialMapsB = np.genfromtxt(mobileFromSpatialMapsFileName, delimiter=',', names=True)
+        immobileFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11b_immobile_boxB_from_spatial_maps.csv')
+        immobileFromSpatialMapsB = np.genfromtxt(immobileFromSpatialMapsFileName, delimiter=',', names=True)
+        dissolvedFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11b_dissolved_boxB_from_spatial_maps.csv')
+        dissolvedFromSpatialMapsB = np.genfromtxt(dissolvedFromSpatialMapsFileName, delimiter=',', names=True)
+        sealFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11b_seal_boxB_from_spatial_maps.csv')
+        sealFromSpatialMapsB = np.genfromtxt(sealFromSpatialMapsFileName, delimiter=',', names=True)
+
+        convectionFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11b_convection_from_spatial_maps.csv')
+        convectionFromSpatialMaps = np.genfromtxt(convectionFromSpatialMapsFileName, delimiter=',', names=True)
+
     for i, group in zip(range(len(groups)), groups):
         color = f'C{i}'
 
         if groupFolders:
             baseFolder = groupFolders[i]
 
-        if group[-2] != '-':
+        if not group[-1].isnumeric():
             if not groupFolders:
-                baseFolder = os.path.join(folder, group.lower(), 'spe11b')
-            if group.lower() in groups_and_colors:
-                color = groups_and_colors[group.lower()]
+                baseFolder = os.path.join(folder, group, 'spe11b')
+            if group in groups_and_colors:
+                color = groups_and_colors[group]
             ls = '-'
         else:
             if not groupFolders:
-                baseFolder = os.path.join(folder, group[:-2].lower(), 'spe11b', f'result{group[-1]}')
-            if group[:-2].lower() in groups_and_colors:
-                color = groups_and_colors[group[:-2].lower()]
+                baseFolder = os.path.join(folder, group[:-1], 'spe11b', f'result{group[-1]}')
+            if group[:-1] in groups_and_colors:
+                color = groups_and_colors[group[:-1]]
             if group[-1] == '1': ls = '-'
             elif group[-1] == '2': ls = '--'
             elif group[-1] == '3': ls = '-.'
@@ -79,29 +111,36 @@ def assembleTimeSeries():
             axsP[1].plot(t, 1e-5*csvData[:, 2], label=group, color=color, linestyle=ls)
 
         # scale mass to kilotons
-        if len(csvData[0]) > 3:
+        if group in calculated:
+            columnName = group.replace('-', '')
+            axsA[0, 0].plot(tSpatialMaps, 1e-6*mobileFromSpatialMapsA[columnName], label=group + r'$^*$', color=color, linestyle=ls)
+            axsA[0, 1].plot(tSpatialMaps, 1e-6*immobileFromSpatialMapsA[columnName], label=group + r'$^*$', color=color, linestyle=ls)
+            axsA[1, 0].plot(tSpatialMaps, 1e-6*dissolvedFromSpatialMapsA[columnName], label=group + r'$^*$', color=color, linestyle=ls)
+            axsA[1, 1].plot(tSpatialMaps, 1e-6*sealFromSpatialMapsA[columnName], label=group + r'$^*$', color=color, linestyle=ls)
+        else:
             axsA[0, 0].plot(t, 1e-6*csvData[:, 3], label=group, color=color, linestyle=ls)
-        if len(csvData[0]) > 4:
             axsA[0, 1].plot(t, 1e-6*csvData[:, 4], label=group, color=color, linestyle=ls)
-        if len(csvData[0]) > 5:
             axsA[1, 0].plot(t, 1e-6*csvData[:, 5], label=group, color=color, linestyle=ls)
-        if len(csvData[0]) > 6:
             axsA[1, 1].plot(t, 1e-6*csvData[:, 6], label=group, color=color, linestyle=ls)
-        # detect if immobile CO2 has been evaluated wrong potentially
-        if max(1e-6*csvData[:, 4]) > 1:
-            print(f"{group} potentially used inconsistent evaluation of immobile CO2.")
+            # detect if immobile CO2 has been evaluated wrong potentially
+            if max(1e-6*csvData[:, 4]) > 1:
+                print(f"{group} potentially used inconsistent evaluation of immobile CO2.")
 
-        if len(csvData[0]) > 7:
+        if group in calculated:
+            axsB[0, 0].plot(tSpatialMaps, 1e-6*mobileFromSpatialMapsB[columnName], label=group + r'$^*$', color=color, linestyle=ls)
+            axsB[0, 1].plot(tSpatialMaps, 1e-6*immobileFromSpatialMapsB[columnName], label=group + r'$^*$', color=color, linestyle=ls)
+            axsB[1, 0].plot(tSpatialMaps, 1e-6*dissolvedFromSpatialMapsB[columnName], label=group + r'$^*$', color=color, linestyle=ls)
+            axsB[1, 1].plot(tSpatialMaps, 1e-6*sealFromSpatialMapsB[columnName], label=group + r'$^*$', color=color, linestyle=ls)
+        else:
             axsB[0, 0].plot(t, 1e-6*csvData[:, 7], label=group, color=color, linestyle=ls)
-        if len(csvData[0]) > 8:
             axsB[0, 1].plot(t, 1e-6*csvData[:, 8], label=group, color=color, linestyle=ls)
-        if len(csvData[0]) > 9:
             axsB[1, 0].plot(t, 1e-6*csvData[:, 9], label=group, color=color, linestyle=ls)
-        if len(csvData[0]) > 10:
             axsB[1, 1].plot(t, 1e-6*csvData[:, 10], label=group, color=color, linestyle=ls)
 
         # scale length to kilometers
-        if len(csvData[0]) > 11:
+        if group in calculated:
+            axsC.plot(tSpatialMaps, 1e-3*convectionFromSpatialMaps[columnName], label=group + r'$^*$', color=color, linestyle=ls)
+        else:
             axsC.plot(t, 1e-3*csvData[:, 11], label=group, color=color, linestyle=ls)
 
         # scale mass to tons
@@ -115,7 +154,6 @@ def assembleTimeSeries():
     axsP[0].set_ylabel(r'pressure [bar]')
     axsP[0].set_xscale(r'log')
     axsP[0].set_xlim((1e0, 1e3))
-    #axsP[0].set_ylim((270, 450))
     axsP[1].set_title(r'sensor 2')
     axsP[1].set_xlabel(r'time [y]')
     axsP[1].set_xscale(r'log')
@@ -123,20 +161,17 @@ def assembleTimeSeries():
     axsP[1].yaxis.tick_right()
     axsP[1].yaxis.set_label_position('right')
     axsP[1].set_xlim((1e0, 1e3))
-    #axsP[1].set_ylim((210, 400))
     handles, labels = axsP[1].get_legend_handles_labels()
-    figP.legend(handles, labels, loc='center left', bbox_to_anchor=(1, 0.5))
+    figP.legend(handles, labels, loc='center left', bbox_to_anchor=(1, 0.5), ncols=2)
     figP.tight_layout()
-    figP.savefig('spe11b_time_series_pressure.png', bbox_inches='tight', dpi=300)
+    figP.savefig('spe11b_time_series_pressure.png', bbox_inches='tight', dpi=120)
 
     axsA[0, 0].set_title(r'Box A: mobile gaseous CO2')
     axsA[0, 0].set_ylabel(r'mass [kt]')
-    axsA[0, 0].set_ylim(-0.5, 4e1)
     axsA[0, 0].set_xticklabels([])
     axsA[0, 0].set_xscale(r'log')
     axsA[0, 0].set_xlim((1e0, 1e3))
     axsA[0, 1].set_title(r'Box A: immobile gaseous CO2')
-#    axsA[0, 1].set_ylim(0, 6e0)
     axsA[0, 1].set_xticklabels([])
     axsA[0, 1].set_ylabel(r'mass [kt]')
     axsA[0, 1].yaxis.tick_right()
@@ -146,28 +181,28 @@ def assembleTimeSeries():
     axsA[1, 0].set_title(r'Box A: dissolved CO2')
     axsA[1, 0].set_xlabel(r'time [y]')
     axsA[1, 0].set_ylabel(r'mass [kt]')
-    axsA[1, 0].set_ylim(0, 1e1)
     axsA[1, 0].set_xscale(r'log')
     axsA[1, 0].set_xlim((1e0, 1e3))
     axsA[1, 1].set_title(r'Box A: CO2 in the seal facies')
     axsA[1, 1].set_xlabel(r'time [y]')
-    axsA[1, 1].set_ylim(0, 2e-1)
+    axsA[1, 1].set_ylim(0, 5.0e-1)
     axsA[1, 1].set_ylabel(r'mass [kt]')
     axsA[1, 1].yaxis.tick_right()
     axsA[1, 1].yaxis.set_label_position('right')
     axsA[1, 1].set_xscale(r'log')
     axsA[1, 1].set_xlim((1e0, 1e3))
+    if calculated:
+        axsA[1, 1].plot([], [], ' ', label=r'$^*$from dense data')
     handles, labels = axsA[1][1].get_legend_handles_labels()
-    figA.legend(handles, labels, loc='center left', bbox_to_anchor=(1, 0.5))
+    figA.legend(handles, labels, loc='center left', bbox_to_anchor=(1, 0.5), ncols=2)
     figA.tight_layout()
-    figA.savefig('spe11b_time_series_boxA.png', bbox_inches='tight', dpi=300)
+    figA.savefig('spe11b_time_series_boxA.png', bbox_inches='tight', dpi=120)
 
     axsB[0, 0].set_title(r'Box B: mobile gaseous CO2')
     axsB[0, 0].set_ylabel(r'mass [kt]')
     axsB[0, 0].set_xticklabels([])
     axsB[0, 0].set_xscale(r'log')
     axsB[0, 0].set_xlim((1e1, 1e3))
-    axsB[0, 0].set_ylim((0, 4))
     axsB[0, 1].set_title(r'Box B: immobile gaseous CO2')
     axsB[0, 1].set_xticklabels([])
     axsB[0, 1].set_ylabel(r'mass [kt]')
@@ -175,13 +210,11 @@ def assembleTimeSeries():
     axsB[0, 1].yaxis.set_label_position('right')
     axsB[0, 1].set_xscale(r'log')
     axsB[0, 1].set_xlim((1e1, 1e3))
-    axsB[0, 1].set_ylim((0, 3))
     axsB[1, 0].set_title(r'Box B: dissolved CO2')
     axsB[1, 0].set_xlabel(r'time [y]')
     axsB[1, 0].set_ylabel(r'mass [kt]')
     axsB[1, 0].set_xscale(r'log')
     axsB[1, 0].set_xlim((1e1, 1e3))
-    axsB[1, 0].set_ylim((0, 3))
     axsB[1, 1].set_title(r'Box B: CO2 in the seal facies')
     axsB[1, 1].set_xlabel(r'time [y]')
     axsB[1, 1].set_ylabel(r'mass [kt]')
@@ -189,11 +222,13 @@ def assembleTimeSeries():
     axsB[1, 1].yaxis.set_label_position('right')
     axsB[1, 1].set_xscale(r'log')
     axsB[1, 1].set_xlim((1e1, 1e3))
-    axsB[1, 1].set_ylim((0, 0.1))
+    axsB[1, 1].set_ylim((0, 3.0e-1))
+    if calculated:
+        axsB[1, 1].plot([], [], ' ', label=r'$^*$from dense data')
     handles, labels = axsB[1][1].get_legend_handles_labels()
-    figB.legend(handles, labels, loc='center left', bbox_to_anchor=(1, 0.5))
+    figB.legend(handles, labels, loc='center left', bbox_to_anchor=(1, 0.5), ncols=2)
     figB.tight_layout()
-    figB.savefig('spe11b_time_series_boxB.png', bbox_inches='tight', dpi=300)
+    figB.savefig('spe11b_time_series_boxB.png', bbox_inches='tight', dpi=120)
 
     axsC.set_title(r'Box C: convection')
     axsC.set_xlabel(r'time [y]')
@@ -201,27 +236,29 @@ def assembleTimeSeries():
     axsC.set_xscale(r'log')
     axsC.set_xlim((1e1, 1e3))
     axsC.set_ylim((0, 20))
-    axsC.legend(loc='center left', bbox_to_anchor=(1, 0.5))
-    figC.savefig('spe11b_time_series_boxC.png', bbox_inches='tight', dpi=300)
+    if calculated:
+        axsC.plot([], [], ' ', label=r'$^*$from dense data')
+    axsC.legend(loc='center left', bbox_to_anchor=(1, 0.5), ncols=2)
+    figC.savefig('spe11b_time_series_boxC.png', bbox_inches='tight', dpi=120)
 
     axsT[0].set_title(r'CO2 in sealing units')
     axsT[0].set_xlabel(r'time [y]')
     axsT[0].set_ylabel(r'mass [t]')
-    axsT[0].set_ylim(0, 1e3)
+#    axsT[0].set_ylim(0, 1e3)
     axsT[0].set_xscale(r'log')
     axsT[0].set_xlim((1e0, 1e3))
     axsT[1].set_title(r'CO2 in boundary volumes')
     axsT[1].set_xlabel(r'time [y]')
     axsT[1].set_ylabel(r'mass [t]')
-    axsT[1].set_ylim(0, 1e2)
+#    axsT[1].set_ylim(0, 1e2)
     axsT[1].set_xscale(r'log')
     axsT[1].yaxis.tick_right()
     axsT[1].yaxis.set_label_position('right')
     axsT[1].set_xlim((5e2, 1e3))
     handles, labels = axsT[1].get_legend_handles_labels()
-    figT.legend(handles, labels, loc='center left', bbox_to_anchor=(1, 0.5))
+    figT.legend(handles, labels, loc='center left', bbox_to_anchor=(1, 0.5), ncols=2)
     figT.tight_layout()
-    figT.savefig('spe11b_time_series_seal.png', bbox_inches='tight', dpi=300)
+    figT.savefig('spe11b_time_series_seal.png', bbox_inches='tight', dpi=120)
 
 if __name__ == "__main__":
     assembleTimeSeries()

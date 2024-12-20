@@ -15,7 +15,7 @@ parser = argparse.ArgumentParser(
 parser.add_argument('-g','--groups', nargs='+', help='names of groups', required=True)
 
 cmdArgs = vars(parser.parse_args())
-groups = cmdArgs["groups"]
+groups = [x.lower() for x in cmdArgs["groups"]]
 
 mobileData = np.genfromtxt('spe11b_mobile_boxA_from_spatial_maps.csv', delimiter=',', skip_header=1)
 immobileData = np.genfromtxt('spe11b_immobile_boxA_from_spatial_maps.csv', delimiter=',', skip_header=1)
@@ -28,13 +28,13 @@ figA, axsA = plt.subplots(2, 2, figsize=(9, 6))
 for i, group in zip(range(len(groups)), groups):
     color = f'C{i}'
 
-    if group[-2] != '-':
-        if group.lower() in groups_and_colors:
-            color = groups_and_colors[group.lower()]
+    if not group[-1].isnumeric():
+        if group in groups_and_colors:
+            color = groups_and_colors[group]
         ls = '-'
     else:
-        if group[:-2].lower() in groups_and_colors:
-            color = groups_and_colors[group[:-2].lower()]
+        if group[:-1] in groups_and_colors:
+            color = groups_and_colors[group[:-1]]
         if group[-1] == '1': ls = '-'
         elif group[-1] == '2': ls = '--'
         elif group[-1] == '3': ls = '-.'

@@ -35,7 +35,7 @@ def calculateCO2Distribution():
     parser.add_argument('-dt','--timestepsize', help='size of the time step in years between two spatial maps', required=False, type=int, default=5)
 
     cmdArgs = vars(parser.parse_args())
-    groups = cmdArgs["groups"]
+    groups = [x.lower() for x in cmdArgs["groups"]]
     groupFolders = cmdArgs["groupfolders"]
     folder = cmdArgs["folder"]
 
@@ -83,14 +83,39 @@ def calculateCO2Distribution():
 
     header = 'time [s]'
     for i, group in zip(range(numGroups), groups):
-        if group[-2] == '-':
-            header = header + ', ' + group[:-2].lower() + group[-1]
-        else:
-            header = header + ', ' + group.lower()
         color = f'C{i}'
+        header = header + ', ' + group
 
         if groupFolders:
             baseFolder = groupFolders[i]
+
+        if not group[-1].isnumeric():
+            if not groupFolders:
+                baseFolder = os.path.join(folder, group, 'spe11b')
+            if group in groups_and_colors:
+                color = groups_and_colors[group]
+            ls = '-'
+        else:
+            if not groupFolders:
+                baseFolder = os.path.join(folder, group[:-1], 'spe11b', f'result{group[-1]}')
+            if group[:-1] in groups_and_colors:
+                color = groups_and_colors[group[:-1]]
+            if group[-1] == '1': ls = '-'
+            elif group[-1] == '2': ls = '--'
+            elif group[-1] == '3': ls = '-.'
+            elif group[-1] == '4': ls = ':'
+
+        # get baseline of mass quantities
+        fileName = os.path.join(baseFolder, f'spe11b_spatial_map_0y.csv')
+        p, s, mCO2, mH2O, rhoG, rhoL, tmCO2, temp = getFieldValues(fileName, nX, nY)
+        mCO2InBoxA0 = np.nan_to_num(mCO2[0:60, 329:830])
+        sInBoxA0 = np.nan_to_num(s[0:60, 329:830])
+        nXBoxA = len(mCO2InBoxA0[0])
+        nYBoxA = len(mCO2InBoxA0)
+        mCO2InBoxB0 = np.nan_to_num(mCO2[59:120, 99:330])
+        sInBoxB0 = np.nan_to_num(s[59:120, 99:330])
+        nXBoxB = len(mCO2InBoxB0[0])
+        nYBoxB = len(mCO2InBoxB0)
 
         mobileA = []
         immobileA = []
@@ -101,22 +126,6 @@ def calculateCO2Distribution():
         dissolvedB = []
         sealB = []
         for year in range(0, numTimeSteps*dt+1, dt):
-            if group[-2] != '-':
-                if not groupFolders:
-                    baseFolder = os.path.join(folder, group.lower(), 'spe11b')
-                if group.lower() in groups_and_colors:
-                    color = groups_and_colors[group.lower()]
-                ls = '-'
-            else:
-                if not groupFolders:
-                    baseFolder = os.path.join(folder, group[:-2].lower(), 'spe11b', f'result{group[-1]}')
-                if group[:-2].lower() in groups_and_colors:
-                    color = groups_and_colors[group[:-2].lower()]
-                if group[-1] == '1': ls = '-'
-                elif group[-1] == '2': ls = '--'
-                elif group[-1] == '3': ls = '-.'
-                elif group[-1] == '4': ls = ':'
-
             fileName = os.path.join(baseFolder, f'spe11b_spatial_map_{year}y.csv')
             if not os.path.isfile(fileName):
                 mobileA.append(float('nan'))
@@ -131,19 +140,19 @@ def calculateCO2Distribution():
 
             p, s, mCO2, mH2O, rhoG, rhoL, tmCO2, temp = getFieldValues(fileName, nX, nY)
             mCO2InBoxA = np.nan_to_num(mCO2[0:60, 329:830])
-            mH2OInBoxA = np.nan_to_num(mH2O[0:60, 329:830])
+            mH2OInBoxA = np.nan_to_num(mH2O[0:60, 329:830]) - mCO2InBoxA0
+            mCO2InBoxA[mCO2InBoxA < 0] = 0
             rhoGInBoxA = np.nan_to_num(rhoG[0:60, 329:830])
             rhoLInBoxA = np.nan_to_num(rhoL[0:60, 329:830])
-            sInBoxA = np.nan_to_num(s[0:60, 329:830])
-            nXBoxA = len(mCO2InBoxA[0])
-            nYBoxA = len(mCO2InBoxA)
-            mCO2InBoxB = np.nan_to_num(mCO2[59:120, 99:330])
+            sInBoxA = np.nan_to_num(s[0:60, 329:830]) - sInBoxA0
+            sInBoxA[sInBoxA < 0] = 0
+            mCO2InBoxB = np.nan_to_num(mCO2[59:120, 99:330]) - mCO2InBoxB0
+            mCO2InBoxB[mCO2InBoxB < 0] = 0
             mH2OInBoxB = np.nan_to_num(mH2O[59:120, 99:330])
             rhoGInBoxB = np.nan_to_num(rhoG[59:120, 99:330])
             rhoLInBoxB = np.nan_to_num(rhoL[59:120, 99:330])
-            sInBoxB = np.nan_to_num(s[59:120, 99:330])
-            nXBoxB = len(mCO2InBoxB[0])
-            nYBoxB = len(mCO2InBoxB)
+            sInBoxB = np.nan_to_num(s[59:120, 99:330]) - sInBoxB0
+            sInBoxB[sInBoxB < 0] = 0
             
             mCO2InGS = np.multiply(1 - mH2OInBoxA, sInBoxA)
             mCO2InGSRhoG = np.multiply(mCO2InGS, rhoGInBoxA)

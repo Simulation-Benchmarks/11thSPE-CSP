@@ -1,3 +1,8 @@
+# SPDX-FileCopyrightText: 2024 Bernd Flemisch <bernd.flemisch@iws.uni-stuttgart.de>
+#
+# SPDX-License-Identifier: MIT
+#!/usr/bin/env python3
+import os
 import numpy as np
 import argparse
 import matplotlib
@@ -15,10 +20,14 @@ parser = argparse.ArgumentParser(
 
 parser.add_argument('-g','--groups', nargs='+', help='names of groups', required=True)
 
-cmdArgs = vars(parser.parse_args())
-groups = cmdArgs["groups"]
+parser.add_argument('-t','--tablefolder', help='path to folder containing calculated tables')
 
-csvData = np.genfromtxt('spe11a_convection_from_spatial_maps.csv', delimiter=',', skip_header=1)
+cmdArgs = vars(parser.parse_args())
+groups = [x.lower() for x in cmdArgs["groups"]]
+tableFolder = cmdArgs["tablefolder"]
+
+fromSpatialMapsFileName = os.path.join(tableFolder, 'spe11a_convection_from_spatial_maps.csv')
+csvData = np.genfromtxt(fromSpatialMapsFileName, delimiter=',', skip_header=1)
 t = csvData[:, 0]/60/60
 
 fig, axs = plt.subplots(figsize=(5, 3))
@@ -26,13 +35,13 @@ fig, axs = plt.subplots(figsize=(5, 3))
 for i, group in zip(range(len(groups)), groups):
     color = f'C{i}'
 
-    if group[-2] != '-':
-        if group.lower() in groups_and_colors:
-            color = groups_and_colors[group.lower()]
+    if not group[-1].isnumeric():
+        if group in groups_and_colors:
+            color = groups_and_colors[group]
         ls = '-'
     else:
-        if group[:-2].lower() in groups_and_colors:
-            color = groups_and_colors[group[:-2].lower()]
+        if group[:-1] in groups_and_colors:
+            color = groups_and_colors[group[:-1]]
         if group[-1] == '1': ls = '-'
         elif group[-1] == '2': ls = '--'
         elif group[-1] == '3': ls = '-.'

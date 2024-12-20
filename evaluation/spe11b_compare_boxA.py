@@ -23,7 +23,7 @@ def compareConvection():
     parser.add_argument('-t','--tablefolder', help='path to folder containing calculated tables')
 
     cmdArgs = vars(parser.parse_args())
-    groups = cmdArgs["groups"]
+    groups = [x.lower() for x in cmdArgs["groups"]]
     folder = cmdArgs["folder"]
     tableFolder = cmdArgs["tablefolder"]
 
@@ -48,15 +48,15 @@ def compareConvection():
     for i, group in zip(range(len(groups)), groups):
         color = f'C{i}'
 
-        if group[-2] != '-':
-            baseFolder = os.path.join(folder, group.lower(), 'spe11b')
-            if group.lower() in groups_and_colors:
-                color = groups_and_colors[group.lower()]
+        if not group[-1].isnumeric():
+            baseFolder = os.path.join(folder, group, 'spe11b')
+            if group in groups_and_colors:
+                color = groups_and_colors[group]
             ls = '-'
         else:
-            baseFolder = os.path.join(folder, group[:-2].lower(), 'spe11b', f'result{group[-1]}')
-            if group[:-2].lower() in groups_and_colors:
-                color = groups_and_colors[group[:-2].lower()]
+            baseFolder = os.path.join(folder, group[:-1], 'spe11b', f'result{group[-1]}')
+            if group[:-1] in groups_and_colors:
+                color = groups_and_colors[group[:-1]]
             if group[-1] == '1': ls = '-'
             elif group[-1] == '2': ls = '--'
             elif group[-1] == '3': ls = '-.'
@@ -83,7 +83,7 @@ def compareConvection():
         if len(csvData[0]) > 6:
             axsS[0].plot(t, 1e-6*csvData[:, 6], label=group, color=color, linestyle=ls)
 
-        columnName = group.lower().replace('-', '')
+        columnName = group.replace('-', '')
         axsM[1].plot(tSpatialMaps, 1e-6*mobileFromSpatialMaps[columnName], label=group, color=color, linestyle=ls)
         axsI[1].plot(tSpatialMaps, 1e-6*immobileFromSpatialMaps[columnName], label=group, color=color, linestyle=ls)
         axsD[1].plot(tSpatialMaps, 1e-6*dissolvedFromSpatialMaps[columnName], label=group, color=color, linestyle=ls)

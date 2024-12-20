@@ -94,7 +94,7 @@ def visualizePerformanceSpatialMaps():
 
     cmdArgs = vars(parser.parse_args())
     time = cmdArgs["time"]
-    groups = cmdArgs["groups"]
+    groups = [x.lower() for x in cmdArgs["groups"]]
     groupFolders = cmdArgs["groupfolders"]
     folder = cmdArgs["folder"]
 
@@ -141,12 +141,12 @@ def visualizePerformanceSpatialMaps():
         if groupFolders:
             baseFolder = groupFolders[i]
 
-        if group[-2] != '-':
+        if not group[-1].isnumeric():
             if not groupFolders:
-                baseFolder = os.path.join(folder, group.lower())
+                baseFolder = os.path.join(folder, group, 'spe11a')
         else:
             if not groupFolders:
-                baseFolder = os.path.join(folder, group[:-2].lower(), f'result{group[-1]}')
+                baseFolder = os.path.join(folder, group[:-1], 'spe11a', f'result{group[-1]}')
 
         fileName = os.path.join(baseFolder, f'spe11a_performance_spatial_map_{time}h.csv')
         cvol, arat, co2_max_norm_res, h2o_max_norm_res, co2_mb_error, h2o_mb_error, post_est = getFieldValues(fileName, nX, nY)
