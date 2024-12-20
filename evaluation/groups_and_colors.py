@@ -4,6 +4,7 @@
 #!/usr/bin/env python3
 import matplotlib
 import matplotlib.pyplot as plt
+import seaborn
 
 groups_and_colors = {
     "calgary": "#000000",
@@ -25,6 +26,9 @@ groups_and_colors = {
     "tetratech": "#809693",
     "ut-csee": "#4FC601"
 }
+
+mass_cmap = matplotlib.colormaps['icefire'].resampled(256)
+mass_cmap.__dict__['colors'][0] = [1, 1, 1, 1]
 
 def plotColors():
     fig, axs = plt.subplots(figsize=(6, 3))
