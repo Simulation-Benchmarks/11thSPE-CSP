@@ -78,11 +78,9 @@ def plotColorMesh(fig, x, y, z, idx, name, pRows, pCols, cmap='viridis', vmin=No
 
     if not vmin:
         vmin = np.nanmin(np.where(z > 0, z, np.inf))
-        print(vmin)
 
     if not vmax:
         vmax = np.nanmax(z)
-        print(vmax)
 
     ax = fig.add_subplot(pRows, pCols, 1 + idx)
     if vmax == vmin:
