@@ -29,6 +29,8 @@ groups_and_colors = {
 
 mass_cmap = matplotlib.colormaps['icefire'].resampled(256)
 mass_cmap.__dict__['colors'][0] = [1, 1, 1, 1]
+mass_cmap.set_bad([0.5, 0.5, 0.5])
+mass_cmap.set_under([1, 1, 1])
 
 def plotColors():
     fig, axs = plt.subplots(figsize=(6, 3))
