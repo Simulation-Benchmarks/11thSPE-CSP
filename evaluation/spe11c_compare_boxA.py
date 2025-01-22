@@ -105,7 +105,7 @@ def compareConvection():
     handles, labels = axsM[1].get_legend_handles_labels()
     figM.legend(handles, labels, loc='center left', bbox_to_anchor=(1, 0.5), ncol=2)
     figM.tight_layout()
-    figM.savefig('spe11c_compare_mobile_boxA.png', bbox_inches='tight', dpi=300)
+    figM.savefig('spe11c_compare_mobA.png', bbox_inches='tight', dpi=300)
 
     axsI[0].set_title(r'reported')
     axsI[0].set_ylabel(r'mass [Mt]')
@@ -123,7 +123,7 @@ def compareConvection():
     handles, labels = axsI[1].get_legend_handles_labels()
     figI.legend(handles, labels, loc='center left', bbox_to_anchor=(1, 0.5), ncol=2)
     figI.tight_layout()
-    figI.savefig('spe11c_compare_immobile_boxA.png', bbox_inches='tight', dpi=300)
+    figI.savefig('spe11c_compare_immA.png', bbox_inches='tight', dpi=300)
 
     axsD[0].set_title(r'reported')
     axsD[0].set_ylabel(r'mass [Mt]')
@@ -141,7 +141,7 @@ def compareConvection():
     handles, labels = axsD[1].get_legend_handles_labels()
     figD.legend(handles, labels, loc='center left', bbox_to_anchor=(1, 0.5), ncol=2)
     figD.tight_layout()
-    figD.savefig('spe11c_compare_dissolved_boxA.png', bbox_inches='tight', dpi=300)
+    figD.savefig('spe11c_compare_dissA.png', bbox_inches='tight', dpi=300)
 
     axsS[0].set_title(r'reported')
     axsS[0].set_ylabel(r'mass [Mt]')
@@ -159,7 +159,7 @@ def compareConvection():
     handles, labels = axsS[1].get_legend_handles_labels()
     figS.legend(handles, labels, loc='center left', bbox_to_anchor=(1, 0.5), ncol=2)
     figS.tight_layout()
-    figS.savefig('spe11c_compare_seal_boxA.png', bbox_inches='tight', dpi=300)
+    figS.savefig('spe11c_compare_sealA.png', bbox_inches='tight', dpi=300)
 
 
 if __name__ == "__main__":

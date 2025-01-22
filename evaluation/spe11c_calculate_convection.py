@@ -49,14 +49,14 @@ def getFieldValues(fileName, nX, nY, nZ):
         print(f'or y ({len(np.unique(csvData[:,1]))} instead of {nY}) coordinates. Returning nans.')
         return p, mCO2, temp
 
-    p = np.reshape(csvData[:, 3], (nX, nY, nZ)) if len(csvData[0]) > 3 else float('nan')
-    s = np.reshape(csvData[:, 4], (nX, nY, nZ)) if len(csvData[0]) > 4 else float('nan')
-    mCO2 = np.reshape(csvData[:, 5], (nX, nY, nZ)) if len(csvData[0]) > 5 else float('nan')
-    temp = np.reshape(csvData[:, 10], (nX, nY, nZ)) if len(csvData[0]) > 10 else float('nan')
+    p = np.reshape(csvData[:, 3], (nX, nY, nZ)) if len(csvData[0]) > 3 else np.nan
+    s = np.reshape(csvData[:, 4], (nX, nY, nZ)) if len(csvData[0]) > 4 else np.nan
+    mCO2 = np.reshape(csvData[:, 5], (nX, nY, nZ)) if len(csvData[0]) > 5 else np.nan
+    temp = np.reshape(csvData[:, 10], (nX, nY, nZ)) if len(csvData[0]) > 10 else np.nan
 
-    p[p < 1e0] = float('nan')
-    mCO2[s > 1 - 1e-5] = float('nan')
-    mCO2[np.isnan(s)] = float('nan')
+    p[p < 1e0] = np.nan
+    mCO2[s > 1 - 1e-5] = np.nan
+    mCO2[np.isnan(s)] = np.nan
     return p, mCO2, temp
 
 
@@ -126,12 +126,12 @@ def calculateConvection():
         for year in timeSteps:
             fileName = os.path.join(baseFolder, f'spe11c_spatial_map_{year}y.csv')
             if not os.path.isfile(fileName):
-                integral.append(float('nan'))
+                integral.append(np.nan)
                 continue
 
             p, mCO2, temp = getFieldValues(fileName, nX, nY, nZ)
             if np.isnan(p).all():
-                integral.append(float('nan'))
+                integral.append(np.nan)
                 continue
                 
             mCO2InBoxC = mCO2[66:156, :, 13:43]
@@ -167,12 +167,12 @@ def calculateConvection():
         axs.set_xlabel(r'time [y]')
         axs.set_ylabel(r'$M$ [km$^2$]')
         axs.set_xscale('log')
-        fig.savefig('spe11c_convection_from_spatial_maps.png', bbox_inches='tight', dpi=300)
+        fig.savefig('spe11c_time_series_boxC_from_spatial_maps.png', bbox_inches='tight', dpi=300)
 
         table[:, i+1] = integral
         # scale to m2 for file reporting
         table[:, i+1] = 1e6*table[:, i+1]
-        np.savetxt('spe11c_convection_from_spatial_maps.csv', table, fmt='%.5e', delimiter=', ', header=header)
+        np.savetxt('spe11c_mC_from_spatial_maps.csv', table, fmt='%.5e', delimiter=', ', header=header)
 
 
 if __name__ == "__main__":

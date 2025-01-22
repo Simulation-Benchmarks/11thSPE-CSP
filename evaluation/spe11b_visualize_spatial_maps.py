@@ -76,10 +76,10 @@ def plotColorMesh(fig, x, y, z, idx, name, pRows, pCols, cmap='viridis', vmin=No
     cmap.set_bad([0.5, 0.5, 0.5])
     cmap.set_under([1, 1, 1])
 
-    if not vmin:
+    if vmin is None:
         vmin = np.nanmin(np.where(z > 0, z, np.inf))
 
-    if not vmax:
+    if vmax is None:
         vmax = np.nanmax(z)
 
     ax = fig.add_subplot(pRows, pCols, 1 + idx)
@@ -222,16 +222,16 @@ def visualizeSpatialMaps():
             plotColorMesh(fig, x, y, temp, 7, "temperature [°C]", pRows, pCols, 'coolwarm')
         else:
             # scale pressure to bars
-            plotColorMesh(figP, x, y, 1e-5*p, i, group, 200, 500, pRows, pCols)
-            plotColorMesh(figS, x, y, s, i, group, 0, 1, pRows, pCols)
+            plotColorMesh(figP, x, y, 1e-5*p, i, group, pRows, pCols, 'viridis', 200, 500)
+            plotColorMesh(figS, x, y, s, i, group, pRows, pCols, cmap, 0, 1)
             # scale mass fractions to g/kg
-            plotColorMesh(figMCO2, x, y, 1e3*mCO2, i, group, 0, 70, pRows, pCols)
-            plotColorMesh(figMH2O, x, y, 1e3*mH2O, i, group, 0, 4, pRows, pCols)
-            plotColorMesh(figRhoG, x, y, rhoG, i, group, 0.85e3, 1.05e3, pRows, pCols)
-            plotColorMesh(figRhoL, x, y, rhoL, i, group, 0.99e3, 1.025e3, pRows, pCols)
+            plotColorMesh(figMCO2, x, y, 1e3*mCO2, i, group, pRows, pCols, cmap, 0, 70)
+            plotColorMesh(figMH2O, x, y, 1e3*mH2O, i, group, pRows, pCols, 'icefire', 0, 4)
+            plotColorMesh(figRhoG, x, y, rhoG, i, group, pRows, pCols, 'icefire', 0.85e3, 0.95e3)
+            plotColorMesh(figRhoL, x, y, rhoL, i, group, pRows, pCols, 'icefire', 0.99e3, 1.025e3)
             # scale mass to tons
-            plotColorMesh(figTmCO2, x, y, 1e-3*tmCO2, i, group, 0, 3, pRows, pCols)
-            plotColorMesh(figTemp, x, y, temp, i, group, 15, 70, pRows, pCols)
+            plotColorMesh(figTmCO2, x, y, 1e-3*tmCO2, i, group, pRows, pCols, cmap, 0, 3)
+            plotColorMesh(figTemp, x, y, temp, i, group, pRows, pCols, 'coolwarm', 8, 70)
     
     if len(groups) == 1:
         fig.suptitle(f'{groups[0]} at {time} years')

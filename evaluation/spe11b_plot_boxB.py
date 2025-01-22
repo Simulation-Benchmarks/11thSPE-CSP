@@ -17,10 +17,10 @@ parser.add_argument('-g','--groups', nargs='+', help='names of groups', required
 cmdArgs = vars(parser.parse_args())
 groups = [x.lower() for x in cmdArgs["groups"]]
 
-mobileData = np.genfromtxt('spe11b_mobile_boxB_from_spatial_maps.csv', delimiter=',', skip_header=1)
-immobileData = np.genfromtxt('spe11b_immobile_boxB_from_spatial_maps.csv', delimiter=',', skip_header=1)
-dissolvedData = np.genfromtxt('spe11b_dissolved_boxB_from_spatial_maps.csv', delimiter=',', skip_header=1)
-sealData = np.genfromtxt('spe11b_seal_boxB_from_spatial_maps.csv', delimiter=',', skip_header=1)
+mobileData = np.genfromtxt('spe11b_mobB_from_spatial_maps.csv', delimiter=',', skip_header=1)
+immobileData = np.genfromtxt('spe11b_immB_from_spatial_maps.csv', delimiter=',', skip_header=1)
+dissolvedData = np.genfromtxt('spe11b_dissB_from_spatial_maps.csv', delimiter=',', skip_header=1)
+sealData = np.genfromtxt('spe11b_sealB_from_spatial_maps.csv', delimiter=',', skip_header=1)
 t = mobileData[:, 0]/60/60/24/365
 
 figB, axsB = plt.subplots(2, 2, figsize=(9, 6))

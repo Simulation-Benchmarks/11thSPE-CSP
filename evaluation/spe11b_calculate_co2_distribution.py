@@ -128,14 +128,14 @@ def calculateCO2Distribution():
         for year in range(0, numTimeSteps*dt+1, dt):
             fileName = os.path.join(baseFolder, f'spe11b_spatial_map_{year}y.csv')
             if not os.path.isfile(fileName):
-                mobileA.append(float('nan'))
-                immobileA.append(float('nan'))
-                dissolvedA.append(float('nan'))
-                sealA.append(float('nan'))
-                mobileB.append(float('nan'))
-                immobileB.append(float('nan'))
-                dissolvedB.append(float('nan'))
-                sealB.append(float('nan'))
+                mobileA.append(np.nan)
+                immobileA.append(np.nan)
+                dissolvedA.append(np.nan)
+                sealA.append(np.nan)
+                mobileB.append(np.nan)
+                immobileB.append(np.nan)
+                dissolvedB.append(np.nan)
+                sealB.append(np.nan)
                 continue
 
             p, s, mCO2, mH2O, rhoG, rhoL, tmCO2, temp = getFieldValues(fileName, nX, nY)
@@ -290,15 +290,15 @@ def calculateCO2Distribution():
     figB.tight_layout()
     figB.savefig('spe11b_time_series_boxB_from_spatial_maps.png', bbox_inches='tight', dpi=300)
 
-    np.savetxt('spe11b_mobile_boxA_from_spatial_maps.csv', mobileATable, fmt='%.5e', delimiter=', ', header=header)
-    np.savetxt('spe11b_immobile_boxA_from_spatial_maps.csv', immobileATable, fmt='%.5e', delimiter=', ', header=header)
-    np.savetxt('spe11b_dissolved_boxA_from_spatial_maps.csv', dissolvedATable, fmt='%.5e', delimiter=', ', header=header)
-    np.savetxt('spe11b_seal_boxA_from_spatial_maps.csv', sealATable, fmt='%.5e', delimiter=', ', header=header)
+    np.savetxt('spe11b_mobA_from_spatial_maps.csv', mobileATable, fmt='%.5e', delimiter=', ', header=header)
+    np.savetxt('spe11b_immA_from_spatial_maps.csv', immobileATable, fmt='%.5e', delimiter=', ', header=header)
+    np.savetxt('spe11b_dissA_from_spatial_maps.csv', dissolvedATable, fmt='%.5e', delimiter=', ', header=header)
+    np.savetxt('spe11b_sealA_from_spatial_maps.csv', sealATable, fmt='%.5e', delimiter=', ', header=header)
 
-    np.savetxt('spe11b_mobile_boxB_from_spatial_maps.csv', mobileBTable, fmt='%.5e', delimiter=', ', header=header)
-    np.savetxt('spe11b_immobile_boxB_from_spatial_maps.csv', immobileBTable, fmt='%.5e', delimiter=', ', header=header)
-    np.savetxt('spe11b_dissolved_boxB_from_spatial_maps.csv', dissolvedBTable, fmt='%.5e', delimiter=', ', header=header)
-    np.savetxt('spe11b_seal_boxB_from_spatial_maps.csv', sealBTable, fmt='%.5e', delimiter=', ', header=header)
+    np.savetxt('spe11b_mobB_from_spatial_maps.csv', mobileBTable, fmt='%.5e', delimiter=', ', header=header)
+    np.savetxt('spe11b_immB_from_spatial_maps.csv', immobileBTable, fmt='%.5e', delimiter=', ', header=header)
+    np.savetxt('spe11b_dissB_from_spatial_maps.csv', dissolvedBTable, fmt='%.5e', delimiter=', ', header=header)
+    np.savetxt('spe11b_sealB_from_spatial_maps.csv', sealBTable, fmt='%.5e', delimiter=', ', header=header)
 
 if __name__ == "__main__":
     calculateCO2Distribution()

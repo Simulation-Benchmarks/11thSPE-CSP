@@ -18,7 +18,7 @@ parser.add_argument('-g','--groups', nargs='+', help='names of groups', required
 cmdArgs = vars(parser.parse_args())
 groups = [x.lower() for x in cmdArgs["groups"]]
 
-csvData = np.genfromtxt('spe11b_convection_from_spatial_maps.csv', delimiter=',', skip_header=1)
+csvData = np.genfromtxt('spe11b_mC_from_spatial_maps.csv', delimiter=',', skip_header=1)
 t = csvData[:, 0]/60/60/24/365
 
 fig, axs = plt.subplots(figsize=(5, 3))
@@ -47,4 +47,4 @@ axs.set_xlabel(r'time [y]')
 axs.set_ylabel(r'$M$ [km]')
 axs.set_xscale('log')
 axs.set_ylim((0, 14))
-fig.savefig('spe11b_convection_from_spatial_maps.png', bbox_inches='tight', dpi=300)
+fig.savefig('spe11b_mC_from_spatial_maps.png', bbox_inches='tight', dpi=300)

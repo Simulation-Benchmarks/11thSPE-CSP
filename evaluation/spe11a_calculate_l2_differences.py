@@ -71,8 +71,8 @@ def calculateL2Differences():
         tmCO2I[tmCO2I < 0] = 0
 
         # set values to 'nan' for impermeable cells
-        pI[np.isnan(pSLB)] = float('nan')
-        tmCO2I[np.isnan(pSLB)] = float('nan')
+        pI[np.isnan(pSLB)] = np.nan
+        tmCO2I[np.isnan(pSLB)] = np.nan
 
         pIMean = np.nanmean(pI)
         pIVariation = pI - pIMean
@@ -104,8 +104,8 @@ def calculateL2Differences():
             tmCO2J = tmCO2J - tmCO2J0
             tmCO2J[tmCO2J < 0] = 0
 
-            pJ[np.isnan(pSLB)] = float('nan')
-            tmCO2J[np.isnan(pSLB)] = float('nan')
+            pJ[np.isnan(pSLB)] = np.nan
+            tmCO2J[np.isnan(pSLB)] = np.nan
 
             pDiff = pI - pJ
             # set difference to zero for impermeable cells

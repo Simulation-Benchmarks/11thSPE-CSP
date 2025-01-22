@@ -32,7 +32,7 @@ def compareConvection():
 
     fig, axs = plt.subplots(figsize=(5, 3))
 
-    fromSpatialMapsFileName = os.path.join(tableFolder, 'spe11c_convection_from_spatial_maps.csv')
+    fromSpatialMapsFileName = os.path.join(tableFolder, 'spe11c_mC_from_spatial_maps.csv')
     fromSpatialMaps = np.genfromtxt(fromSpatialMapsFileName, delimiter=',', names=True)
     tSpatialMaps = fromSpatialMaps['time_s']/60/60/24/365
 
@@ -76,7 +76,7 @@ def compareConvection():
     axs.set_xscale(r'log')
     axs.set_xlim((5e0, 1e3))
     axs.legend(loc='center left', bbox_to_anchor=(1, 0.5), ncols=2)
-    fig.savefig('spe11c_compare_convection.png', bbox_inches='tight', dpi=300)
+    fig.savefig('spe11c_compare_mC.png', bbox_inches='tight', dpi=300)
 
 
 if __name__ == "__main__":

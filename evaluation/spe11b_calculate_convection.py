@@ -80,7 +80,7 @@ def calculateConvection():
         for year in range(0, numTimeSteps*dt+1, dt):
             fileName = os.path.join(baseFolder, f'spe11b_spatial_map_{year}y.csv')
             if not os.path.isfile(fileName):
-                integral.append(float('nan'))
+                integral.append(np.nan)
                 continue
 
             p, s, mCO2, mH2O, rhoG, rhoL, tmCO2, temp = getFieldValues(fileName, nX, nY)
@@ -119,9 +119,9 @@ def calculateConvection():
     axs.set_xlabel(r'time [y]')
     axs.set_ylabel(r'$M$ [km]')
     axs.set_xscale('log')
-    fig.savefig('spe11b_convection_from_spatial_maps.png', bbox_inches='tight', dpi=300)
+    fig.savefig('spe11b_time_series_boxC_from_spatial_maps.png', bbox_inches='tight', dpi=300)
 
-    np.savetxt('spe11b_convection_from_spatial_maps.csv', table, fmt='%.5e', delimiter=', ', header=header)
+    np.savetxt('spe11b_mC_from_spatial_maps.csv', table, fmt='%.5e', delimiter=', ', header=header)
 
 if __name__ == "__main__":
     calculateConvection()

@@ -15,6 +15,8 @@ import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
+import seaborn as sns
+import groups_and_colors
 #np.set_printoptions(threshold=sys.maxsize)
 
 def getFieldValues(fileName, nX, nY, nZ):
@@ -56,34 +58,46 @@ def getFieldValues(fileName, nX, nY, nZ):
         print(f'Cannot find unique x ({len(np.unique(csvData[:,0]))} instead of {nX}) or y ({len(np.unique(csvData[:,1]))} instead of {nY}) coordinates. Returning nans.')
         return p, s, mCO2, mH2O, rhoG, rhoL, tmCO2, temp
 
-    for i in np.arange(0, nX):
-        for j in np.arange(0, nY):
-            p[i, j, :] = csvData[(i*nY + j)*nZ:(i*nY + j + 1)*nZ, 3] if len(csvData[0]) > 3 else float('nan')
-            s[i, j, :] = csvData[(i*nY + j)*nZ:(i*nY + j + 1)*nZ, 4] if len(csvData[0]) > 4 else float('nan')
-            mCO2[i, j, :] = csvData[(i*nY + j)*nZ:(i*nY + j + 1)*nZ, 5] if len(csvData[0]) > 5 else float('nan')
-            mH2O[i, j, :] = csvData[(i*nY + j)*nZ:(i*nY + j + 1)*nZ, 6] if len(csvData[0]) > 6 else float('nan')
-            rhoG[i, j, :] = csvData[(i*nY + j)*nZ:(i*nY + j + 1)*nZ, 7] if len(csvData[0]) > 7 else float('nan')
-            rhoL[i, j, :] = csvData[(i*nY + j)*nZ:(i*nY + j + 1)*nZ, 8] if len(csvData[0]) > 8 else float('nan')
-            tmCO2[i, j, :] = csvData[(i*nY + j)*nZ:(i*nY + j + 1)*nZ, 9] if len(csvData[0]) > 9 else float('nan')
-            temp[i, j, :] = csvData[(i*nY + j)*nZ:(i*nY + j + 1)*nZ, 10] if len(csvData[0]) > 10 else float('nan')
+    p = np.reshape(csvData[:, 3], (nX, nY, nZ)) if len(csvData[0]) > 3 else np.nan
+    s = np.reshape(csvData[:, 4], (nX, nY, nZ)) if len(csvData[0]) > 4 else np.nan
+    mCO2 = np.reshape(csvData[:, 5], (nX, nY, nZ)) if len(csvData[0]) > 5 else np.nan
+    mH2O = np.reshape(csvData[:, 6], (nX, nY, nZ)) if len(csvData[0]) > 6 else np.nan
+    rhoG = np.reshape(csvData[:, 7], (nX, nY, nZ)) if len(csvData[0]) > 7 else np.nan
+    rhoL = np.reshape(csvData[:, 8], (nX, nY, nZ)) if len(csvData[0]) > 8 else np.nan
+    tmCO2 = np.reshape(csvData[:, 9], (nX, nY, nZ)) if len(csvData[0]) > 9 else np.nan
+    temp = np.reshape(csvData[:, 10], (nX, nY, nZ)) if len(csvData[0]) > 10 else np.nan
 
-    p[p < 1e0] = float('nan')
-    rhoG[rhoG < 1e-5] = float('nan')
-    rhoL[rhoL < 1e-5] = float('nan')
-    rhoG[s < 1e-3] = float('nan')
-    rhoL[s > 1 - 1e-3] = float('nan')
-    mH2O[s < 1e-3] = float('nan')
-    mCO2[s > 1 - 1e-3] = float('nan')
-    rhoG[np.isnan(s)] = float('nan')
-    rhoL[np.isnan(s)] = float('nan')
-    mH2O[np.isnan(s)] = float('nan')
-    mCO2[np.isnan(s)] = float('nan')
+    p[p < 1e0] = np.nan
+    rhoG[rhoG < 1e-5] = np.nan
+    rhoL[rhoL < 1e-5] = np.nan
+    rhoG[s < 1e-3] = -1
+    rhoL[s > 1 - 1e-3] = np.nan
+    mH2O[s < 1e-3] = -1
+    mCO2[s > 1 - 1e-3] = np.nan
+    rhoG[np.isnan(s)] = np.nan
+    rhoL[np.isnan(s)] = np.nan
+    mH2O[np.isnan(s)] = np.nan
+    mCO2[np.isnan(s)] = np.nan
     return p, s, mCO2, mH2O, rhoG, rhoL, tmCO2, temp
 
 
-def plotColorMesh(fig, x, y, z, idx, name, vmin, vmax, pRows, pCols):
+def plotColorMesh(fig, x, y, z, idx, name, pRows, pCols, cmap='viridis', vmin=None, vmax=None):
+    if isinstance(cmap, str):
+        cmap = matplotlib.colormaps[cmap]
+    cmap.set_bad([0.5, 0.5, 0.5])
+    cmap.set_under([1, 1, 1])
+
+    if vmin is None:
+        vmin = np.nanmin(np.where(z > 0, z, np.inf))
+
+    if vmax is None:
+        vmax = np.nanmax(z)
+
     ax = fig.add_subplot(pRows, pCols, 1 + idx)
-    im = ax.pcolormesh(x, y, z, shading='flat', cmap='viridis', vmin=vmin, vmax=vmax)
+    if vmax == vmin:
+        im = ax.pcolormesh(x, y, z, shading='flat', cmap=cmap)
+    else:
+        im = ax.pcolormesh(x, y, z, shading='flat', cmap=cmap, vmin=vmin, vmax=vmax)
     ax.axis([x.min(), x.max(), y.min(), y.max()])
     ax.axis('scaled')
     ax.set_title(f'{name}')
@@ -177,7 +191,7 @@ def visualizeSpatialMaps():
     nZ = 120
 
     # select file that contains impermeable cells with 'nan' pressure values
-    fileNameTetra = os.path.join(folder, 'tetratech-rps', 'spe11c', 'result2', f'spe11c_spatial_map_{time}y.csv')
+    fileNameTetra = os.path.join(folder, 'tetratech', 'spe11c', 'result2', f'spe11c_spatial_map_{time}y.csv')
     p, s, mCO2Tetra, mH2O, rhoG, rhoL, tmCO2, temp = getFieldValues(fileNameTetra, nX, nY, nZ)
 
     for i, group in zip(range(len(groups)), groups):
@@ -193,13 +207,13 @@ def visualizeSpatialMaps():
 
         fileName = os.path.join(baseFolder, f'spe11c_spatial_map_{time}y.csv')
         p3, s3, mCO23, mH2O3, rhoG3, rhoL3, tmCO23, temp3 = getFieldValues(fileName, nX, nY, nZ)
-        p3[np.isnan(mCO2Tetra)] = float('nan')
-        s3[np.isnan(mCO2Tetra)] = float('nan')
-        mCO23[np.isnan(mCO2Tetra)] = float('nan')
-        mH2O3[np.isnan(mCO2Tetra)] = float('nan')
-        rhoG3[np.isnan(mCO2Tetra)] = float('nan')
-        rhoL3[np.isnan(mCO2Tetra)] = float('nan')
-        tmCO23[np.isnan(mCO2Tetra)] = float('nan')
+        p3[np.isnan(mCO2Tetra)] = np.nan
+        s3[np.isnan(mCO2Tetra)] = np.nan
+        mCO23[np.isnan(mCO2Tetra)] = np.nan
+        mH2O3[np.isnan(mCO2Tetra)] = np.nan
+        rhoG3[np.isnan(mCO2Tetra)] = np.nan
+        rhoL3[np.isnan(mCO2Tetra)] = np.nan
+        tmCO23[np.isnan(mCO2Tetra)] = np.nan
 
         if cutPlane == 'uw':
             xSpace = np.arange(0.0, 8.4e3 + 25.0, 5.0e1)
@@ -229,30 +243,32 @@ def visualizeSpatialMaps():
             for j, v in zip(range(0, len(x[0])), x[0]):
                 y[:, j] = 2*(y[:, j] + 150*(1 - np.square((v - 2500)/2500)) + v/500)
 
+        cmap = groups_and_colors.mass_cmap
+
         if len(groups) == 1:
             # scale pressure to bars
-            plotColorMesh(fig, x, y, 1e-5*p, 0, "pressure [bar]", 200, 350, pRows, pCols)
-            plotColorMesh(fig, x, y, s, 1, "gas saturation [-]", 0, 1, pRows, pCols)
+            plotColorMesh(fig, x, y, 1e-5*p, 0, "pressure [bar]", pRows, pCols)
+            plotColorMesh(fig, x, y, s, 1, "gas saturation [-]", pRows, pCols, cmap)
             # scale mass fractions to g/kg
-            plotColorMesh(fig, x, y, 1e3*mCO2, 2, "CO2 mass frac in liquid [g/kg]", 0, 70, pRows, pCols)
-            plotColorMesh(fig, x, y, 1e3*mH2O, 3, "H2O mass frac in gas [g/kg]", 1, 4, pRows, pCols)
-            plotColorMesh(fig, x, y, rhoG, 4, "gas phase density [kg/m3]", 0.8e3, 1.0e3, pRows, pCols)
-            plotColorMesh(fig, x, y, rhoL, 5, "liquid phase density [kg/m3]", 0.99e3, 1.03e3, pRows, pCols)
+            plotColorMesh(fig, x, y, 1e3*mCO2, 2, "CO2 mass frac in liquid [g/kg]", pRows, pCols, cmap)
+            plotColorMesh(fig, x, y, 1e3*mH2O, 3, "H2O mass frac in gas [g/kg]", pRows, pCols, 'icefire')
+            plotColorMesh(fig, x, y, rhoG, 4, "gas phase density [kg/m3]", pRows, pCols, 'icefire')
+            plotColorMesh(fig, x, y, rhoL, 5, "liquid phase density [kg/m3]", pRows, pCols, 'icefire')
             # scale mass to kilotons
-            plotColorMesh(fig, x, y, 1e-6*tmCO2, 6, "total CO2 mass [kt]", 0, 4.5, pRows, pCols)
-            plotColorMesh(fig, x, y, temp, 7, "temperature [°C]", 20, 70, pRows, pCols)
+            plotColorMesh(fig, x, y, 1e-6*tmCO2, 6, "total CO2 mass [kt]", pRows, pCols, cmap)
+            plotColorMesh(fig, x, y, temp, 7, "temperature [°C]", pRows, pCols, 'coolwarm')
         else:
             # scale pressure to bars
-            plotColorMesh(figP, x, y, 1e-5*p, i, group, 200, 350, pRows, pCols)
-            plotColorMesh(figS, x, y, s, i, group, 0, 1, pRows, pCols)
+            plotColorMesh(figP, x, y, 1e-5*p, i, group, pRows, pCols, 'viridis', 200, 350)
+            plotColorMesh(figS, x, y, s, i, group, pRows, pCols, cmap, 0, 1)
             # scale mass fractions to g/kg
-            plotColorMesh(figMCO2, x, y, 1e3*mCO2, i, group, 0, 70, pRows, pCols)
-            plotColorMesh(figMH2O, x, y, 1e3*mH2O, i, group, 1, 4, pRows, pCols)
-            plotColorMesh(figRhoG, x, y, rhoG, i, group, 0.8e3, 1.0e3, pRows, pCols)
-            plotColorMesh(figRhoL, x, y, rhoL, i, group, 0.99e3, 1.03e3, pRows, pCols)
+            plotColorMesh(figMCO2, x, y, 1e3*mCO2, i, group, pRows, pCols, cmap, 0, 70)
+            plotColorMesh(figMH2O, x, y, 1e3*mH2O, i, group, pRows, pCols, 'icefire', 1, 4)
+            plotColorMesh(figRhoG, x, y, rhoG, i, group, pRows, pCols, 'icefire', 0.8e3, 1.0e3)
+            plotColorMesh(figRhoL, x, y, rhoL, i, group, pRows, pCols, 'icefire', 0.99e3, 1.03e3)
             # scale mass to kilotons
-            plotColorMesh(figTmCO2, x, y, 1e-6*tmCO2, i, group, 0, 4.5, pRows, pCols)
-            plotColorMesh(figTemp, x, y, temp, i, group, 20, 70, pRows, pCols)
+            plotColorMesh(figTmCO2, x, y, 1e-6*tmCO2, i, group, pRows, pCols, cmap, 0, 4.5)
+            plotColorMesh(figTemp, x, y, temp, i, group, pRows, pCols, 'coolwarm', 20, 70)
     
     if len(groups) == 1:
         fig.suptitle(f'{groups[0]} at {time} years')

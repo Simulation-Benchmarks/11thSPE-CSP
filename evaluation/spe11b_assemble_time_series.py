@@ -47,26 +47,26 @@ def assembleTimeSeries():
     figT, axsT = plt.subplots(1, 2, figsize=(9, 3))
 
     if calculated:
-        mobileFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11b_mobile_boxA_from_spatial_maps.csv')
+        mobileFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11b_mobA_from_spatial_maps.csv')
         mobileFromSpatialMapsA = np.genfromtxt(mobileFromSpatialMapsFileName, delimiter=',', names=True)
         tSpatialMaps = mobileFromSpatialMapsA['time_s']/60/60/24/365
-        immobileFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11b_immobile_boxA_from_spatial_maps.csv')
+        immobileFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11b_immA_from_spatial_maps.csv')
         immobileFromSpatialMapsA = np.genfromtxt(immobileFromSpatialMapsFileName, delimiter=',', names=True)
-        dissolvedFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11b_dissolved_boxA_from_spatial_maps.csv')
+        dissolvedFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11b_dissA_from_spatial_maps.csv')
         dissolvedFromSpatialMapsA = np.genfromtxt(dissolvedFromSpatialMapsFileName, delimiter=',', names=True)
-        sealFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11b_seal_boxA_from_spatial_maps.csv')
+        sealFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11b_sealA_from_spatial_maps.csv')
         sealFromSpatialMapsA = np.genfromtxt(sealFromSpatialMapsFileName, delimiter=',', names=True)
 
-        mobileFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11b_mobile_boxB_from_spatial_maps.csv')
+        mobileFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11b_mobB_from_spatial_maps.csv')
         mobileFromSpatialMapsB = np.genfromtxt(mobileFromSpatialMapsFileName, delimiter=',', names=True)
-        immobileFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11b_immobile_boxB_from_spatial_maps.csv')
+        immobileFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11b_immB_from_spatial_maps.csv')
         immobileFromSpatialMapsB = np.genfromtxt(immobileFromSpatialMapsFileName, delimiter=',', names=True)
-        dissolvedFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11b_dissolved_boxB_from_spatial_maps.csv')
+        dissolvedFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11b_dissB_from_spatial_maps.csv')
         dissolvedFromSpatialMapsB = np.genfromtxt(dissolvedFromSpatialMapsFileName, delimiter=',', names=True)
-        sealFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11b_seal_boxB_from_spatial_maps.csv')
+        sealFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11b_sealB_from_spatial_maps.csv')
         sealFromSpatialMapsB = np.genfromtxt(sealFromSpatialMapsFileName, delimiter=',', names=True)
 
-        convectionFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11b_convection_from_spatial_maps.csv')
+        convectionFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11b_mC_from_spatial_maps.csv')
         convectionFromSpatialMaps = np.genfromtxt(convectionFromSpatialMapsFileName, delimiter=',', names=True)
 
     for i, group in zip(range(len(groups)), groups):

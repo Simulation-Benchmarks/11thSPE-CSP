@@ -40,7 +40,7 @@ def getFieldValues(fileName, nX, nY, nZ):
         return p, tmCO2, temp
 
     p[:] = csvData[:, 3]
-    p[p < 1e0] = float('nan')
+    p[p < 1e0] = np.nan
     tmCO2[:] = csvData[:, 9]
     temp[:] = csvData[:, 10]
 
@@ -102,8 +102,8 @@ def calculateL2Differences():
         p[:, i], tmCO2[:, i], temp[:, i] = getFieldValues(fileName, nX, nY, nZ)
 
         # set values to 'nan' for impermeable cells
-        p[:, i][np.isnan(pSLB)] = float('nan')
-        tmCO2[:, i][np.isnan(pSLB)] = float('nan')
+        p[:, i][np.isnan(pSLB)] = np.nan
+        tmCO2[:, i][np.isnan(pSLB)] = np.nan
 
     l2NormP = np.zeros((numGroups, numGroups))
     l2SemiNormP = np.zeros((numGroups, numGroups))

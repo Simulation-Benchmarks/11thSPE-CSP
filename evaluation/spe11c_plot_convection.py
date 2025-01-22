@@ -26,7 +26,7 @@ cmdArgs = vars(parser.parse_args())
 groups = [x.lower() for x in cmdArgs["groups"]]
 tableFolder = cmdArgs["tablefolder"]
 
-fromSpatialMapsFileName = os.path.join(tableFolder, 'spe11c_convection_from_spatial_maps.csv')
+fromSpatialMapsFileName = os.path.join(tableFolder, 'spe11c_mC_from_spatial_maps.csv')
 csvData = np.genfromtxt(fromSpatialMapsFileName, delimiter=',', skip_header=1)
 t = csvData[:, 0]/60/60/24/365
 
@@ -56,4 +56,4 @@ axs.set_xlabel(r'time [y]')
 axs.set_ylabel(r'$M$ [km$^2$]')
 axs.set_xscale('log')
 axs.set_xlim((5e0, 1e3))
-fig.savefig('spe11c_convection_from_spatial_maps.png', bbox_inches='tight', dpi=300)
+fig.savefig('spe11c_mC_from_spatial_maps.png', bbox_inches='tight', dpi=300)

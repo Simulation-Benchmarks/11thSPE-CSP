@@ -35,14 +35,14 @@ def compareConvection():
     figD, axsD = plt.subplots(1, 2, figsize=(9, 3))
     figS, axsS = plt.subplots(1, 2, figsize=(9, 3))
 
-    mobileFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11b_mobile_boxA_from_spatial_maps.csv')
+    mobileFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11b_mobA_from_spatial_maps.csv')
     mobileFromSpatialMaps = np.genfromtxt(mobileFromSpatialMapsFileName, delimiter=',', names=True)
     tSpatialMaps = mobileFromSpatialMaps['time_s']/60/60/24/365
-    immobileFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11b_immobile_boxA_from_spatial_maps.csv')
+    immobileFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11b_immA_from_spatial_maps.csv')
     immobileFromSpatialMaps = np.genfromtxt(immobileFromSpatialMapsFileName, delimiter=',', names=True)
-    dissolvedFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11b_dissolved_boxA_from_spatial_maps.csv')
+    dissolvedFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11b_dissA_from_spatial_maps.csv')
     dissolvedFromSpatialMaps = np.genfromtxt(dissolvedFromSpatialMapsFileName, delimiter=',', names=True)
-    sealFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11b_seal_boxA_from_spatial_maps.csv')
+    sealFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11b_sealA_from_spatial_maps.csv')
     sealFromSpatialMaps = np.genfromtxt(sealFromSpatialMapsFileName, delimiter=',', names=True)
 
     for i, group in zip(range(len(groups)), groups):
@@ -105,7 +105,7 @@ def compareConvection():
     handles, labels = axsM[1].get_legend_handles_labels()
     figM.legend(handles, labels, loc='center left', bbox_to_anchor=(1, 0.5), ncol=2)
     figM.tight_layout()
-    figM.savefig('spe11b_compare_mobile_boxA.png', bbox_inches='tight', dpi=300)
+    figM.savefig('spe11b_compare_mobA.png', bbox_inches='tight', dpi=300)
 
     axsI[0].set_title(r'reported')
     axsI[0].set_ylabel(r'mass [kt]')
@@ -123,7 +123,7 @@ def compareConvection():
     handles, labels = axsI[1].get_legend_handles_labels()
     figI.legend(handles, labels, loc='center left', bbox_to_anchor=(1, 0.5), ncol=2)
     figI.tight_layout()
-    figI.savefig('spe11b_compare_immobile_boxA.png', bbox_inches='tight', dpi=300)
+    figI.savefig('spe11b_compare_immA.png', bbox_inches='tight', dpi=300)
 
     axsD[0].set_title(r'reported')
     axsD[0].set_ylabel(r'mass [kt]')
@@ -141,7 +141,7 @@ def compareConvection():
     handles, labels = axsD[1].get_legend_handles_labels()
     figD.legend(handles, labels, loc='center left', bbox_to_anchor=(1, 0.5), ncol=2)
     figD.tight_layout()
-    figD.savefig('spe11b_compare_dissolved_boxA.png', bbox_inches='tight', dpi=300)
+    figD.savefig('spe11b_compare_dissA.png', bbox_inches='tight', dpi=300)
 
     axsS[0].set_title(r'reported')
     axsS[0].set_ylabel(r'mass [kt]')
@@ -159,7 +159,7 @@ def compareConvection():
     handles, labels = axsS[1].get_legend_handles_labels()
     figS.legend(handles, labels, loc='center left', bbox_to_anchor=(1, 0.5), ncol=2)
     figS.tight_layout()
-    figS.savefig('spe11b_compare_seal_boxA.png', bbox_inches='tight', dpi=300)
+    figS.savefig('spe11b_compare_sealA.png', bbox_inches='tight', dpi=300)
 
 
 if __name__ == "__main__":

@@ -32,11 +32,11 @@ def compareConvection():
 
     fig, axs = plt.subplots(figsize=(5, 3))
 
-    fromSpatialMapsFileName = os.path.join(tableFolder, 'spe11b_convection_from_spatial_maps.csv')
+    fromSpatialMapsFileName = os.path.join(tableFolder, 'spe11b_mC_from_spatial_maps.csv')
     fromSpatialMaps = np.genfromtxt(fromSpatialMapsFileName, delimiter=',', names=True)
     tSpatialMaps = fromSpatialMaps['time_s']/60/60/24/365
 
-    typicalFileName = os.path.join(folder, 'ut-csee-pge', 'spe11b', 'result2', 'spe11b_time_series.csv')
+    typicalFileName = os.path.join(folder, 'ut-csee', 'spe11b', 'result2', 'spe11b_time_series.csv')
     typical = np.genfromtxt(typicalFileName, delimiter=',')
     axs.plot(typical[:, 0]/60/60/24/365, 1e-3*typical[:, 11], label='typical', color='k', linestyle='-')
 
@@ -76,8 +76,8 @@ def compareConvection():
     axs.set_xscale(r'log')
     axs.set_xlim((1e1, 1e3))
     axs.set_ylim((-1e-1, 8.0e0))
-    axs.legend(loc='center left', bbox_to_anchor=(1, 0.5))
-    fig.savefig('spe11b_compare_convection.png', bbox_inches='tight', dpi=300)
+    axs.legend(loc='center left', bbox_to_anchor=(1, 0.5), ncols=2)
+    fig.savefig('spe11b_compare_mC.png', bbox_inches='tight', dpi=300)
 
 
 if __name__ == "__main__":
