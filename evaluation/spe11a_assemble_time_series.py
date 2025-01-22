@@ -9,6 +9,18 @@ import matplotlib
 import matplotlib.pyplot as plt
 from groups_and_colors import groups_and_colors
 
+def is_notebook() -> bool:
+    try:
+        shell = get_ipython().__class__.__name__
+        if shell == 'ZMQInteractiveShell':
+            return True   # Jupyter notebook or qtconsole
+        elif shell == 'TerminalInteractiveShell':
+            return False  # Terminal running IPython
+        else:
+            return False  # Other type (?)
+    except NameError:
+        return False      # Probably standard Python interpreter
+
 def assembleTimeSeries():
     """Visualize time series for Case A of the 11th SPE CSP"""
 
@@ -47,28 +59,28 @@ def assembleTimeSeries():
     figT, axsT = plt.subplots(figsize=(5, 3))
 
     if calculated:
-        mobileFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11a_mobile_boxA_from_spatial_maps.csv')
+        mobileFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11a_mobA_from_spatial_maps.csv')
         mobileFromSpatialMapsA = np.genfromtxt(mobileFromSpatialMapsFileName, delimiter=',', names=True)
         tSpatialMaps = mobileFromSpatialMapsA['time_s']/60/60
         # project initial values to 1e-1 hours for improved visualization
         tSpatialMaps[0] = 1e-1
-        immobileFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11a_immobile_boxA_from_spatial_maps.csv')
+        immobileFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11a_immA_from_spatial_maps.csv')
         immobileFromSpatialMapsA = np.genfromtxt(immobileFromSpatialMapsFileName, delimiter=',', names=True)
-        dissolvedFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11a_dissolved_boxA_from_spatial_maps.csv')
+        dissolvedFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11a_dissA_from_spatial_maps.csv')
         dissolvedFromSpatialMapsA = np.genfromtxt(dissolvedFromSpatialMapsFileName, delimiter=',', names=True)
-        sealFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11a_seal_boxA_from_spatial_maps.csv')
+        sealFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11a_sealA_from_spatial_maps.csv')
         sealFromSpatialMapsA = np.genfromtxt(sealFromSpatialMapsFileName, delimiter=',', names=True)
 
-        mobileFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11a_mobile_boxB_from_spatial_maps.csv')
+        mobileFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11a_mobB_from_spatial_maps.csv')
         mobileFromSpatialMapsB = np.genfromtxt(mobileFromSpatialMapsFileName, delimiter=',', names=True)
-        immobileFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11a_immobile_boxB_from_spatial_maps.csv')
+        immobileFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11a_immB_from_spatial_maps.csv')
         immobileFromSpatialMapsB = np.genfromtxt(immobileFromSpatialMapsFileName, delimiter=',', names=True)
-        dissolvedFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11a_dissolved_boxB_from_spatial_maps.csv')
+        dissolvedFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11a_dissB_from_spatial_maps.csv')
         dissolvedFromSpatialMapsB = np.genfromtxt(dissolvedFromSpatialMapsFileName, delimiter=',', names=True)
-        sealFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11a_seal_boxB_from_spatial_maps.csv')
+        sealFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11a_sealB_from_spatial_maps.csv')
         sealFromSpatialMapsB = np.genfromtxt(sealFromSpatialMapsFileName, delimiter=',', names=True)
 
-        convectionFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11a_convection_from_spatial_maps.csv')
+        convectionFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11a_mC_from_spatial_maps.csv')
         convectionFromSpatialMaps = np.genfromtxt(convectionFromSpatialMapsFileName, delimiter=',', names=True)
 
     for i, group in zip(range(len(groups)), groups):
@@ -160,7 +172,6 @@ def assembleTimeSeries():
     handles, labels = axsP[1].get_legend_handles_labels()
     figP.legend(handles, labels, loc='center left', bbox_to_anchor=(1, 0.5))
     figP.tight_layout()
-    figP.savefig('spe11a_time_series_pressure.png', bbox_inches='tight', dpi=300)
 
     axsA[0, 0].set_title(r'Box A: mobile gaseous CO2')
     axsA[0, 0].set_ylabel(r'mass [g]')
@@ -191,7 +202,6 @@ def assembleTimeSeries():
     handles, labels = axsA[1][1].get_legend_handles_labels()
     figA.legend(handles, labels, loc='center left', bbox_to_anchor=(1, 0.5))
     figA.tight_layout()
-    figA.savefig('spe11a_time_series_boxA.png', bbox_inches='tight', dpi=300)
 
     axsB[0, 0].set_title(r'Box B: mobile gaseous CO2')
     axsB[0, 0].set_ylabel(r'mass [g]')
@@ -222,7 +232,6 @@ def assembleTimeSeries():
     handles, labels = axsB[1][1].get_legend_handles_labels()
     figB.legend(handles, labels, loc='center left', bbox_to_anchor=(1, 0.5))
     figB.tight_layout()
-    figB.savefig('spe11a_time_series_boxB.png', bbox_inches='tight', dpi=300)
 
     axsC.set_title(r'Box C: convection')
     axsC.set_xlabel(r'time [h]')
@@ -232,7 +241,6 @@ def assembleTimeSeries():
     if calculated:
         axsC.plot([], [], ' ', label=r'$^*$from dense data')
     axsC.legend(loc='center left', bbox_to_anchor=(1, 0.5))
-    figC.savefig('spe11a_time_series_boxC.png', bbox_inches='tight', dpi=300)
 
     axsT.set_title(r'CO2 in sealing units')
     axsT.set_xlabel(r'time [h]')
@@ -240,7 +248,13 @@ def assembleTimeSeries():
     axsT.set_xlim(1e-1, 7260.0/60)
     axsT.set_xscale(r'log')
     axsT.legend(loc='center left', bbox_to_anchor=(1, 0.5))
-    figT.savefig('spe11a_time_series_seal.png', bbox_inches='tight', dpi=300)
+
+    if not is_notebook():
+        figP.savefig('spe11a_time_series_pressure.png', bbox_inches='tight', dpi=300)
+        figA.savefig('spe11a_time_series_boxA.png', bbox_inches='tight', dpi=300)
+        figB.savefig('spe11a_time_series_boxB.png', bbox_inches='tight', dpi=300)
+        figC.savefig('spe11a_time_series_boxC.png', bbox_inches='tight', dpi=300)
+        figT.savefig('spe11a_time_series_seal.png', bbox_inches='tight', dpi=300)
 
 if __name__ == "__main__":
     assembleTimeSeries()
