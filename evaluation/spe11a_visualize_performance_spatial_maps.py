@@ -15,7 +15,7 @@ import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
-np.set_printoptions(threshold=sys.maxsize)
+from is_notebook import is_notebook
 
 def getFieldValues(fileName, nX, nY):
     cvol = np.zeros([nY, nX])
@@ -170,24 +170,26 @@ def visualizePerformanceSpatialMaps():
     
     if len(groups) == 1:
         fig.suptitle(f'{groups[0]} at {time} hours')
-        fig.savefig(f'spe11a_{groups[0].lower()}_performance+_{time}h.png', bbox_inches='tight')
-        print('File spe11a_' + f'{groups[0].lower()}_performance_{time}h.png has been generated.')
+        if not is_notebook():
+            fig.savefig(f'spe11a_{groups[0].lower()}_performance+_{time}h.png', bbox_inches='tight')
+            print('File spe11a_' + f'{groups[0].lower()}_performance_{time}h.png has been generated.')
     else:
         figCVol.suptitle(r'cell volume [cm$^3$] at' + f' {time} hours')
-        figCVol.savefig(f'spe11a_cvol_{time}h.png', bbox_inches='tight')
         figARat.suptitle(f'aspect ratio [-] at {time} hours')
-        figARat.savefig(f'spe11a_arat_{time}h.png', bbox_inches='tight')
         figCO2MNR.suptitle(f'CO2 maximum normalized residual [-] at {time} hours')
-        figCO2MNR.savefig(f'spe11a_co2_max_norm_res_{time}h.png', bbox_inches='tight')
         figH2OMNR.suptitle(f'H2O maximum normalized residual [-] at {time} hours')
-        figH2OMNR.savefig(f'spe11a_h2o_max_norm_res_{time}h.png', bbox_inches='tight')
         figCO2MBE.suptitle(f'CO2 mass-balance error [-] at {time} hours')
-        figCO2MBE.savefig(f'spe11a_co2_mb_error_{time}h.png', bbox_inches='tight')
         figH2OMBE.suptitle(f'H2O mass-balance error [-] at {time} hours')
-        figH2OMBE.savefig(f'spe11a_h2o_mb_error_{time}h.png', bbox_inches='tight')
         figPostEst.suptitle(f'a posteriori error estimate [-] at {time} hours')
-        figPostEst.savefig(f'spe11a_post_est_{time}h.png', bbox_inches='tight')
-        print('Files spe11a_{cvol, arat, {co2, h2o}_max_norm_res, {co2, h2o}_mb_error, post_est}' + f'_{time}h.png have been generated.')
+        if not is_notebook():
+            figCVol.savefig(f'spe11a_cvol_{time}h.png', bbox_inches='tight')
+            figARat.savefig(f'spe11a_arat_{time}h.png', bbox_inches='tight')
+            figCO2MNR.savefig(f'spe11a_co2_max_norm_res_{time}h.png', bbox_inches='tight')
+            figH2OMNR.savefig(f'spe11a_h2o_max_norm_res_{time}h.png', bbox_inches='tight')
+            figCO2MBE.savefig(f'spe11a_co2_mb_error_{time}h.png', bbox_inches='tight')
+            figH2OMBE.savefig(f'spe11a_h2o_mb_error_{time}h.png', bbox_inches='tight')
+            figPostEst.savefig(f'spe11a_post_est_{time}h.png', bbox_inches='tight')
+            print('Files spe11a_{cvol, arat, {co2, h2o}_max_norm_res, {co2, h2o}_mb_error, post_est}' + f'_{time}h.png have been generated.')
 
 if __name__ == "__main__":
     visualizePerformanceSpatialMaps()

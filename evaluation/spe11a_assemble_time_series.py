@@ -8,18 +8,7 @@ import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
 from groups_and_colors import groups_and_colors
-
-def is_notebook() -> bool:
-    try:
-        shell = get_ipython().__class__.__name__
-        if shell == 'ZMQInteractiveShell':
-            return True   # Jupyter notebook or qtconsole
-        elif shell == 'TerminalInteractiveShell':
-            return False  # Terminal running IPython
-        else:
-            return False  # Other type (?)
-    except NameError:
-        return False      # Probably standard Python interpreter
+from is_notebook import is_notebook
 
 def assembleTimeSeries():
     """Visualize time series for Case A of the 11th SPE CSP"""
@@ -161,6 +150,7 @@ def assembleTimeSeries():
     axsP[0].set_xlabel(r'time [h]')
     axsP[0].set_ylabel(r'pressure [bar]')
     axsP[0].set_xlim(1e-1, 7260.0/60)
+    axsP[0].set_ylim(1.15, 1.18)
     axsP[0].set_xscale(r'log')
     axsP[1].set_title(r'sensor 2')
     axsP[1].set_xlabel(r'time [h]')

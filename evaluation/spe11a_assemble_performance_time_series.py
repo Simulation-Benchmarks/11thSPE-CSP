@@ -8,6 +8,7 @@ import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
 from groups_and_colors import groups_and_colors
+from is_notebook import is_notebook
 
 def assemblePerformanceTimeSeries():
     """Visualize performance time series for Case A of the 11th SPE CSP"""
@@ -101,7 +102,7 @@ def assemblePerformanceTimeSeries():
     axsT.set_yscale('log')
     axsT.set_xlim((9e-2, 2e2))
     axsT.set_ylim((1e-2, 1e3))
-    axsT.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+    axsT.legend(loc='center left', bbox_to_anchor=(1, 0.5), ncols=2)
 
     axsF.set_title(r'number of failed time steps')
     axsF.set_xlabel(r'time [h]')
@@ -109,14 +110,14 @@ def assemblePerformanceTimeSeries():
     axsF.set_xscale('log')
     axsF.set_yscale('log')
     axsF.set_xlim((9e-2, 2e2))
-    axsF.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+    axsF.legend(loc='center left', bbox_to_anchor=(1, 0.5), ncols=2)
 
     axsM.set_title(r'mass balance')
     axsM.set_xlabel(r'time [h]')
     axsM.set_ylabel(r'mass [g]')
     axsM.set_xscale('log')
     axsM.set_xlim((9e-2, 2e2))
-    axsM.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+    axsM.legend(loc='center left', bbox_to_anchor=(1, 0.5), ncols=2)
 
     axsD.set_title(r'degrees of freedom')
     axsD.set_xlabel(r'time [h]')
@@ -125,7 +126,7 @@ def assemblePerformanceTimeSeries():
     axsD.set_yscale('log')
     axsD.set_xlim((9e-2, 2e2))
     axsD.set_ylim((1e4, 1e7))
-    axsD.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+    axsD.legend(loc='center left', bbox_to_anchor=(1, 0.5), ncols=2)
 
     axsN.set_title(r'number of nonlinear iterations')
     axsN.set_xlabel(r'time [h]')
@@ -133,7 +134,7 @@ def assemblePerformanceTimeSeries():
     axsN.set_xscale('log')
     axsN.set_yscale('log')
     axsN.set_xlim((9e-2, 2e2))
-    axsN.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+    axsN.legend(loc='center left', bbox_to_anchor=(1, 0.5), ncols=2)
 
     axsR.set_title(r'number of local residual evaluations')
     axsR.set_xlabel(r'time [h]')
@@ -141,7 +142,7 @@ def assemblePerformanceTimeSeries():
     axsR.set_xscale('log')
     axsR.set_yscale('log')
     axsR.set_xlim((9e-2, 2e2))
-    axsR.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+    axsR.legend(loc='center left', bbox_to_anchor=(1, 0.5), ncols=2)
 
     axsL.set_title(r'number of linear iterations')
     axsL.set_xlabel(r'time [h]')
@@ -149,7 +150,7 @@ def assemblePerformanceTimeSeries():
     axsL.set_xscale('log')
     axsL.set_yscale('log')
     axsL.set_xlim((9e-2, 2e2))
-    axsL.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+    axsL.legend(loc='center left', bbox_to_anchor=(1, 0.5), ncols=2)
 
     axsRT[0].set_title(r'runtime')
     axsRT[0].set_xlabel(r'time [h]')
@@ -164,17 +165,18 @@ def assemblePerformanceTimeSeries():
     axsRT[1].set_yscale('log')
     axsRT[1].set_xlim((9e-2, 2e2))
     handles, labels = axsRT[1].get_legend_handles_labels()
-    figRT.legend(handles, labels, loc='center left', bbox_to_anchor=(1, 0.5))
+    figRT.legend(handles, labels, loc='center left', bbox_to_anchor=(1, 0.5), ncols=2)
     figRT.tight_layout()
 
-    figT.savefig(f'spe11a_time_series_tstep{detailedString}.png', bbox_inches='tight', dpi=300)
-    figF.savefig(f'spe11a_time_series_fsteps{detailedString}.png', bbox_inches='tight', dpi=300)
-    figM.savefig(f'spe11a_time_series_mass{detailedString}.png', bbox_inches='tight', dpi=300)
-    figD.savefig(f'spe11a_time_series_dof{detailedString}.png', bbox_inches='tight', dpi=300)
-    figN.savefig(f'spe11a_time_series_nliter{detailedString}.png', bbox_inches='tight', dpi=300)
-    figR.savefig(f'spe11a_time_series_nres{detailedString}.png', bbox_inches='tight', dpi=300)
-    figL.savefig(f'spe11a_time_series_liniter{detailedString}.png', bbox_inches='tight', dpi=300)
-    figRT.savefig(f'spe11a_time_series_runtime{detailedString}.png', bbox_inches='tight', dpi=300)
+    if not is_notebook():
+        figT.savefig(f'spe11a_time_series_tstep{detailedString}.png', bbox_inches='tight', dpi=300)
+        figF.savefig(f'spe11a_time_series_fsteps{detailedString}.png', bbox_inches='tight', dpi=300)
+        figM.savefig(f'spe11a_time_series_mass{detailedString}.png', bbox_inches='tight', dpi=300)
+        figD.savefig(f'spe11a_time_series_dof{detailedString}.png', bbox_inches='tight', dpi=300)
+        figN.savefig(f'spe11a_time_series_nliter{detailedString}.png', bbox_inches='tight', dpi=300)
+        figR.savefig(f'spe11a_time_series_nres{detailedString}.png', bbox_inches='tight', dpi=300)
+        figL.savefig(f'spe11a_time_series_liniter{detailedString}.png', bbox_inches='tight', dpi=300)
+        figRT.savefig(f'spe11a_time_series_runtime{detailedString}.png', bbox_inches='tight', dpi=300)
 
 if __name__ == "__main__":
     assemblePerformanceTimeSeries()

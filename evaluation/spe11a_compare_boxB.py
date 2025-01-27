@@ -8,6 +8,7 @@ import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
 from groups_and_colors import groups_and_colors
+from is_notebook import is_notebook
 
 def compareConvection():
     """Compare different CO2 phase distributions in Box B for Case A of the 11th SPE CSP"""
@@ -107,7 +108,6 @@ def compareConvection():
     handles, labels = axsM[1].get_legend_handles_labels()
     figM.legend(handles, labels, loc='center left', bbox_to_anchor=(1, 0.5), ncol=2)
     figM.tight_layout()
-    figM.savefig('spe11a_compare_mobB.png', bbox_inches='tight', dpi=300)
 
     axsI[0].set_title(r'reported')
     axsI[0].set_ylabel(r'mass [g]')
@@ -127,7 +127,6 @@ def compareConvection():
     handles, labels = axsI[1].get_legend_handles_labels()
     figI.legend(handles, labels, loc='center left', bbox_to_anchor=(1, 0.5), ncol=2)
     figI.tight_layout()
-    figI.savefig('spe11a_compare_immB.png', bbox_inches='tight', dpi=300)
 
     axsD[0].set_title(r'reported')
     axsD[0].set_ylabel(r'mass [g]')
@@ -147,7 +146,6 @@ def compareConvection():
     handles, labels = axsD[1].get_legend_handles_labels()
     figD.legend(handles, labels, loc='center left', bbox_to_anchor=(1, 0.5), ncol=2)
     figD.tight_layout()
-    figD.savefig('spe11a_compare_dissB.png', bbox_inches='tight', dpi=300)
 
     axsS[0].set_title(r'reported')
     axsS[0].set_ylabel(r'mass [g]')
@@ -167,8 +165,12 @@ def compareConvection():
     handles, labels = axsS[1].get_legend_handles_labels()
     figS.legend(handles, labels, loc='center left', bbox_to_anchor=(1, 0.5), ncol=2)
     figS.tight_layout()
-    figS.savefig('spe11a_compare_sealB.png', bbox_inches='tight', dpi=300)
 
+    if not is_notebook():
+        figM.savefig('spe11a_compare_mobB.png', bbox_inches='tight', dpi=300)
+        figI.savefig('spe11a_compare_immB.png', bbox_inches='tight', dpi=300)
+        figD.savefig('spe11a_compare_dissB.png', bbox_inches='tight', dpi=300)
+        figS.savefig('spe11a_compare_sealB.png', bbox_inches='tight', dpi=300)
 
 if __name__ == "__main__":
     compareConvection()

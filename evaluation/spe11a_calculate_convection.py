@@ -12,6 +12,7 @@ from groups_and_colors import groups_and_colors
 import sys
 sys.path.append('..')
 import thermodynamics.make_solubility_table as solubility
+from is_notebook import is_notebook
 
 def calculateConvection():
     """Calculate the convection integral for Case A of the 11th SPE CSP"""
@@ -113,9 +114,11 @@ def calculateConvection():
     axs.set_xlabel(r'time [h]')
     axs.set_ylabel(r'$M$ [m]')
     axs.set_xscale('log')
-    fig.savefig('spe11a_time_series_boxC_from_spatial_maps.png', bbox_inches='tight', dpi=300)
 
-    np.savetxt('spe11a_mC_from_spatial_maps.csv', table, fmt='%.5e', delimiter=', ', header=header)
+    if not is_notebook():
+        fig.savefig('spe11a_time_series_boxC_from_spatial_maps.png', bbox_inches='tight', dpi=300)
+        np.savetxt('spe11a_mC_from_spatial_maps.csv', table, fmt='%.5e', delimiter=', ', header=header)
+
 
 if __name__ == "__main__":
     calculateConvection()

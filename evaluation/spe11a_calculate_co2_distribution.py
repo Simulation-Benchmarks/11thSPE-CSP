@@ -12,6 +12,7 @@ from groups_and_colors import groups_and_colors
 import sys
 sys.path.append('..')
 import thermodynamics.make_solubility_table as solubility
+from is_notebook import is_notebook
 
 def calculateCO2Distribution():
     """Calculate the CO2 distribution among phases in Boxes A and B for Case A of the 11th SPE CSP"""
@@ -260,7 +261,6 @@ def calculateCO2Distribution():
     handles, labels = axsA[1][1].get_legend_handles_labels()
     figA.legend(handles, labels, loc='center left', bbox_to_anchor=(1, 0.5))
     figA.tight_layout()
-    figA.savefig('spe11a_time_series_boxA_from_spatial_maps.png', bbox_inches='tight', dpi=300)
 
     axsB[0, 0].set_title(r'Box B: mobile gaseous CO2')
     axsB[0, 0].set_ylabel(r'mass [g]')
@@ -289,17 +289,19 @@ def calculateCO2Distribution():
     handles, labels = axsB[1][1].get_legend_handles_labels()
     figB.legend(handles, labels, loc='center left', bbox_to_anchor=(1, 0.5))
     figB.tight_layout()
-    figB.savefig('spe11a_time_series_boxB_from_spatial_maps.png', bbox_inches='tight', dpi=300)
 
-    np.savetxt('spe11a_mobA_from_spatial_maps.csv', mobileATable, fmt='%.5e', delimiter=', ', header=header)
-    np.savetxt('spe11a_immA_from_spatial_maps.csv', immobileATable, fmt='%.5e', delimiter=', ', header=header)
-    np.savetxt('spe11a_dissA_from_spatial_maps.csv', dissolvedATable, fmt='%.5e', delimiter=', ', header=header)
-    np.savetxt('spe11a_sealA_from_spatial_maps.csv', sealATable, fmt='%.5e', delimiter=', ', header=header)
+    if not is_notebook():
+        np.savetxt('spe11a_mobA_from_spatial_maps.csv', mobileATable, fmt='%.5e', delimiter=', ', header=header)
+        np.savetxt('spe11a_immA_from_spatial_maps.csv', immobileATable, fmt='%.5e', delimiter=', ', header=header)
+        np.savetxt('spe11a_dissA_from_spatial_maps.csv', dissolvedATable, fmt='%.5e', delimiter=', ', header=header)
+        np.savetxt('spe11a_sealA_from_spatial_maps.csv', sealATable, fmt='%.5e', delimiter=', ', header=header)
+        figA.savefig('spe11a_time_series_boxA_from_spatial_maps.png', bbox_inches='tight', dpi=300)
 
-    np.savetxt('spe11a_mobB_from_spatial_maps.csv', mobileBTable, fmt='%.5e', delimiter=', ', header=header)
-    np.savetxt('spe11a_immB_from_spatial_maps.csv', immobileBTable, fmt='%.5e', delimiter=', ', header=header)
-    np.savetxt('spe11a_dissB_from_spatial_maps.csv', dissolvedBTable, fmt='%.5e', delimiter=', ', header=header)
-    np.savetxt('spe11a_sealB_from_spatial_maps.csv', sealBTable, fmt='%.5e', delimiter=', ', header=header)
+        np.savetxt('spe11a_mobB_from_spatial_maps.csv', mobileBTable, fmt='%.5e', delimiter=', ', header=header)
+        np.savetxt('spe11a_immB_from_spatial_maps.csv', immobileBTable, fmt='%.5e', delimiter=', ', header=header)
+        np.savetxt('spe11a_dissB_from_spatial_maps.csv', dissolvedBTable, fmt='%.5e', delimiter=', ', header=header)
+        np.savetxt('spe11a_sealB_from_spatial_maps.csv', sealBTable, fmt='%.5e', delimiter=', ', header=header)
+        figB.savefig('spe11a_time_series_boxB_from_spatial_maps.png', bbox_inches='tight', dpi=300)
 
 if __name__ == "__main__":
     calculateCO2Distribution()

@@ -8,6 +8,7 @@ import argparse
 import matplotlib
 import matplotlib.pyplot as plt
 from groups_and_colors import groups_and_colors
+from is_notebook import is_notebook
 
 
 font = {'size' : 12}
@@ -54,4 +55,5 @@ axs.set_title(r'Box C: convection from spatial maps')
 axs.set_xlabel(r'time [h]')
 axs.set_ylabel(r'$M$ [m]')
 axs.set_xscale('log')
-fig.savefig('spe11a_mC_from_spatial_maps.png', bbox_inches='tight', dpi=300)
+if not is_notebook():
+    fig.savefig('spe11a_mC_from_spatial_maps.png', bbox_inches='tight', dpi=300)

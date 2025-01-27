@@ -7,6 +7,7 @@ import argparse
 import numpy as np
 import matplotlib
 from spe11a_visualize_spatial_maps import getFieldValues
+from is_notebook import is_notebook
 
 def myStr(value):
     return f'{value:.4e}'
@@ -131,25 +132,26 @@ def calculateL2Differences():
             gradYDiff = np.nan_to_num(gradYDiff)
             h1SemiNormP[i, j] = h1SemiNormP[j, i] = np.sqrt(deltaX*deltaY*(np.sum(np.square(gradXDiff)) + np.sum(np.square(gradYDiff))))
 
-    with open(f'spe11a_pressure_l2_diff_{hour}h.csv', 'w') as f:
-        print('#, ', ', '.join(map(str, groups)), file=f)
-        for i, groupI in zip(range(numGroups), groups):
-            print(groupI + ',', ', '.join(map(myStr, l2NormP[i])), file=f)
+    if not is_notebook():
+        with open(f'spe11a_pressure_l2_diff_{hour}h.csv', 'w') as f:
+            print('#, ', ', '.join(map(str, groups)), file=f)
+            for i, groupI in zip(range(numGroups), groups):
+                print(groupI + ',', ', '.join(map(myStr, l2NormP[i])), file=f)
 
-    with open(f'spe11a_pressure_l2semi_diff_{hour}h.csv', 'w') as f:
-        print('#, ', ', '.join(map(str, groups)), file=f)
-        for i, groupI in zip(range(numGroups), groups):
-            print(groupI + ',', ', '.join(map(myStr, l2SemiNormP[i])), file=f)
+        with open(f'spe11a_pressure_l2semi_diff_{hour}h.csv', 'w') as f:
+            print('#, ', ', '.join(map(str, groups)), file=f)
+            for i, groupI in zip(range(numGroups), groups):
+                print(groupI + ',', ', '.join(map(myStr, l2SemiNormP[i])), file=f)
 
-    with open(f'spe11a_pressure_h1semi_diff_{hour}h.csv', 'w') as f:
-        print('#, ', ', '.join(map(str, groups)), file=f)
-        for i, groupI in zip(range(numGroups), groups):
-            print(groupI + ',', ', '.join(map(myStr, h1SemiNormP[i])), file=f)
+        with open(f'spe11a_pressure_h1semi_diff_{hour}h.csv', 'w') as f:
+            print('#, ', ', '.join(map(str, groups)), file=f)
+            for i, groupI in zip(range(numGroups), groups):
+                print(groupI + ',', ', '.join(map(myStr, h1SemiNormP[i])), file=f)
 
-    with open(f'spe11a_tmco2_l2_diff_{hour}h.csv', 'w') as f:
-        print('#, ', ', '.join(map(str, groups)), file=f)
-        for i, groupI in zip(range(numGroups), groups):
-            print(groupI + ',', ', '.join(map(myStr, l2NormM[i])), file=f)
+        with open(f'spe11a_tmco2_l2_diff_{hour}h.csv', 'w') as f:
+            print('#, ', ', '.join(map(str, groups)), file=f)
+            for i, groupI in zip(range(numGroups), groups):
+                print(groupI + ',', ', '.join(map(myStr, l2NormM[i])), file=f)
 
 
 if __name__ == "__main__":
