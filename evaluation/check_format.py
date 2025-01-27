@@ -13,6 +13,7 @@ import argparse
 import zipfile
 import tempfile
 import numpy as np
+from is_notebook import is_notebook
 
 def checkSparseData(folder, case):
     fileName = os.path.join(folder, f"spe11{case}_time_series.csv")
@@ -189,10 +190,11 @@ def checkFormat():
     else:
         print("The dense data does not meet the requirements.\n")
 
-    if checkQuestionnaire(folder, case):
-        print("Successfully checked the questionnaire.")
-    else:
-        print("The questionnaire does not meet the requirements.")
+    if not is_notebook():
+        if checkQuestionnaire(folder, case):
+            print("Successfully checked the questionnaire.")
+        else:
+            print("The questionnaire does not meet the requirements.")
 
     if createdTempDir:
         print(f"\nRemoving temporary folder {folder}.")
