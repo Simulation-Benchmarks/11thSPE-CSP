@@ -28,7 +28,7 @@ def assemblePerformanceTimeSeries():
     parser.set_defaults(detailed=False)
 
     cmdArgs = vars(parser.parse_args())
-    groups = [x.lower() for x in cmdArgs["groups"]]
+    groups = cmdArgs["groups"]
     groupFolders = cmdArgs["groupfolders"]
     folder = cmdArgs["folder"]
     det = cmdArgs["detailed"]
@@ -58,15 +58,15 @@ def assemblePerformanceTimeSeries():
 
         if not group[-1].isnumeric():
             if not groupFolders:
-                baseFolder = os.path.join(folder, group, 'spe11a')
-            if group in groups_and_colors:
-                color = groups_and_colors[group]
+                baseFolder = os.path.join(folder, group.lower(), 'spe11a')
+            if group.lower() in groups_and_colors:
+                color = groups_and_colors[group.lower()]
             ls = '-'
         else:
             if not groupFolders:
-                baseFolder = os.path.join(folder, group[:-1], 'spe11a', f'result{group[-1]}')
-            if group[:-1] in groups_and_colors:
-                color = groups_and_colors[group[:-1]]
+                baseFolder = os.path.join(folder, group[:-1].lower(), 'spe11a', f'result{group[-1]}')
+            if group[:-1].lower() in groups_and_colors:
+                color = groups_and_colors[group[:-1].lower()]
             if group[-1] == '1': ls = '-'
             elif group[-1] == '2': ls = '--'
             elif group[-1] == '3': ls = '-.'
@@ -168,15 +168,14 @@ def assemblePerformanceTimeSeries():
     figRT.legend(handles, labels, loc='center left', bbox_to_anchor=(1, 0.5), ncols=2)
     figRT.tight_layout()
 
-    if not is_notebook():
-        figT.savefig(f'spe11a_time_series_tstep{detailedString}.png', bbox_inches='tight', dpi=300)
-        figF.savefig(f'spe11a_time_series_fsteps{detailedString}.png', bbox_inches='tight', dpi=300)
-        figM.savefig(f'spe11a_time_series_mass{detailedString}.png', bbox_inches='tight', dpi=300)
-        figD.savefig(f'spe11a_time_series_dof{detailedString}.png', bbox_inches='tight', dpi=300)
-        figN.savefig(f'spe11a_time_series_nliter{detailedString}.png', bbox_inches='tight', dpi=300)
-        figR.savefig(f'spe11a_time_series_nres{detailedString}.png', bbox_inches='tight', dpi=300)
-        figL.savefig(f'spe11a_time_series_liniter{detailedString}.png', bbox_inches='tight', dpi=300)
-        figRT.savefig(f'spe11a_time_series_runtime{detailedString}.png', bbox_inches='tight', dpi=300)
+    figT.savefig(f'spe11a_time_series_tstep{detailedString}.png', bbox_inches='tight', dpi=300)
+    figF.savefig(f'spe11a_time_series_fsteps{detailedString}.png', bbox_inches='tight', dpi=300)
+    figM.savefig(f'spe11a_time_series_mass{detailedString}.png', bbox_inches='tight', dpi=300)
+    figD.savefig(f'spe11a_time_series_dof{detailedString}.png', bbox_inches='tight', dpi=300)
+    figN.savefig(f'spe11a_time_series_nliter{detailedString}.png', bbox_inches='tight', dpi=300)
+    figR.savefig(f'spe11a_time_series_nres{detailedString}.png', bbox_inches='tight', dpi=300)
+    figL.savefig(f'spe11a_time_series_liniter{detailedString}.png', bbox_inches='tight', dpi=300)
+    figRT.savefig(f'spe11a_time_series_runtime{detailedString}.png', bbox_inches='tight', dpi=300)
 
 if __name__ == "__main__":
     assemblePerformanceTimeSeries()

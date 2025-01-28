@@ -31,12 +31,12 @@ def assembleTimeSeries():
     parser.add_argument('-p','--percentiles', nargs='+', help='plot area between the two given percentiles')
 
     cmdArgs = vars(parser.parse_args())
-    groups = [x.lower() for x in cmdArgs["groups"]]
+    groups = cmdArgs["groups"]
     groupFolders = cmdArgs["groupfolders"]
     folder = cmdArgs["folder"]
     calculated = []
     if cmdArgs["calculated"]:
-        calculated = [x.lower() for x in cmdArgs["calculated"]]
+        calculated = cmdArgs["calculated"]
         groups = sorted(groups + calculated)
         tableFolder = cmdArgs["tablefolder"]
     if cmdArgs["percentiles"]:
@@ -125,15 +125,15 @@ def assembleTimeSeries():
 
         if not group[-1].isnumeric():
             if not groupFolders:
-                baseFolder = os.path.join(folder, group, 'spe11a')
-            if group in groups_and_colors:
-                color = groups_and_colors[group]
+                baseFolder = os.path.join(folder, group.lower(), 'spe11a')
+            if group.lower() in groups_and_colors:
+                color = groups_and_colors[group.lower()]
             ls = '-'
         else:
             if not groupFolders:
-                baseFolder = os.path.join(folder, group[:-1], 'spe11a', f'result{group[-1]}')
-            if group[:-1] in groups_and_colors:
-                color = groups_and_colors[group[:-1]]
+                baseFolder = os.path.join(folder, group[:-1].lower(), 'spe11a', f'result{group[-1]}')
+            if group[:-1].lower() in groups_and_colors:
+                color = groups_and_colors[group[:-1].lower()]
             if group[-1] == '1': ls = '-'
             elif group[-1] == '2': ls = '--'
             elif group[-1] == '3': ls = '-.'
@@ -158,7 +158,7 @@ def assembleTimeSeries():
 
         # scale mass to grams
         if group in calculated:
-            columnName = group.replace('-', '')
+            columnName = group.lower().replace('-', '')
             axsA[0, 0].plot(tSpatialMaps, 1e3*mobileFromSpatialMapsA[columnName], label=group + r'$^*$', color=color, linestyle=ls)
             axsA[0, 1].plot(tSpatialMaps, 1e3*immobileFromSpatialMapsA[columnName], label=group + r'$^*$', color=color, linestyle=ls)
             axsA[1, 0].plot(tSpatialMaps, 1e3*dissolvedFromSpatialMapsA[columnName], label=group + r'$^*$', color=color, linestyle=ls)
@@ -284,12 +284,11 @@ def assembleTimeSeries():
     axsT.set_xscale(r'log')
     axsT.legend(loc='center left', bbox_to_anchor=(1, 0.5))
 
-    if not is_notebook():
-        figP.savefig('spe11a_time_series_pressure.png', bbox_inches='tight', dpi=300)
-        figA.savefig('spe11a_time_series_boxA.png', bbox_inches='tight', dpi=300)
-        figB.savefig('spe11a_time_series_boxB.png', bbox_inches='tight', dpi=300)
-        figC.savefig('spe11a_time_series_boxC.png', bbox_inches='tight', dpi=300)
-        figT.savefig('spe11a_time_series_seal.png', bbox_inches='tight', dpi=300)
+    figP.savefig('spe11a_time_series_pressure.png', bbox_inches='tight', dpi=300)
+    figA.savefig('spe11a_time_series_boxA.png', bbox_inches='tight', dpi=300)
+    figB.savefig('spe11a_time_series_boxB.png', bbox_inches='tight', dpi=300)
+    figC.savefig('spe11a_time_series_boxC.png', bbox_inches='tight', dpi=300)
+    figT.savefig('spe11a_time_series_seal.png', bbox_inches='tight', dpi=300)
 
 if __name__ == "__main__":
     assembleTimeSeries()

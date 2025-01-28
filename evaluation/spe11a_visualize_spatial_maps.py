@@ -121,7 +121,7 @@ def visualizeSpatialMaps():
 
     cmdArgs = vars(parser.parse_args())
     time = cmdArgs["time"]
-    groups = [x.lower() for x in cmdArgs["groups"]]
+    groups = cmdArgs["groups"]
     groupFolders = cmdArgs["groupfolders"]
     folder = cmdArgs["folder"]
 
@@ -180,10 +180,10 @@ def visualizeSpatialMaps():
 
         if not group[-1].isnumeric():
             if not groupFolders:
-                baseFolder = os.path.join(folder, group, 'spe11a')
+                baseFolder = os.path.join(folder, group.lower(), 'spe11a')
         else:
             if not groupFolders:
-                baseFolder = os.path.join(folder, group[:-1], 'spe11a', f'result{group[-1]}')
+                baseFolder = os.path.join(folder, group[:-1].lower(), 'spe11a', f'result{group[-1]}')
 
         fileName = os.path.join(baseFolder, f'spe11a_spatial_map_{time}h.csv')
         p, s, mCO2, mH2O, rhoG, rhoL, tmCO2 = getFieldValues(fileName, nX, nY)
@@ -233,15 +233,15 @@ def visualizeSpatialMaps():
         figRhoG.suptitle(f'gas phase density [kg/m3] at {time} hours')
         figRhoL.suptitle(f'liquid phase density [kg/m3] at {time} hours')
         figTmCO2.suptitle(f'total CO2 mass [g] at {time} hours')
-        if not is_notebook():
-            figP.savefig(f'spe11a_pressure_{time}h.png', bbox_inches='tight')
-            figS.savefig(f'spe11a_saturation_{time}h.png', bbox_inches='tight')
-            figMCO2.savefig(f'spe11a_mco2_{time}h.png', bbox_inches='tight')
-            figMH2O.savefig(f'spe11a_mh2o_{time}h.png', bbox_inches='tight')
-            figRhoG.savefig(f'spe11a_rhog_{time}h.png', bbox_inches='tight')
-            figRhoL.savefig(f'spe11a_rhol_{time}h.png', bbox_inches='tight')
-            figTmCO2.savefig(f'spe11a_tmco2_{time}h.png', bbox_inches='tight')
-            print('Files spe11a_{pressure, saturation, mco2, mh2o, rhog, rhol, tmco2}' + f'_{time}h.png have been generated.')
+
+        figP.savefig(f'spe11a_pressure_{time}h.png', bbox_inches='tight')
+        figS.savefig(f'spe11a_saturation_{time}h.png', bbox_inches='tight')
+        figMCO2.savefig(f'spe11a_mco2_{time}h.png', bbox_inches='tight')
+        figMH2O.savefig(f'spe11a_mh2o_{time}h.png', bbox_inches='tight')
+        figRhoG.savefig(f'spe11a_rhog_{time}h.png', bbox_inches='tight')
+        figRhoL.savefig(f'spe11a_rhol_{time}h.png', bbox_inches='tight')
+        figTmCO2.savefig(f'spe11a_tmco2_{time}h.png', bbox_inches='tight')
+        print('Files spe11a_{pressure, saturation, mco2, mh2o, rhog, rhol, tmco2}' + f'_{time}h.png have been generated.')
 
 if __name__ == "__main__":
     visualizeSpatialMaps()

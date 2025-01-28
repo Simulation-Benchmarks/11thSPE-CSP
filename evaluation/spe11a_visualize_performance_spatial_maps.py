@@ -94,7 +94,7 @@ def visualizePerformanceSpatialMaps():
 
     cmdArgs = vars(parser.parse_args())
     time = cmdArgs["time"]
-    groups = [x.lower() for x in cmdArgs["groups"]]
+    groups = cmdArgs["groups"]
     groupFolders = cmdArgs["groupfolders"]
     folder = cmdArgs["folder"]
 
@@ -143,10 +143,10 @@ def visualizePerformanceSpatialMaps():
 
         if not group[-1].isnumeric():
             if not groupFolders:
-                baseFolder = os.path.join(folder, group, 'spe11a')
+                baseFolder = os.path.join(folder, group.lower(), 'spe11a')
         else:
             if not groupFolders:
-                baseFolder = os.path.join(folder, group[:-1], 'spe11a', f'result{group[-1]}')
+                baseFolder = os.path.join(folder, group[:-1].lower(), 'spe11a', f'result{group[-1]}')
 
         fileName = os.path.join(baseFolder, f'spe11a_performance_spatial_map_{time}h.csv')
         cvol, arat, co2_max_norm_res, h2o_max_norm_res, co2_mb_error, h2o_mb_error, post_est = getFieldValues(fileName, nX, nY)
@@ -181,15 +181,15 @@ def visualizePerformanceSpatialMaps():
         figCO2MBE.suptitle(f'CO2 mass-balance error [-] at {time} hours')
         figH2OMBE.suptitle(f'H2O mass-balance error [-] at {time} hours')
         figPostEst.suptitle(f'a posteriori error estimate [-] at {time} hours')
-        if not is_notebook():
-            figCVol.savefig(f'spe11a_cvol_{time}h.png', bbox_inches='tight')
-            figARat.savefig(f'spe11a_arat_{time}h.png', bbox_inches='tight')
-            figCO2MNR.savefig(f'spe11a_co2_max_norm_res_{time}h.png', bbox_inches='tight')
-            figH2OMNR.savefig(f'spe11a_h2o_max_norm_res_{time}h.png', bbox_inches='tight')
-            figCO2MBE.savefig(f'spe11a_co2_mb_error_{time}h.png', bbox_inches='tight')
-            figH2OMBE.savefig(f'spe11a_h2o_mb_error_{time}h.png', bbox_inches='tight')
-            figPostEst.savefig(f'spe11a_post_est_{time}h.png', bbox_inches='tight')
-            print('Files spe11a_{cvol, arat, {co2, h2o}_max_norm_res, {co2, h2o}_mb_error, post_est}' + f'_{time}h.png have been generated.')
+
+        figCVol.savefig(f'spe11a_cvol_{time}h.png', bbox_inches='tight')
+        figARat.savefig(f'spe11a_arat_{time}h.png', bbox_inches='tight')
+        figCO2MNR.savefig(f'spe11a_co2_max_norm_res_{time}h.png', bbox_inches='tight')
+        figH2OMNR.savefig(f'spe11a_h2o_max_norm_res_{time}h.png', bbox_inches='tight')
+        figCO2MBE.savefig(f'spe11a_co2_mb_error_{time}h.png', bbox_inches='tight')
+        figH2OMBE.savefig(f'spe11a_h2o_mb_error_{time}h.png', bbox_inches='tight')
+        figPostEst.savefig(f'spe11a_post_est_{time}h.png', bbox_inches='tight')
+        print('Files spe11a_{cvol, arat, {co2, h2o}_max_norm_res, {co2, h2o}_mb_error, post_est}' + f'_{time}h.png have been generated.')
 
 if __name__ == "__main__":
     visualizePerformanceSpatialMaps()
