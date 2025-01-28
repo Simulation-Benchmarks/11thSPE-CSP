@@ -27,6 +27,8 @@ def assembleTimeSeries():
 
     parser.add_argument('-t','--tablefolder', help='path to folder containing calculated tables')
 
+    parser.add_argument('-p','--percentiles', nargs='+', help='plot area between the two given percentiles')
+
     cmdArgs = vars(parser.parse_args())
     groups = [x.lower() for x in [x.lower() for x in cmdArgs["groups"]]]
     groupFolders = cmdArgs["groupfolders"]
@@ -35,6 +37,10 @@ def assembleTimeSeries():
     if cmdArgs["calculated"]:
         calculated = [x.lower() for x in cmdArgs["calculated"]]
         groups = sorted(groups + calculated)
+        tableFolder = cmdArgs["tablefolder"]
+    if cmdArgs["percentiles"]:
+        lowerPercentile = int(cmdArgs["percentiles"][0])
+        upperPercentile = int(cmdArgs["percentiles"][1])
         tableFolder = cmdArgs["tablefolder"]
 
     font = {'size' : 12}
@@ -68,6 +74,48 @@ def assembleTimeSeries():
 
         convectionFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11b_mC_from_spatial_maps.csv')
         convectionFromSpatialMaps = np.genfromtxt(convectionFromSpatialMapsFileName, delimiter=',', names=True)
+
+    if cmdArgs["percentiles"]:
+        p1PercentilesFileName = os.path.join(tableFolder, 'spe11b_p1_percentiles.csv')
+        p1Percentiles = np.genfromtxt(p1PercentilesFileName, delimiter=',', names=True)
+        tPercentiles = p1Percentiles['time_s']/60/60/24/365
+        axsP[0].fill_between(tPercentiles, 1e-5*p1Percentiles[f'P{lowerPercentile}_Pa'], 1e-5*p1Percentiles[f'P{upperPercentile}_Pa'], color='lightgray', label=f'[P{lowerPercentile}, P{upperPercentile}]')
+        p2PercentilesFileName = os.path.join(tableFolder, 'spe11b_p2_percentiles.csv')
+        p2Percentiles = np.genfromtxt(p2PercentilesFileName, delimiter=',', names=True)
+        axsP[1].fill_between(tPercentiles, 1e-5*p2Percentiles[f'P{lowerPercentile}_Pa'], 1e-5*p2Percentiles[f'P{upperPercentile}_Pa'], color='lightgray', label=f'[P{lowerPercentile}, P{upperPercentile}]')
+        mobAPercentilesFileName = os.path.join(tableFolder, 'spe11b_mobA_percentiles.csv')
+        mobAPercentiles = np.genfromtxt(mobAPercentilesFileName, delimiter=',', names=True)
+        axsA[0, 0].fill_between(tPercentiles, 1e-6*mobAPercentiles[f'P{lowerPercentile}_kg'], 1e-6*mobAPercentiles[f'P{upperPercentile}_kg'], color='lightgray', label=f'[P{lowerPercentile}, P{upperPercentile}]')
+        immAPercentilesFileName = os.path.join(tableFolder, 'spe11b_immA_percentiles.csv')
+        immAPercentiles = np.genfromtxt(immAPercentilesFileName, delimiter=',', names=True)
+        axsA[0, 1].fill_between(tPercentiles, 1e-6*immAPercentiles[f'P{lowerPercentile}_kg'], 1e-6*immAPercentiles[f'P{upperPercentile}_kg'], color='lightgray', label=f'[P{lowerPercentile}, P{upperPercentile}]')
+        dissAPercentilesFileName = os.path.join(tableFolder, 'spe11b_dissA_percentiles.csv')
+        dissAPercentiles = np.genfromtxt(dissAPercentilesFileName, delimiter=',', names=True)
+        axsA[1, 0].fill_between(tPercentiles, 1e-6*dissAPercentiles[f'P{lowerPercentile}_kg'], 1e-6*dissAPercentiles[f'P{upperPercentile}_kg'], color='lightgray', label=f'[P{lowerPercentile}, P{upperPercentile}]')
+        sealAPercentilesFileName = os.path.join(tableFolder, 'spe11b_sealA_percentiles.csv')
+        sealAPercentiles = np.genfromtxt(sealAPercentilesFileName, delimiter=',', names=True)
+        axsA[1, 1].fill_between(tPercentiles, 1e-6*sealAPercentiles[f'P{lowerPercentile}_kg'], 1e-6*sealAPercentiles[f'P{upperPercentile}_kg'], color='lightgray', label=f'[P{lowerPercentile}, P{upperPercentile}]')
+        mobBPercentilesFileName = os.path.join(tableFolder, 'spe11b_mobB_percentiles.csv')
+        mobBPercentiles = np.genfromtxt(mobBPercentilesFileName, delimiter=',', names=True)
+        axsB[0, 0].fill_between(tPercentiles, 1e-6*mobBPercentiles[f'P{lowerPercentile}_kg'], 1e-6*mobBPercentiles[f'P{upperPercentile}_kg'], color='lightgray', label=f'[P{lowerPercentile}, P{upperPercentile}]')
+        immBPercentilesFileName = os.path.join(tableFolder, 'spe11b_immB_percentiles.csv')
+        immBPercentiles = np.genfromtxt(immBPercentilesFileName, delimiter=',', names=True)
+        axsB[0, 1].fill_between(tPercentiles, 1e-6*immBPercentiles[f'P{lowerPercentile}_kg'], 1e-6*immBPercentiles[f'P{upperPercentile}_kg'], color='lightgray', label=f'[P{lowerPercentile}, P{upperPercentile}]')
+        dissBPercentilesFileName = os.path.join(tableFolder, 'spe11b_dissB_percentiles.csv')
+        dissBPercentiles = np.genfromtxt(dissBPercentilesFileName, delimiter=',', names=True)
+        axsB[1, 0].fill_between(tPercentiles, 1e-6*dissBPercentiles[f'P{lowerPercentile}_kg'], 1e-6*dissBPercentiles[f'P{upperPercentile}_kg'], color='lightgray', label=f'[P{lowerPercentile}, P{upperPercentile}]')
+        sealBPercentilesFileName = os.path.join(tableFolder, 'spe11b_sealB_percentiles.csv')
+        sealBPercentiles = np.genfromtxt(sealBPercentilesFileName, delimiter=',', names=True)
+        axsB[1, 1].fill_between(tPercentiles, 1e-6*sealBPercentiles[f'P{lowerPercentile}_kg'], 1e-6*sealBPercentiles[f'P{upperPercentile}_kg'], color='lightgray', label=f'[P{lowerPercentile}, P{upperPercentile}]')
+        mCPercentilesFileName = os.path.join(tableFolder, 'spe11b_mC_percentiles.csv')
+        mCPercentiles = np.genfromtxt(mCPercentilesFileName, delimiter=',', names=True)
+        axsC.fill_between(tPercentiles, 1e-3*mCPercentiles[f'P{lowerPercentile}_m'], 1e-3*mCPercentiles[f'P{upperPercentile}_m'], color='lightgray', label=f'[P{lowerPercentile}, P{upperPercentile}]')
+        sealTotPercentilesFileName = os.path.join(tableFolder, 'spe11b_sealTot_percentiles.csv')
+        sealTotPercentiles = np.genfromtxt(sealTotPercentilesFileName, delimiter=',', names=True)
+        axsT[0].fill_between(tPercentiles, 1e-3*sealTotPercentiles[f'P{lowerPercentile}_kg'], 1e-3*sealTotPercentiles[f'P{upperPercentile}_kg'], color='lightgray', label=f'[P{lowerPercentile}, P{upperPercentile}]')
+        boundaryPercentilesFileName = os.path.join(tableFolder, 'spe11b_boundary_percentiles.csv')
+        boundaryPercentiles = np.genfromtxt(boundaryPercentilesFileName, delimiter=',', names=True)
+        axsT[1].fill_between(tPercentiles, 1e-3*boundaryPercentiles[f'P{lowerPercentile}_kg'], 1e-3*boundaryPercentiles[f'P{upperPercentile}_kg'], color='lightgray', label=f'[P{lowerPercentile}, P{upperPercentile}]')
 
     for i, group in zip(range(len(groups)), groups):
         color = f'C{i}'
