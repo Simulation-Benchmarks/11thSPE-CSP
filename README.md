@@ -3,7 +3,7 @@
 This repository accompanies the 11th Society of Petroleum Engineers Comparative Solution Project, see https://spe.org/csp/.
 
 To access data and scripts interactively, open this repo on the NFDI JupyterHub:
-[![NFDI](https://nfdi-jupyter.de/images/nfdi_badge.svg)](https://hub.nfdi-jupyter.de/r2d/gh/Simulation-Benchmarks/11thSPE-CSP/add-button?labpath=notebooks%2Fstart.ipynb)
+[![NFDI](https://nfdi-jupyter.de/images/nfdi_badge.svg)](https://hub.nfdi-jupyter.de/r2d/gh/Simulation-Benchmarks/11thSPE-CSP?labpath=notebooks%2Fstart.ipynb)
 
 Navigate to one of the following folders for accessing the corresponding material:
 
