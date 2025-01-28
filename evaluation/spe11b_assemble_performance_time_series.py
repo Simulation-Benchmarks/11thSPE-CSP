@@ -27,7 +27,7 @@ def assemblePerformanceTimeSeries():
     parser.set_defaults(detailed=False)
 
     cmdArgs = vars(parser.parse_args())
-    groups = [x.lower() for x in cmdArgs["groups"]]
+    groups = cmdArgs["groups"]
     groupFolders = cmdArgs["groupfolders"]
     folder = cmdArgs["folder"]
     det = cmdArgs["detailed"]
@@ -57,15 +57,15 @@ def assemblePerformanceTimeSeries():
 
         if not group[-1].isnumeric():
             if not groupFolders:
-                baseFolder = os.path.join(folder, group, 'spe11b')
-            if group in groups_and_colors:
-                color = groups_and_colors[group]
+                baseFolder = os.path.join(folder, group.lower(), 'spe11b')
+            if group.lower() in groups_and_colors:
+                color = groups_and_colors[group.lower()]
             ls = '-'
         else:
             if not groupFolders:
-                baseFolder = os.path.join(folder, group[:-1], 'spe11b', f'result{group[-1]}')
-            if group[:-1] in groups_and_colors:
-                color = groups_and_colors[group[:-1]]
+                baseFolder = os.path.join(folder, group[:-1].lower(), 'spe11b', f'result{group[-1]}')
+            if group[:-1].lower() in groups_and_colors:
+                color = groups_and_colors[group[:-1].lower()]
             if group[-1] == '1': ls = '-'
             elif group[-1] == '2': ls = '--'
             elif group[-1] == '3': ls = '-.'
