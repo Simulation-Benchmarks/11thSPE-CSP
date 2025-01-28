@@ -11,7 +11,7 @@ from groups_and_colors import groups_and_colors
 from is_notebook import is_notebook
 
 def assembleTimeSeries():
-    """Calculate percentiles for Case A of the 11th SPE CSP"""
+    """Calculate percentiles for Case B of the 11th SPE CSP"""
 
     parser = argparse.ArgumentParser(
         description="This script calculates the percentiles of the time series quantities "
@@ -39,32 +39,33 @@ def assembleTimeSeries():
         tableFolder = cmdArgs["tablefolder"]
 
     if calculated:
-        mobileFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11a_mobA_from_spatial_maps.csv')
+        mobileFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11b_mobA_from_spatial_maps.csv')
         mobileFromSpatialMapsA = np.genfromtxt(mobileFromSpatialMapsFileName, delimiter=',', names=True)
         tSpatialMaps = mobileFromSpatialMapsA['time_s']/60/60
         # project initial values to 1e-1 hours for improved visualization
         tSpatialMaps[0] = 1e-1
-        immobileFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11a_immA_from_spatial_maps.csv')
+        immobileFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11b_immA_from_spatial_maps.csv')
         immobileFromSpatialMapsA = np.genfromtxt(immobileFromSpatialMapsFileName, delimiter=',', names=True)
-        dissolvedFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11a_dissA_from_spatial_maps.csv')
+        dissolvedFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11b_dissA_from_spatial_maps.csv')
         dissolvedFromSpatialMapsA = np.genfromtxt(dissolvedFromSpatialMapsFileName, delimiter=',', names=True)
-        sealFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11a_sealA_from_spatial_maps.csv')
+        sealFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11b_sealA_from_spatial_maps.csv')
         sealFromSpatialMapsA = np.genfromtxt(sealFromSpatialMapsFileName, delimiter=',', names=True)
 
-        mobileFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11a_mobB_from_spatial_maps.csv')
+        mobileFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11b_mobB_from_spatial_maps.csv')
         mobileFromSpatialMapsB = np.genfromtxt(mobileFromSpatialMapsFileName, delimiter=',', names=True)
-        immobileFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11a_immB_from_spatial_maps.csv')
+        immobileFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11b_immB_from_spatial_maps.csv')
         immobileFromSpatialMapsB = np.genfromtxt(immobileFromSpatialMapsFileName, delimiter=',', names=True)
-        dissolvedFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11a_dissB_from_spatial_maps.csv')
+        dissolvedFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11b_dissB_from_spatial_maps.csv')
         dissolvedFromSpatialMapsB = np.genfromtxt(dissolvedFromSpatialMapsFileName, delimiter=',', names=True)
-        sealFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11a_sealB_from_spatial_maps.csv')
+        sealFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11b_sealB_from_spatial_maps.csv')
         sealFromSpatialMapsB = np.genfromtxt(sealFromSpatialMapsFileName, delimiter=',', names=True)
 
-        convectionFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11a_mC_from_spatial_maps.csv')
+        convectionFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11b_mC_from_spatial_maps.csv')
         convectionFromSpatialMaps = np.genfromtxt(convectionFromSpatialMapsFileName, delimiter=',', names=True)
 
     numGroups = len(groups)
-    numTimeSteps = 721
+    numTimeSteps = 10001
+    t = np.linspace(0, 1000*365*24*60*60, num=numTimeSteps)
     p1 = np.zeros((numTimeSteps, numGroups));
     p2 = np.zeros((numTimeSteps, numGroups));
     mobA = np.zeros((numTimeSteps, numGroups));
@@ -83,11 +84,11 @@ def assembleTimeSeries():
             baseFolder = groupFolders[i]
         else:
             if not group[-1].isnumeric():
-                baseFolder = os.path.join(folder, group.lower(), 'spe11a')
+                baseFolder = os.path.join(folder, group.lower(), 'spe11b')
             else:
-                baseFolder = os.path.join(folder, group[:-1].lower(), 'spe11a', f'result{group[-1]}')
+                baseFolder = os.path.join(folder, group[:-1].lower(), 'spe11b', f'result{group[-1]}')
 
-        fileName = os.path.join(baseFolder, 'spe11a_time_series.csv')
+        fileName = os.path.join(baseFolder, 'spe11b_time_series.csv')
         print(f'Processing {fileName}.')
 
         skip_header = 0
@@ -98,12 +99,19 @@ def assembleTimeSeries():
         delimiter = ','
 
         csvData = np.genfromtxt(fileName, delimiter=delimiter, skip_header=skip_header)
-        t = csvData[:, 0]
 
-        p1[:, i] = csvData[:, 1]
-        p2[:, i] = csvData[:, 2]
+        if len(csvData[:, 0]) != numTimeSteps:
+            print(f'Interpolating from {len(csvData[:, 0])} time steps.')
+            p1[:, i] = np.interp(t, csvData[:, 0], csvData[:, 1])
+            p2[:, i] = np.interp(t, csvData[:, 0], csvData[:, 2])
+            sealTot[:, i] = np.interp(t, csvData[:, 0], csvData[:, 12])
+        else:
+            p1[:, i] = csvData[:, 1]
+            p2[:, i] = csvData[:, 2]
+            sealTot[:, i] = csvData[:, 12]
 
         if group in calculated:
+            print(f'Interpolating from {mobileFromSpatialMapsA['time_s']} time steps.')
             columnName = group.lower().replace('-', '')
             mobA[:, i] = np.interp(t, mobileFromSpatialMapsA['time_s'], mobileFromSpatialMapsA[columnName])
             immA[:, i] = np.interp(t, immobileFromSpatialMapsA['time_s'], immobileFromSpatialMapsA[columnName])
@@ -114,6 +122,16 @@ def assembleTimeSeries():
             dissB[:, i] = np.interp(t, dissolvedFromSpatialMapsB['time_s'], dissolvedFromSpatialMapsB[columnName])
             sealB[:, i] = np.interp(t, sealFromSpatialMapsB['time_s'], sealFromSpatialMapsB[columnName])
             mC[:, i] = np.interp(t, convectionFromSpatialMaps['time_s'], convectionFromSpatialMaps[columnName])
+        elif len(csvData[:, 0]) != numTimeSteps:
+            mobA[:, i] = np.interp(t, csvData[:, 0], csvData[:, 3])
+            immA[:, i] = np.interp(t, csvData[:, 0], csvData[:, 4])
+            dissA[:, i] = np.interp(t, csvData[:, 0], csvData[:, 5])
+            sealA[:, i] = np.interp(t, csvData[:, 0], csvData[:, 6])
+            mobB[:, i] = np.interp(t, csvData[:, 0], csvData[:, 7])
+            immB[:, i] = np.interp(t, csvData[:, 0], csvData[:, 8])
+            dissB[:, i] = np.interp(t, csvData[:, 0], csvData[:, 9])
+            sealB[:, i] = np.interp(t, csvData[:, 0], csvData[:, 10])
+            mC[:, i] = np.interp(t, csvData[:, 0], csvData[:, 11])
         else:
             mobA[:, i] = csvData[:, 3]
             immA[:, i] = csvData[:, 4]
@@ -125,7 +143,6 @@ def assembleTimeSeries():
             sealB[:, i] = csvData[:, 10]
             mC[:, i] = csvData[:, 11]
 
-        sealTot[:, i] = csvData[:, 12]
 
     numPercentiles = 21
     p1Percentiles = np.zeros((numTimeSteps, numPercentiles+1))
@@ -174,18 +191,18 @@ def assembleTimeSeries():
         mCHeader = mCHeader + f', P{p} [m]' 
 
     if not is_notebook():
-        np.savetxt('spe11a_p1_percentiles.csv', p1Percentiles, fmt='%.5e', delimiter=', ', header=pHeader)
-        np.savetxt('spe11a_p2_percentiles.csv', p2Percentiles, fmt='%.5e', delimiter=', ', header=pHeader)
-        np.savetxt('spe11a_mobA_percentiles.csv', mobAPercentiles, fmt='%.5e', delimiter=', ', header=massHeader)
-        np.savetxt('spe11a_immA_percentiles.csv', immAPercentiles, fmt='%.5e', delimiter=', ', header=massHeader)
-        np.savetxt('spe11a_dissA_percentiles.csv', dissAPercentiles, fmt='%.5e', delimiter=', ', header=massHeader)
-        np.savetxt('spe11a_sealA_percentiles.csv', sealAPercentiles, fmt='%.5e', delimiter=', ', header=massHeader)
-        np.savetxt('spe11a_mobB_percentiles.csv', mobBPercentiles, fmt='%.5e', delimiter=', ', header=massHeader)
-        np.savetxt('spe11a_immB_percentiles.csv', immBPercentiles, fmt='%.5e', delimiter=', ', header=massHeader)
-        np.savetxt('spe11a_dissB_percentiles.csv', dissBPercentiles, fmt='%.5e', delimiter=', ', header=massHeader)
-        np.savetxt('spe11a_sealB_percentiles.csv', sealBPercentiles, fmt='%.5e', delimiter=', ', header=massHeader)
-        np.savetxt('spe11a_mC_percentiles.csv', mCPercentiles, fmt='%.5e', delimiter=', ', header=mCHeader)
-        np.savetxt('spe11a_sealTot_percentiles.csv', sealTotPercentiles, fmt='%.5e', delimiter=', ', header=massHeader)
+        np.savetxt('spe11b_p1_percentiles.csv', p1Percentiles, fmt='%.5e', delimiter=', ', header=pHeader)
+        np.savetxt('spe11b_p2_percentiles.csv', p2Percentiles, fmt='%.5e', delimiter=', ', header=pHeader)
+        np.savetxt('spe11b_mobA_percentiles.csv', mobAPercentiles, fmt='%.5e', delimiter=', ', header=massHeader)
+        np.savetxt('spe11b_immA_percentiles.csv', immAPercentiles, fmt='%.5e', delimiter=', ', header=massHeader)
+        np.savetxt('spe11b_dissA_percentiles.csv', dissAPercentiles, fmt='%.5e', delimiter=', ', header=massHeader)
+        np.savetxt('spe11b_sealA_percentiles.csv', sealAPercentiles, fmt='%.5e', delimiter=', ', header=massHeader)
+        np.savetxt('spe11b_mobB_percentiles.csv', mobBPercentiles, fmt='%.5e', delimiter=', ', header=massHeader)
+        np.savetxt('spe11b_immB_percentiles.csv', immBPercentiles, fmt='%.5e', delimiter=', ', header=massHeader)
+        np.savetxt('spe11b_dissB_percentiles.csv', dissBPercentiles, fmt='%.5e', delimiter=', ', header=massHeader)
+        np.savetxt('spe11b_sealB_percentiles.csv', sealBPercentiles, fmt='%.5e', delimiter=', ', header=massHeader)
+        np.savetxt('spe11b_mC_percentiles.csv', mCPercentiles, fmt='%.5e', delimiter=', ', header=mCHeader)
+        np.savetxt('spe11b_sealTot_percentiles.csv', sealTotPercentiles, fmt='%.5e', delimiter=', ', header=massHeader)
 
 if __name__ == "__main__":
     assembleTimeSeries()
