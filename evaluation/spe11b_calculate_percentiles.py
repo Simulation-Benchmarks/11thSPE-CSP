@@ -78,6 +78,7 @@ def assembleTimeSeries():
     sealB = np.zeros((numTimeSteps, numGroups));
     mC = np.zeros((numTimeSteps, numGroups));
     sealTot = np.zeros((numTimeSteps, numGroups));
+    boundary = np.zeros((numTimeSteps, numGroups));
 
     for i, group in zip(range(numGroups), groups):
         if groupFolders:
@@ -105,13 +106,15 @@ def assembleTimeSeries():
             p1[:, i] = np.interp(t, csvData[:, 0], csvData[:, 1])
             p2[:, i] = np.interp(t, csvData[:, 0], csvData[:, 2])
             sealTot[:, i] = np.interp(t, csvData[:, 0], csvData[:, 12])
+            boundary[:, i] = np.interp(t, csvData[:, 0], csvData[:, 13])
         else:
             p1[:, i] = csvData[:, 1]
             p2[:, i] = csvData[:, 2]
             sealTot[:, i] = csvData[:, 12]
+            boundary[:, i] = csvData[:, 13]
 
         if group in calculated:
-            print(f'Interpolating from {mobileFromSpatialMapsA['time_s']} time steps.')
+            print(f"Interpolating from {len(mobileFromSpatialMapsA['time_s'])} time steps.")
             columnName = group.lower().replace('-', '')
             mobA[:, i] = np.interp(t, mobileFromSpatialMapsA['time_s'], mobileFromSpatialMapsA[columnName])
             immA[:, i] = np.interp(t, immobileFromSpatialMapsA['time_s'], immobileFromSpatialMapsA[columnName])
@@ -157,6 +160,7 @@ def assembleTimeSeries():
     sealBPercentiles = np.zeros((numTimeSteps, numPercentiles+1))
     mCPercentiles = np.zeros((numTimeSteps, numPercentiles+1))
     sealTotPercentiles = np.zeros((numTimeSteps, numPercentiles+1))
+    boundaryPercentiles = np.zeros((numTimeSteps, numPercentiles+1))
 
     pHeader = 'time [s]'
     massHeader = 'time [s]'
@@ -173,6 +177,7 @@ def assembleTimeSeries():
     sealBPercentiles[:, 0] = t
     mCPercentiles[:, 0] = t
     sealTotPercentiles[:, 0] = t
+    boundaryPercentiles[:, 0] = t
     for i, p in zip(range(numPercentiles), np.arange(0, 101, 5)):
         p1Percentiles[:, i+1] = np.nanpercentile(p1, p, axis=1)
         p2Percentiles[:, i+1] = np.nanpercentile(p2, p, axis=1)
@@ -186,6 +191,7 @@ def assembleTimeSeries():
         sealBPercentiles[:, i+1] = np.nanpercentile(sealB, p, axis=1)
         mCPercentiles[:, i+1] = np.nanpercentile(mC, p, axis=1)
         sealTotPercentiles[:, i+1] = np.nanpercentile(sealTot, p, axis=1)
+        boundaryPercentiles[:, i+1] = np.nanpercentile(boundary, p, axis=1)
         pHeader = pHeader + f', P{p} [Pa]' 
         massHeader = massHeader + f', P{p} [kg]' 
         mCHeader = mCHeader + f', P{p} [m]' 
@@ -203,6 +209,7 @@ def assembleTimeSeries():
         np.savetxt('spe11b_sealB_percentiles.csv', sealBPercentiles, fmt='%.5e', delimiter=', ', header=massHeader)
         np.savetxt('spe11b_mC_percentiles.csv', mCPercentiles, fmt='%.5e', delimiter=', ', header=mCHeader)
         np.savetxt('spe11b_sealTot_percentiles.csv', sealTotPercentiles, fmt='%.5e', delimiter=', ', header=massHeader)
+        np.savetxt('spe11b_boundary_percentiles.csv', boundaryPercentiles, fmt='%.5e', delimiter=', ', header=massHeader)
 
 if __name__ == "__main__":
     assembleTimeSeries()
