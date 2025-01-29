@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 import seaborn as sns
 import groups_and_colors
-#np.set_printoptions(threshold=sys.maxsize)
+from round_to_digits import round_to_digits
 
 def getFieldValues(fileName, nX, nY, nZ):
     p = np.zeros([nX, nY, nZ]); p[:] = np.nan
@@ -58,14 +58,14 @@ def getFieldValues(fileName, nX, nY, nZ):
         print(f'Cannot find unique x ({len(np.unique(csvData[:,0]))} instead of {nX}) or y ({len(np.unique(csvData[:,1]))} instead of {nY}) coordinates. Returning nans.')
         return p, s, mCO2, mH2O, rhoG, rhoL, tmCO2, temp
 
-    p = np.reshape(csvData[:, 3], (nX, nY, nZ)) if len(csvData[0]) > 3 else np.nan
-    s = np.reshape(csvData[:, 4], (nX, nY, nZ)) if len(csvData[0]) > 4 else np.nan
-    mCO2 = np.reshape(csvData[:, 5], (nX, nY, nZ)) if len(csvData[0]) > 5 else np.nan
-    mH2O = np.reshape(csvData[:, 6], (nX, nY, nZ)) if len(csvData[0]) > 6 else np.nan
-    rhoG = np.reshape(csvData[:, 7], (nX, nY, nZ)) if len(csvData[0]) > 7 else np.nan
-    rhoL = np.reshape(csvData[:, 8], (nX, nY, nZ)) if len(csvData[0]) > 8 else np.nan
-    tmCO2 = np.reshape(csvData[:, 9], (nX, nY, nZ)) if len(csvData[0]) > 9 else np.nan
-    temp = np.reshape(csvData[:, 10], (nX, nY, nZ)) if len(csvData[0]) > 10 else np.nan
+    p = np.reshape(round_to_digits(csvData[:, 3], 4), (nX, nY, nZ)) if len(csvData[0]) > 3 else np.nan
+    s = np.reshape(round_to_digits(csvData[:, 4], 4), (nX, nY, nZ)) if len(csvData[0]) > 4 else np.nan
+    mCO2 = np.reshape(round_to_digits(csvData[:, 5], 4), (nX, nY, nZ)) if len(csvData[0]) > 5 else np.nan
+    mH2O = np.reshape(round_to_digits(csvData[:, 6], 4), (nX, nY, nZ)) if len(csvData[0]) > 6 else np.nan
+    rhoG = np.reshape(round_to_digits(csvData[:, 7], 4), (nX, nY, nZ)) if len(csvData[0]) > 7 else np.nan
+    rhoL = np.reshape(round_to_digits(csvData[:, 8], 4), (nX, nY, nZ)) if len(csvData[0]) > 8 else np.nan
+    tmCO2 = np.reshape(round_to_digits(csvData[:, 9], 4), (nX, nY, nZ)) if len(csvData[0]) > 9 else np.nan
+    temp = np.reshape(round_to_digits(csvData[:, 10], 4), (nX, nY, nZ)) if len(csvData[0]) > 10 else np.nan
 
     p[p < 1e0] = np.nan
     rhoG[rhoG < 1e-5] = np.nan
@@ -140,7 +140,7 @@ def visualizeSpatialMaps():
 
     cmdArgs = vars(parser.parse_args())
     time = cmdArgs["time"]
-    groups = [x.lower() for x in cmdArgs["groups"]]
+    groups = cmdArgs["groups"]
     groupFolders = cmdArgs["groupfolders"]
     folder = cmdArgs["folder"]
     cutPlane = cmdArgs["cutplane"]
@@ -200,10 +200,10 @@ def visualizeSpatialMaps():
 
         if not group[-1].isnumeric():
             if not groupFolders:
-                baseFolder = os.path.join(folder, group, 'spe11c')
+                baseFolder = os.path.join(folder, group.lower(), 'spe11c')
         else:
             if not groupFolders:
-                baseFolder = os.path.join(folder, group[:-1], 'spe11c', f'result{group[-1]}')
+                baseFolder = os.path.join(folder, group[:-1].lower(), 'spe11c', f'result{group[-1]}')
 
         fileName = os.path.join(baseFolder, f'spe11c_spatial_map_{time}y.csv')
         p3, s3, mCO23, mH2O3, rhoG3, rhoL3, tmCO23, temp3 = getFieldValues(fileName, nX, nY, nZ)

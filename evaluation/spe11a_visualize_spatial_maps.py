@@ -18,6 +18,7 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 import seaborn as sns
 import groups_and_colors
 from is_notebook import is_notebook
+from round_to_digits import round_to_digits
 
 def getFieldValues(fileName, nX, nY):
     p = np.zeros([nY, nX]); p[:] = np.nan
@@ -45,13 +46,14 @@ def getFieldValues(fileName, nX, nY):
     ind = np.lexsort((csvData[:,0], csvData[:,1]))
     csvData = csvData[ind]
     for i in np.arange(0, nY):
-        p[i, :] = csvData[i*nX:(i+1)*nX, 2] if len(csvData[0]) > 2 else 0
-        s[i, :] = csvData[i*nX:(i+1)*nX, 3] if len(csvData[0]) > 3 else 0
-        mCO2[i, :] = csvData[i*nX:(i+1)*nX, 4] if len(csvData[0]) > 4 else 0
-        mH2O[i, :] = csvData[i*nX:(i+1)*nX, 5] if len(csvData[0]) > 5 else 0
-        rhoG[i, :] = csvData[i*nX:(i+1)*nX, 6] if len(csvData[0]) > 6 else 0
-        rhoL[i, :] = csvData[i*nX:(i+1)*nX, 7] if len(csvData[0]) > 7 else 0
-        tmCO2[i, :] = csvData[i*nX:(i+1)*nX, 8] if len(csvData[0]) > 8 else 0
+        # round to four significant digits as required by the description
+        p[i, :] = round_to_digits(csvData[i*nX:(i+1)*nX, 2], 4) if len(csvData[0]) > 2 else 0
+        s[i, :] = round_to_digits(csvData[i*nX:(i+1)*nX, 3], 4) if len(csvData[0]) > 3 else 0
+        mCO2[i, :] = round_to_digits(csvData[i*nX:(i+1)*nX, 4], 4) if len(csvData[0]) > 4 else 0
+        mH2O[i, :] = round_to_digits(csvData[i*nX:(i+1)*nX, 5], 4) if len(csvData[0]) > 5 else 0
+        rhoG[i, :] = round_to_digits(csvData[i*nX:(i+1)*nX, 6], 4) if len(csvData[0]) > 6 else 0
+        rhoL[i, :] = round_to_digits(csvData[i*nX:(i+1)*nX, 7], 4) if len(csvData[0]) > 7 else 0
+        tmCO2[i, :] = round_to_digits(csvData[i*nX:(i+1)*nX, 8], 4) if len(csvData[0]) > 8 else 0
 
     p[p < 1e0] = np.nan
     rhoG[rhoG < 1e-5] = np.nan
