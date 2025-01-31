@@ -30,12 +30,12 @@ def assembleTimeSeries():
     parser.add_argument('-p','--percentiles', nargs='+', help='plot area between the two given percentiles')
 
     cmdArgs = vars(parser.parse_args())
-    groups = [x.lower() for x in [x.lower() for x in cmdArgs["groups"]]]
+    groups = cmdArgs["groups"]
     groupFolders = cmdArgs["groupfolders"]
     folder = cmdArgs["folder"]
     calculated = []
     if cmdArgs["calculated"]:
-        calculated = [x.lower() for x in cmdArgs["calculated"]]
+        calculated = cmdArgs["calculated"]
         groups = sorted(groups + calculated)
         tableFolder = cmdArgs["tablefolder"]
     if cmdArgs["percentiles"]:
@@ -125,15 +125,15 @@ def assembleTimeSeries():
 
         if not group[-1].isnumeric():
             if not groupFolders:
-                baseFolder = os.path.join(folder, group, 'spe11b')
-            if group in groups_and_colors:
-                color = groups_and_colors[group]
+                baseFolder = os.path.join(folder, group.lower(), 'spe11b')
+            if group.lower() in groups_and_colors:
+                color = groups_and_colors[group.lower()]
             ls = '-'
         else:
             if not groupFolders:
-                baseFolder = os.path.join(folder, group[:-1], 'spe11b', f'result{group[-1]}')
-            if group[:-1] in groups_and_colors:
-                color = groups_and_colors[group[:-1]]
+                baseFolder = os.path.join(folder, group[:-1].lower(), 'spe11b', f'result{group[-1]}')
+            if group[:-1].lower() in groups_and_colors:
+                color = groups_and_colors[group[:-1].lower()]
             if group[-1] == '1': ls = '-'
             elif group[-1] == '2': ls = '--'
             elif group[-1] == '3': ls = '-.'
@@ -160,7 +160,7 @@ def assembleTimeSeries():
 
         # scale mass to kilotons
         if group in calculated:
-            columnName = group.replace('-', '')
+            columnName = group.lower().replace('-', '')
             axsA[0, 0].plot(tSpatialMaps, 1e-6*mobileFromSpatialMapsA[columnName], label=group + r'$^*$', color=color, linestyle=ls)
             axsA[0, 1].plot(tSpatialMaps, 1e-6*immobileFromSpatialMapsA[columnName], label=group + r'$^*$', color=color, linestyle=ls)
             axsA[1, 0].plot(tSpatialMaps, 1e-6*dissolvedFromSpatialMapsA[columnName], label=group + r'$^*$', color=color, linestyle=ls)
@@ -292,13 +292,11 @@ def assembleTimeSeries():
     axsT[0].set_title(r'CO2 in sealing units')
     axsT[0].set_xlabel(r'time [y]')
     axsT[0].set_ylabel(r'mass [t]')
-#    axsT[0].set_ylim(0, 1e3)
     axsT[0].set_xscale(r'log')
     axsT[0].set_xlim((1e0, 1e3))
     axsT[1].set_title(r'CO2 in boundary volumes')
     axsT[1].set_xlabel(r'time [y]')
     axsT[1].set_ylabel(r'mass [t]')
-#    axsT[1].set_ylim(0, 1e2)
     axsT[1].set_xscale(r'log')
     axsT[1].yaxis.tick_right()
     axsT[1].yaxis.set_label_position('right')
