@@ -41,9 +41,6 @@ def assembleTimeSeries():
     if calculated:
         mobileFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11a_mobA_from_spatial_maps.csv')
         mobileFromSpatialMapsA = np.genfromtxt(mobileFromSpatialMapsFileName, delimiter=',', names=True)
-        tSpatialMaps = mobileFromSpatialMapsA['time_s']/60/60
-        # project initial values to 1e-1 hours for improved visualization
-        tSpatialMaps[0] = 1e-1
         immobileFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11a_immA_from_spatial_maps.csv')
         immobileFromSpatialMapsA = np.genfromtxt(immobileFromSpatialMapsFileName, delimiter=',', names=True)
         dissolvedFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11a_dissA_from_spatial_maps.csv')
