@@ -1,3 +1,5 @@
+<!--SPDX-FileCopyrightText: 2025 Bernd Flemisch <bernd@iws.uni-stuttgart.de-->
+<!--SPDX-License-Identifier: CC-BY-4.0-->
 # Evaluation
 
 This folder contains scripts for evaluating results submitted to the 11th SPE CSP.

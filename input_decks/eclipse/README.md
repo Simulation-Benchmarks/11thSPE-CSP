@@ -1,3 +1,5 @@
+<!--SPDX-FileCopyrightText: 2025 Bernd Flemisch <bernd@iws.uni-stuttgart.de-->
+<!--SPDX-License-Identifier: CC-BY-4.0-->
 ## Eclipse input deck
 
 This input deck for Eclipse consists of a simple grid together with porosity and intrinsic permeability.

@@ -1,3 +1,5 @@
+# SPDX-FileCopyrightText: 2024 Jan M. Nordbotten <jan.nordbotten@uib.no>
+# SPDX-License-Identifier: CC0-1.0
 
 Changes in description of SPE 11th CSP from version posted at launch:  
 

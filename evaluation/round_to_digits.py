@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2025 Bernd Flemisch <bernd.flemisch@iws.uni-stuttgart.de>
+#
+# SPDX-License-Identifier: MIT
 import numpy as np
 
 # Copied from https://stackoverflow.com/a/59888924

@@ -1,3 +1,5 @@
+<!--SPDX-FileCopyrightText: 2025 Bernd Flemisch <bernd@iws.uni-stuttgart.de-->
+<!--SPDX-License-Identifier: CC-BY-4.0-->
 # Thermodynamics
 
 The two Python scripts located in this folder create CSV tables for the pure phase properties and solubilities.

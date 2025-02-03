@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2025 Bernd Flemisch <bernd.flemisch@iws.uni-stuttgart.de>
+#
+# SPDX-License-Identifier: MIT
 import numpy as np
 import argparse
 import matplotlib

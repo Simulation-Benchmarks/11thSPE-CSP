@@ -1,3 +1,5 @@
+<!--SPDX-FileCopyrightText: 2025 Bernd Flemisch <bernd@iws.uni-stuttgart.de-->
+<!--SPDX-License-Identifier: CC-BY-4.0-->
 # SPE11 Geometry Files
 
 This folder contains geometry files for the SPE11 variants in the [gmsh](https://gmsh.info/) geometry format.

@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2025 Bernd Flemisch <bernd@iws.uni-stuttgart.de>
+# SPDX-License-Identifier: CC0-1.0
+
 numpy==1.24.4
 matplotlib==3.8.0
 seaborn==0.13.0

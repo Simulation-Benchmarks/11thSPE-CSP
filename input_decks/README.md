@@ -1,3 +1,5 @@
+<!--SPDX-FileCopyrightText: 2025 Bernd Flemisch <bernd@iws.uni-stuttgart.de-->
+<!--SPDX-License-Identifier: CC-BY-4.0-->
 ### Obtain input decks
 
 This folder contains input decks or links to input decks. Select a subfolder corresponding to a particular simulator and follow the README.md there.

@@ -1,3 +1,5 @@
+<!--SPDX-FileCopyrightText: 2025 Bernd Flemisch <bernd@iws.uni-stuttgart.de-->
+<!--SPDX-License-Identifier: CC-BY-4.0-->
 # 11th SPE CSP
 
 This repository accompanies the 11th Society of Petroleum Engineers Comparative Solution Project, see https://spe.org/csp/.

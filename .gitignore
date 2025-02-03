@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2024 Bernd Flemisch <bernd@iws.uni-stuttgart.de>
+# SPDX-License-Identifier: CC0-1.0
+
 # Basic output files (generated)
 *.txt
 *.csv
