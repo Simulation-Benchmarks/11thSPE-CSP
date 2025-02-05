@@ -152,27 +152,27 @@ def calculateL2Differences():
             l2SemiNormT[i, j] = l2SemiNormT[j, i] = np.sqrt(cellVolume*np.sum(np.square(tempVariationDiff)))
 
     with open(f'spe11c_pressure_l2_diff_{year}y.csv', 'w') as f:
-        print('#', ', '.join(map(str, groups)), file=f)
+        print('#, ', ', '.join(map(str, groups)), file=f)
         for i, groupI in zip(range(numGroups), groups):
             print(groupI + ',', ', '.join(map(myStr, l2NormP[i])), file=f)
 
     with open(f'spe11c_pressure_l2semi_diff_{year}y.csv', 'w') as f:
-        print('#', ', '.join(map(str, groups)), file=f)
+        print('#, ', ', '.join(map(str, groups)), file=f)
         for i, groupI in zip(range(numGroups), groups):
             print(groupI + ',', ', '.join(map(myStr, l2SemiNormP[i])), file=f)
 
     with open(f'spe11c_temperature_l2_diff_{year}y.csv', 'w') as f:
-        print('#', ', '.join(map(str, groups)), file=f)
+        print('#, ', ', '.join(map(str, groups)), file=f)
         for i, groupI in zip(range(numGroups), groups):
             print(groupI + ',', ', '.join(map(myStr, l2NormT[i])), file=f)
 
     with open(f'spe11c_temperature_l2semi_diff_{year}y.csv', 'w') as f:
-        print('#', ', '.join(map(str, groups)), file=f)
+        print('#, ', ', '.join(map(str, groups)), file=f)
         for i, groupI in zip(range(numGroups), groups):
             print(groupI + ',', ', '.join(map(myStr, l2SemiNormT[i])), file=f)
 
     with open(f'spe11c_tmco2_l2_diff_{year}y.csv', 'w') as f:
-        print('#', ', '.join(map(str, groups)), file=f)
+        print('#, ', ', '.join(map(str, groups)), file=f)
         for i, groupI in zip(range(numGroups), groups):
             print(groupI + ',', ', '.join(map(myStr, l2NormM[i])), file=f)
 

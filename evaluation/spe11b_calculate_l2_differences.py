@@ -146,32 +146,32 @@ def calculateL2Differences():
             h1SemiNormP[i, j] = h1SemiNormP[j, i] = np.sqrt(deltaX*deltaY*(np.sum(np.square(gradXDiff)) + np.sum(np.square(gradYDiff))))
 
     with open(f'spe11b_pressure_l2_diff_{year}y.csv', 'w') as f:
-        print('#', ', '.join(map(str, groups)), file=f)
+        print('#, ', ', '.join(map(str, groups)), file=f)
         for i, groupI in zip(range(numGroups), groups):
             print(groupI + ',', ', '.join(map(myStr, l2NormP[i])), file=f)
 
     with open(f'spe11b_pressure_l2semi_diff_{year}y.csv', 'w') as f:
-        print('#', ', '.join(map(str, groups)), file=f)
+        print('#, ', ', '.join(map(str, groups)), file=f)
         for i, groupI in zip(range(numGroups), groups):
             print(groupI + ',', ', '.join(map(myStr, l2SemiNormP[i])), file=f)
 
     with open(f'spe11b_pressure_h1semi_diff_{year}y.csv', 'w') as f:
-        print('#', ', '.join(map(str, groups)), file=f)
+        print('#, ', ', '.join(map(str, groups)), file=f)
         for i, groupI in zip(range(numGroups), groups):
             print(groupI + ',', ', '.join(map(myStr, h1SemiNormP[i])), file=f)
 
     with open(f'spe11b_temperature_l2_diff_{year}y.csv', 'w') as f:
-        print('#', ', '.join(map(str, groups)), file=f)
+        print('#, ', ', '.join(map(str, groups)), file=f)
         for i, groupI in zip(range(numGroups), groups):
             print(groupI + ',', ', '.join(map(myStr, l2NormT[i])), file=f)
 
     with open(f'spe11b_temperature_l2semi_diff_{year}y.csv', 'w') as f:
-        print('#', ', '.join(map(str, groups)), file=f)
+        print('#, ', ', '.join(map(str, groups)), file=f)
         for i, groupI in zip(range(numGroups), groups):
             print(groupI + ',', ', '.join(map(myStr, l2SemiNormT[i])), file=f)
 
     with open(f'spe11b_tmco2_l2_diff_{year}y.csv', 'w') as f:
-        print('#', ', '.join(map(str, groups)), file=f)
+        print('#, ', ', '.join(map(str, groups)), file=f)
         for i, groupI in zip(range(numGroups), groups):
             print(groupI + ',', ', '.join(map(myStr, l2NormM[i])), file=f)
 
