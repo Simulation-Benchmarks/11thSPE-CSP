@@ -154,9 +154,19 @@ def assembleTimeSeries():
 
         # scale pressure to bars
         if len(csvData[0]) > 1:
-            axsP[0].plot(t, 1e-5*csvData[:, 1], label=group, color=color, linestyle=ls)
+            if np.isnan(csvData[:, 1]).all():
+                print(f'{group} only reported nan for p1.')
+            elif all(val < 0 for val in csvData[:, 1]):
+                print(f'{group} only reported negative values for p1.')
+            else:
+                axsP[0].plot(t, 1e-5*csvData[:, 1], label=group, color=color, linestyle=ls)
         if len(csvData[0]) > 2:
-            axsP[1].plot(t, 1e-5*csvData[:, 2], label=group, color=color, linestyle=ls)
+            if np.isnan(csvData[:, 2]).all():
+                print(f'{group} only reported nan for p2.')
+            elif all(val < 0 for val in csvData[:, 2]):
+                print(f'{group} only reported negative values for p2.')
+            else:
+                axsP[1].plot(t, 1e-5*csvData[:, 2], label=group, color=color, linestyle=ls)
 
         # scale mass to kilotons
         if group in calculated:
@@ -166,10 +176,30 @@ def assembleTimeSeries():
             axsA[1, 0].plot(tSpatialMaps, 1e-6*dissolvedFromSpatialMapsA[columnName], label=group + r'$^*$', color=color, linestyle=ls)
             axsA[1, 1].plot(tSpatialMaps, 1e-6*sealFromSpatialMapsA[columnName], label=group + r'$^*$', color=color, linestyle=ls)
         else:
-            axsA[0, 0].plot(t, 1e-6*csvData[:, 3], label=group, color=color, linestyle=ls)
-            axsA[0, 1].plot(t, 1e-6*csvData[:, 4], label=group, color=color, linestyle=ls)
-            axsA[1, 0].plot(t, 1e-6*csvData[:, 5], label=group, color=color, linestyle=ls)
-            axsA[1, 1].plot(t, 1e-6*csvData[:, 6], label=group, color=color, linestyle=ls)
+            if np.isnan(csvData[:, 3]).all():
+                print(f'{group} only reported nan for mobA.')
+            elif all(val < 0 for val in csvData[:, 3]):
+                print(f'{group} only reported negative values for mobA.')
+            else:
+                axsA[0, 0].plot(t, 1e-6*csvData[:, 3], label=group, color=color, linestyle=ls)
+            if np.isnan(csvData[:, 4]).all():
+                print(f'{group} only reported nan for immA.')
+            elif all(val < 0 for val in csvData[:, 4]):
+                print(f'{group} only reported negative values for immA.')
+            else:
+                axsA[0, 1].plot(t, 1e-6*csvData[:, 4], label=group, color=color, linestyle=ls)
+            if np.isnan(csvData[:, 5]).all():
+                print(f'{group} only reported nan for dissA.')
+            elif all(val < 0 for val in csvData[:, 5]):
+                print(f'{group} only reported negative values for dissA.')
+            else:
+                axsA[1, 0].plot(t, 1e-6*csvData[:, 5], label=group, color=color, linestyle=ls)
+            if np.isnan(csvData[:, 6]).all():
+                print(f'{group} only reported nan for sealA.')
+            elif all(val < 0 for val in csvData[:, 6]):
+                print(f'{group} only reported negative values for sealA.')
+            else:
+                axsA[1, 1].plot(t, 1e-6*csvData[:, 6], label=group, color=color, linestyle=ls)
             # detect if immobile CO2 has been evaluated wrong potentially
             if max(1e-6*csvData[:, 4]) > 1:
                 print(f"{group} potentially used inconsistent evaluation of immobile CO2.")
@@ -180,22 +210,57 @@ def assembleTimeSeries():
             axsB[1, 0].plot(tSpatialMaps, 1e-6*dissolvedFromSpatialMapsB[columnName], label=group + r'$^*$', color=color, linestyle=ls)
             axsB[1, 1].plot(tSpatialMaps, 1e-6*sealFromSpatialMapsB[columnName], label=group + r'$^*$', color=color, linestyle=ls)
         else:
-            axsB[0, 0].plot(t, 1e-6*csvData[:, 7], label=group, color=color, linestyle=ls)
-            axsB[0, 1].plot(t, 1e-6*csvData[:, 8], label=group, color=color, linestyle=ls)
-            axsB[1, 0].plot(t, 1e-6*csvData[:, 9], label=group, color=color, linestyle=ls)
-            axsB[1, 1].plot(t, 1e-6*csvData[:, 10], label=group, color=color, linestyle=ls)
+            if np.isnan(csvData[:, 7]).all():
+                print(f'{group} only reported nan for mobB.')
+            elif all(val < 0 for val in csvData[:, 7]):
+                print(f'{group} only reported negative values for mobB.')
+            else:
+                axsB[0, 0].plot(t, 1e-6*csvData[:, 7], label=group, color=color, linestyle=ls)
+            if np.isnan(csvData[:, 8]).all():
+                print(f'{group} only reported nan for immB.')
+            elif all(val < 0 for val in csvData[:, 8]):
+                print(f'{group} only reported negative values for immB.')
+            else:
+                axsB[0, 1].plot(t, 1e-6*csvData[:, 8], label=group, color=color, linestyle=ls)
+            if np.isnan(csvData[:, 9]).all():
+                print(f'{group} only reported nan for dissB.')
+            elif all(val < 0 for val in csvData[:, 9]):
+                print(f'{group} only reported negative values for dissB.')
+            else:
+                axsB[1, 0].plot(t, 1e-6*csvData[:, 9], label=group, color=color, linestyle=ls)
+            if np.isnan(csvData[:, 10]).all():
+                print(f'{group} only reported nan for sealB.')
+            elif all(val < 0 for val in csvData[:, 10]):
+                print(f'{group} only reported negative values for sealB.')
+            else:
+                axsB[1, 1].plot(t, 1e-6*csvData[:, 10], label=group, color=color, linestyle=ls)
 
         # scale length to kilometers
         if group in calculated:
             axsC.plot(tSpatialMaps, 1e-3*convectionFromSpatialMaps[columnName], label=group + r'$^*$', color=color, linestyle=ls)
         else:
-            axsC.plot(t, 1e-3*csvData[:, 11], label=group, color=color, linestyle=ls)
+            if np.isnan(csvData[:, 11]).all():
+                print(f'{group} only reported nan for mC.')
+            elif all(val < 0 for val in csvData[:, 11]):
+                print(f'{group} only reported negative values for mC.')
+            else:
+                axsC.plot(t, 1e-3*csvData[:, 11], label=group, color=color, linestyle=ls)
 
         # scale mass to tons
         if len(csvData[0]) > 12:
-            axsT[0].plot(t, 1e-3*csvData[:, 12], label=group, color=color, linestyle=ls)
+            if np.isnan(csvData[:, 12]).all():
+                print(f'{group} only reported nan for sealTot.')
+            elif all(val < 0 for val in csvData[:, 12]):
+                print(f'{group} only reported negative values for sealTot.')
+            else:
+                axsT[0].plot(t, 1e-3*csvData[:, 12], label=group, color=color, linestyle=ls)
         if len(csvData[0]) > 13:
-            axsT[1].plot(t, 1e-3*csvData[:, 13], label=group, color=color, linestyle=ls)
+            if np.isnan(csvData[:, 13]).all():
+                print(f'{group} only reported nan for boundaryCO2.')
+            elif all(val < 0 for val in csvData[:, 13]):
+                print(f'{group} only reported negative values for boundaryCO2.')
+            else:
+                axsT[1].plot(t, 1e-3*csvData[:, 13], label=group, color=color, linestyle=ls)
 
     axsP[0].set_title(r'sensor 1')
     axsP[0].set_xlabel(r'time [y]')

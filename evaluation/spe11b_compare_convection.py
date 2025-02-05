@@ -65,7 +65,12 @@ def compareConvection():
 
         # scale length to kilometers
         if len(csvData[0]) > 11:
-            axs.plot(t, 1e-3*csvData[:, 11], label=group + ' reported', color=color, linestyle='-')
+            if np.isnan(csvData[:, 11]).all():
+                print(f'{group} only reported nan.')
+            elif all(val < 0 for val in csvData[:, 11]):
+                print(f'{group} only reported negative values.')
+            else:
+                axs.plot(t, 1e-3*csvData[:, 11], label=group + ' reported', color=color, linestyle='-')
 
         columnName = group.replace('-', '')
         axs.plot(tSpatialMaps, 1e-3*fromSpatialMaps[columnName], label=group + ' calculated', color=color, linestyle='--')
