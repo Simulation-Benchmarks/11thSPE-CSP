@@ -82,10 +82,17 @@ def getFieldValues(fileName, nX, nY, nZ):
 
 
 def plotColorMesh(fig, x, y, z, idx, name, pRows, pCols, cmap='viridis', vmin=None, vmax=None):
+    if cmap == 'viridis' or cmap == 'coolwarm':
+        resetUnder = False
+    else:
+        resetUnder = True
+
     if isinstance(cmap, str):
         cmap = matplotlib.colormaps[cmap]
+        
+    if resetUnder:
+        cmap.set_under([1, 1, 1])
     cmap.set_bad([0.5, 0.5, 0.5])
-    cmap.set_under([1, 1, 1])
 
     if vmin is None:
         vmin = np.nanmin(np.where(z > 0, z, np.inf))
