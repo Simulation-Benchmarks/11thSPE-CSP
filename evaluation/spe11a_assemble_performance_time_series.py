@@ -86,9 +86,9 @@ def assemblePerformanceTimeSeries():
         t = csvData[:, 0]/60/60
 
         dtAvg = csvData[:, 1]
-        dtAvg = np.convolve(dtAvg, [0.2, 0.2, 0.2, 0.2, 0.2], 'valid')
-        dtAvg = np.insert(dtAvg, 0, csvData[0:2, 1])
-        dtAvg = np.insert(dtAvg, -1, csvData[-2:, 1])
+#        dtAvg = np.convolve(dtAvg, [0.2, 0.2, 0.2, 0.2, 0.2], 'valid')
+#        dtAvg = np.insert(dtAvg, 0, csvData[0:2, 1])
+#        dtAvg = np.insert(dtAvg, -1, csvData[-2:, 1])
         axsT.plot(t, dtAvg, label=group, color=color, linestyle=ls)
         axsF.plot(t, np.cumsum(csvData[:, 2]), label=group, color=color, linestyle=ls)
         axsM.plot(t, 1e3*csvData[:, 3], label=group, color=color, linestyle=ls)
