@@ -24,25 +24,33 @@ def assembleTimeSeries():
 
     parser.add_argument('-f','--folder', help='path to folder containing group subfolders', required=False)
 
-    parser.add_argument('-c','--calculated', nargs='+', help='names of groups, taking calculated numbers for Boxes A and B')
+    parser.add_argument('-cAB','--calculatedAB', nargs='+', help='names of groups, taking calculated numbers for Boxes A and B')
+
+    parser.add_argument('-cC','--calculatedC', nargs='+', help='names of groups, taking calculated numbers for Box C')
 
     parser.add_argument('-t','--tablefolder', help='path to folder containing calculated tables')
 
     parser.add_argument('-p','--percentiles', nargs='+', help='plot area between the two given percentiles')
 
     cmdArgs = vars(parser.parse_args())
-    groups = cmdArgs["groups"]
+    groups = set(cmdArgs["groups"])
     groupFolders = cmdArgs["groupfolders"]
     folder = cmdArgs["folder"]
-    calculated = []
-    if cmdArgs["calculated"]:
-        calculated = cmdArgs["calculated"]
-        groups = sorted(groups + calculated)
+    calculatedAB = []
+    calculatedC = []
+    if cmdArgs["calculatedAB"]:
+        calculatedAB = set(cmdArgs["calculatedAB"])
+        groups = groups.union(calculatedAB)
+        tableFolder = cmdArgs["tablefolder"]
+    if cmdArgs["calculatedC"]:
+        calculatedC = set(cmdArgs["calculatedC"])
+        groups = groups.union(calculatedC)
         tableFolder = cmdArgs["tablefolder"]
     if cmdArgs["percentiles"]:
         lowerPercentile = int(cmdArgs["percentiles"][0])
         upperPercentile = int(cmdArgs["percentiles"][1])
         tableFolder = cmdArgs["tablefolder"]
+    groups = sorted(list(groups))
 
     font = {'size' : 12}
     matplotlib.rc('font', **font)
@@ -53,7 +61,7 @@ def assembleTimeSeries():
     figC, axsC = plt.subplots(figsize=(5, 3))
     figT, axsT = plt.subplots(figsize=(5, 3))
 
-    if calculated:
+    if calculatedAB:
         mobileFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11a_mobA_from_spatial_maps.csv')
         mobileFromSpatialMapsA = np.genfromtxt(mobileFromSpatialMapsFileName, delimiter=',', names=True)
         tSpatialMaps = mobileFromSpatialMapsA['time_s']/60/60
@@ -75,6 +83,7 @@ def assembleTimeSeries():
         sealFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11a_sealB_from_spatial_maps.csv')
         sealFromSpatialMapsB = np.genfromtxt(sealFromSpatialMapsFileName, delimiter=',', names=True)
 
+    if calculatedC:
         convectionFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11a_mC_from_spatial_maps.csv')
         convectionFromSpatialMaps = np.genfromtxt(convectionFromSpatialMapsFileName, delimiter=',', names=True)
 
@@ -167,7 +176,7 @@ def assembleTimeSeries():
             axsP[1].plot(t, 1e-5*csvData[:, 2], label=group, color=color, linestyle=ls)
 
         # scale mass to grams
-        if group in calculated:
+        if group in calculatedAB:
             columnName = group.lower().replace('-', '')
             axsA[0, 0].plot(tSpatialMaps, 1e3*mobileFromSpatialMapsA[columnName], label=group + r'$^*$', color=color, linestyle=ls)
             axsA[0, 1].plot(tSpatialMaps, 1e3*immobileFromSpatialMapsA[columnName], label=group + r'$^*$', color=color, linestyle=ls)
@@ -202,7 +211,8 @@ def assembleTimeSeries():
             if max(1e3*csvData[:, 4]) > 0.05:
                 print(f"{group} potentially used inconsistent evaluation of immobile CO2.")
 
-        if group in calculated:
+        if group in calculatedAB:
+            columnName = group.lower().replace('-', '')
             axsB[0, 0].plot(tSpatialMaps, 1e3*mobileFromSpatialMapsB[columnName], label=group + r'$^*$', color=color, linestyle=ls)
             axsB[0, 1].plot(tSpatialMaps, 1e3*immobileFromSpatialMapsB[columnName], label=group + r'$^*$', color=color, linestyle=ls)
             axsB[1, 0].plot(tSpatialMaps, 1e3*dissolvedFromSpatialMapsB[columnName], label=group + r'$^*$', color=color, linestyle=ls)
@@ -233,7 +243,8 @@ def assembleTimeSeries():
             else:
                 axsB[1, 1].plot(t, 1e3*csvData[:, 10], label=group, color=color, linestyle=ls)
 
-        if group in calculated:
+        if group in calculatedC:
+            columnName = group.lower().replace('-', '')
             axsC.plot(tSpatialMaps, convectionFromSpatialMaps[columnName], label=group + r'$^*$', color=color, linestyle=ls)
         else:
             if np.isnan(csvData[:, 11]).all():
@@ -292,7 +303,7 @@ def assembleTimeSeries():
     axsA[1, 1].set_ylabel(r'mass [g]')
     axsA[1, 1].yaxis.tick_right()
     axsA[1, 1].yaxis.set_label_position('right')
-    if calculated:
+    if calculatedAB:
         axsA[1, 1].plot([], [], ' ', label=r'$^*$from dense data')
     handles, labels = axsA[1][1].get_legend_handles_labels()
     figA.legend(handles, labels, loc='center left', bbox_to_anchor=(1, 0.5))
@@ -322,7 +333,7 @@ def assembleTimeSeries():
     axsB[1, 1].set_ylabel(r'mass [g]')
     axsB[1, 1].yaxis.tick_right()
     axsB[1, 1].yaxis.set_label_position('right')
-    if calculated:
+    if calculatedAB:
         axsB[1, 1].plot([], [], ' ', label=r'$^*$from dense data')
     handles, labels = axsB[1][1].get_legend_handles_labels()
     figB.legend(handles, labels, loc='center left', bbox_to_anchor=(1, 0.5))
@@ -333,7 +344,7 @@ def assembleTimeSeries():
     axsC.set_ylabel(r'$M$ [m]')
     axsC.set_xlim(1e0, 7260.0/60)
     axsC.set_xscale(r'log')
-    if calculated:
+    if calculatedC:
         axsC.plot([], [], ' ', label=r'$^*$from dense data')
     axsC.legend(loc='center left', bbox_to_anchor=(1, 0.5))
 

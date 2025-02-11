@@ -102,12 +102,15 @@ def plotColorMesh(fig, x, y, z, idx, name, pRows, pCols, cmap='viridis', vmin=No
     ax.set_xticklabels([])
     ax.set_yticks([])
     ax.set_yticklabels([])
-    divider = make_axes_locatable(ax)
-    cax = divider.append_axes('right', size='5%', pad=0.05)
-    cbformat = matplotlib.ticker.ScalarFormatter()
-    cbformat.set_powerlimits((-2,2))
-    fig.colorbar(im, cax=cax, orientation='vertical', format=cbformat)
-    fig.tight_layout()
+#    divider = make_axes_locatable(ax)
+#    cax = divider.append_axes('right', size='5%', pad=0.05)
+#    cbformat = matplotlib.ticker.ScalarFormatter()
+#    cbformat.set_powerlimits((-2,2))
+#    fig.colorbar(im, cax=cax, orientation='vertical', format=cbformat)
+#    fig.tight_layout()
+    fig.subplots_adjust(right=1.0)
+    cbar_ax = fig.add_axes([1.02, 0.14, 0.025, 0.7])
+    fig.colorbar(im, cax=cbar_ax)
 
 
 def visualizeSpatialMaps():
@@ -152,8 +155,8 @@ def visualizeSpatialMaps():
         figMH2O = plt.figure(figsize=(14, 12))
         figRhoG = plt.figure(figsize=(14, 12))
         figRhoL = plt.figure(figsize=(14, 12))
-        figTmCO2 = plt.figure(figsize=(14, 12))
-        figTemp = plt.figure(figsize=(14, 12))
+        figTmCO2 = plt.figure(figsize=(14, 7.2))
+        figTemp = plt.figure(figsize=(14, 7.2))
 
     if len(groups) == 1:
         pRows = 3
@@ -238,8 +241,8 @@ def visualizeSpatialMaps():
             plotColorMesh(figRhoG, x, y, rhoG, i, group, pRows, pCols, 'icefire', 0.85e3, 0.95e3)
             plotColorMesh(figRhoL, x, y, rhoL, i, group, pRows, pCols, 'icefire', 0.99e3, 1.025e3)
             # scale mass to tons
-            plotColorMesh(figTmCO2, x, y, 1e-3*tmCO2, i, group, pRows, pCols, cmap, 0, 3)
-            plotColorMesh(figTemp, x, y, temp, i, group, pRows, pCols, 'coolwarm', 8, 70)
+            plotColorMesh(figTmCO2, x, y, 1e-3*tmCO2, i, group, pRows, pCols, cmap, 0, 5)
+            plotColorMesh(figTemp, x, y, temp, i, group, pRows, pCols, 'coolwarm', 40, 70)
     
     if len(groups) == 1:
         fig.suptitle(f'{groups[0]} at {time} years')
@@ -258,9 +261,9 @@ def visualizeSpatialMaps():
         figRhoG.savefig(f'spe11b_rhog_{time}y.png', bbox_inches='tight')
         figRhoL.suptitle(f'liquid phase density [kg/m3] at {time} years')
         figRhoL.savefig(f'spe11b_rhol_{time}y.png', bbox_inches='tight')
-        figTmCO2.suptitle(f'total CO2 mass [t] at {time} years')
+        figTmCO2.suptitle(f'                          total CO2 mass [t] at {time} years')
         figTmCO2.savefig(f'spe11b_tmco2_{time}y.png', bbox_inches='tight')
-        figTemp.suptitle(f'temperature [°C] at {time} years')
+        figTemp.suptitle(f'                           temperature [°C] at {time} years')
         figTemp.savefig(f'spe11b_temp_{time}y.png', bbox_inches='tight')
         print('Files spe11b_{pressure, saturation, mco2, mh2o, rhog, rhol, tmco2, temp}' + f'_{time}y.png have been generated.')
 
