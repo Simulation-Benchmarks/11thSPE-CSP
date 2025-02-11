@@ -99,12 +99,15 @@ def plotColorMesh(fig, x, y, z, idx, name, pRows, pCols, cmap='viridis', vmin=No
     ax.set_xticklabels([])
     ax.set_yticks([])
     ax.set_yticklabels([])
-    divider = make_axes_locatable(ax)
-    cax = divider.append_axes('right', size='5%', pad=0.05)
+#    divider = make_axes_locatable(ax)
+#    cax = divider.append_axes('right', size='5%', pad=0.05)
     cbformat = matplotlib.ticker.ScalarFormatter()
     cbformat.set_powerlimits((-2,2))
-    fig.colorbar(im, cax=cax, orientation='vertical', format=cbformat)
-    fig.tight_layout(rect=[0, 0.03, 1, 0.95])
+#    fig.colorbar(im, cax=cax, orientation='vertical', format=cbformat)
+#    fig.tight_layout(rect=[0, 0.03, 1, 0.95])
+    fig.subplots_adjust(right=1.0)
+    cbar_ax = fig.add_axes([1.02, 0.14, 0.025, 0.7])
+    fig.colorbar(im, cax=cbar_ax, format=cbformat)
 
 
 def visualizeSpatialMaps():
@@ -149,7 +152,7 @@ def visualizeSpatialMaps():
         figMH2O = plt.figure(figsize=(15, 9))
         figRhoG = plt.figure(figsize=(15, 9))
         figRhoL = plt.figure(figsize=(15, 9))
-        figTmCO2 = plt.figure(figsize=(15, 9))
+        figTmCO2 = plt.figure(figsize=(14, 7.2))
 
     if len(groups) == 1:
         pRows = 3
@@ -241,7 +244,7 @@ def visualizeSpatialMaps():
         figMH2O.suptitle(f'H2O mass fraction in gas [g/kg] at {time} hours')
         figRhoG.suptitle(f'gas phase density [kg/m3] at {time} hours')
         figRhoL.suptitle(f'liquid phase density [kg/m3] at {time} hours')
-        figTmCO2.suptitle(f'total CO2 mass [g] at {time} hours')
+        figTmCO2.suptitle(f'                          total CO2 mass [g] at {time} hours')
 
         figP.savefig(f'spe11a_pressure_{time}h.png', bbox_inches='tight')
         figS.savefig(f'spe11a_saturation_{time}h.png', bbox_inches='tight')
@@ -249,7 +252,7 @@ def visualizeSpatialMaps():
         figMH2O.savefig(f'spe11a_mh2o_{time}h.png', bbox_inches='tight')
         figRhoG.savefig(f'spe11a_rhog_{time}h.png', bbox_inches='tight')
         figRhoL.savefig(f'spe11a_rhol_{time}h.png', bbox_inches='tight')
-        figTmCO2.savefig(f'spe11a_tmco2_{time}h.png', bbox_inches='tight')
+        figTmCO2.savefig(f'spe11a_tmco2_{time}h.png', bbox_inches='tight', dpi=300)
         print('Files spe11a_{pressure, saturation, mco2, mh2o, rhog, rhol, tmco2}' + f'_{time}h.png have been generated.')
 
 if __name__ == "__main__":
