@@ -6,11 +6,38 @@ import os
 import argparse
 import numpy as np
 import matplotlib
-from spe11a_visualize_spatial_maps import getFieldValues
-from is_notebook import is_notebook
 
 def myStr(value):
     return f'{value:.4e}'
+
+def getFieldValues(fileName, nX, nY):
+    p = np.zeros(nX*nY); p[:] = np.nan
+    tmCO2 = np.zeros(nX*nY); tmCO2[:] = np.nan
+
+    if os.path.isfile(fileName):
+        print(f'Processing {fileName}.')
+    else:
+        print(f'No file {fileName} found. Returning nans.')
+        return p, tmCO2
+
+    skip_header = 0
+    with open(fileName, "r") as file:
+        if not (file.readline()[0]).isnumeric():
+            skip_header = 1
+
+    delimiter = ','
+
+    csvData = np.genfromtxt(fileName, delimiter=delimiter, skip_header=skip_header)
+    csvData[:,0] = np.around(csvData[:,0], decimals=5)
+    csvData[:,1] = np.around(csvData[:,1], decimals=5)
+    ind = np.lexsort((csvData[:,0], csvData[:,1]))
+    csvData = csvData[ind]
+
+    p[:] = csvData[:, 2]
+    p[p < 1e0] = np.nan
+    tmCO2[:] = csvData[:, 8]
+
+    return p, tmCO2
 
 def calculateL2Differences():
     """Calculate the L2 pressure differences for Case A of the 11th SPE CSP"""
@@ -40,118 +67,77 @@ def calculateL2Differences():
     nX = 280
     nY = 120
     deltaX = deltaY = 1.0e-2
+    cellVolume = deltaX*deltaY
 
     # select file that contains impermeable cells with 'nan' pressure values
     fileNameSLB = os.path.join(folder, 'slb', 'spe11a', 'result1', f'spe11a_spatial_map_{hour}h.csv')
-    pSLB, s, mCO2, mH2O, rhoG, rhoL, tmCO2 = getFieldValues(fileNameSLB, nX, nY)
+    pSLB, tmCO2 = getFieldValues(fileNameSLB, nX, nY)
+
+    p = np.zeros([nX*nY, numGroups])
+    tmCO2 = np.zeros([nX*nY, numGroups])
+
+    for i, group in zip(range(numGroups), groups):
+        if groupFolders:
+            baseFolder = groupFolders[i]
+
+        if not group[-1].isnumeric():
+            if not groupFolders:
+                baseFolder = os.path.join(folder, group, 'spe11a')
+        else:
+            if not groupFolders:
+                baseFolder = os.path.join(folder, group[:-1], 'spe11a', f'result{group[-1]}')
+
+        fileName = os.path.join(baseFolder, f'spe11a_spatial_map_{hour}h.csv')
+        p[:, i], tmCO2[:, i] = getFieldValues(fileName, nX, nY)
+
+        # set values to 'nan' for impermeable cells
+        p[:, i][np.isnan(pSLB)] = np.nan
+        tmCO2[:, i][np.isnan(pSLB)] = np.nan
 
     l2NormP = np.zeros((numGroups, numGroups))
     l2SemiNormP = np.zeros((numGroups, numGroups))
-    h1SemiNormP = np.zeros((numGroups, numGroups))
     l2NormM = np.zeros((numGroups, numGroups))
 
-    for i, groupI in zip(range(numGroups), groups):
-        if groupFolders:
-            baseFolderI = groupFolders[i]
-
-        if not groupI[-1].isnumeric():
-            if not groupFolders:
-                baseFolderI = os.path.join(folder, groupI, 'spe11a')
-        else:
-            if not groupFolders:
-                baseFolderI = os.path.join(folder, groupI[:-1], 'spe11a', f'result{groupI[-1]}')
-
-        fileNameI0 = os.path.join(baseFolderI, f'spe11a_spatial_map_0h.csv')
-        pI, s, mCO2, mH2O, rhoG, rhoL, tmCO2I0 = getFieldValues(fileNameI0, nX, nY)
-
-        fileNameI = os.path.join(baseFolderI, f'spe11a_spatial_map_{hour}h.csv')
-        pI, s, mCO2, mH2O, rhoG, rhoL, tmCO2I = getFieldValues(fileNameI, nX, nY)
-
-        # subtract possibly added initial artificial CO2 mass
-        tmCO2I = tmCO2I - tmCO2I0
-        tmCO2I[tmCO2I < 0] = 0
-
-        # set values to 'nan' for impermeable cells
-        pI[np.isnan(pSLB)] = np.nan
-        tmCO2I[np.isnan(pSLB)] = np.nan
+    for i in range(numGroups-1):
+        pI = p[:, i]
+        tmCO2I = tmCO2[:, i]
 
         pIMean = np.nanmean(pI)
         pIVariation = pI - pIMean
 
-        gradXI = 0.5/deltaX*(pI[1:nY-1, 2:nX] - pI[1:nY-1, 0:nX-2])
-        gradYI = 0.5/deltaY*(pI[2:nY, 1:nX-1] - pI[0:nY-2, 1:nX-1])
-
-        for j, groupJ in zip(range(numGroups), groups):
-            if j <= i:
-                continue
-
-            if groupFolders:
-                baseFolderJ = groupFolders[j]
-
-            if not groupJ[-1].isnumeric():
-                if not groupFolders:
-                    baseFolderJ = os.path.join(folder, groupJ, 'spe11a')
-            else:
-                if not groupFolders:
-                    baseFolderJ = os.path.join(folder, groupJ[:-1], 'spe11a', f'result{groupJ[-1]}')
-
-            fileNameJ0 = os.path.join(baseFolderJ, f'spe11a_spatial_map_0h.csv')
-            pJ, s, mCO2, mH2O, rhoG, rhoL, tmCO2J0 = getFieldValues(fileNameJ0, nX, nY)
-
-            fileNameJ = os.path.join(baseFolderJ, f'spe11a_spatial_map_{hour}h.csv')
-            pJ, s, mCO2, mH2O, rhoG, rhoL, tmCO2J = getFieldValues(fileNameJ, nX, nY)
-
-            # subtract possibly added initial artificial CO2 mass
-            tmCO2J = tmCO2J - tmCO2J0
-            tmCO2J[tmCO2J < 0] = 0
-
-            pJ[np.isnan(pSLB)] = np.nan
-            tmCO2J[np.isnan(pSLB)] = np.nan
+        for j in range(i+1, numGroups):
+            pJ = p[:, j]
+            tmCO2J = tmCO2[:, j]
 
             pDiff = pI - pJ
             # set difference to zero for impermeable cells
             pDiff = np.nan_to_num(pDiff)
-            l2NormP[i, j] = l2NormP[j, i] = np.sqrt(deltaX*deltaY*np.sum(np.square(pDiff)))
+            l2NormP[i, j] = l2NormP[j, i] = np.sqrt(cellVolume*np.sum(np.square(pDiff)))
 
             tmCO2Diff = tmCO2I - tmCO2J
             tmCO2Diff = np.nan_to_num(tmCO2Diff)
-            l2NormM[i, j] = l2NormM[j, i] = np.sqrt(deltaX*deltaY*np.sum(np.square(tmCO2Diff)))
+            l2NormM[i, j] = l2NormM[j, i] = np.sqrt(cellVolume*np.sum(np.square(tmCO2Diff)))
 
             pJMean = np.nanmean(pJ)
             pJVariation = pJ - pJMean
             pVariationDiff = pIVariation - pJVariation
             pVariationDiff = np.nan_to_num(pVariationDiff)
-            l2SemiNormP[i, j] = l2SemiNormP[j, i] = np.sqrt(deltaX*deltaY*np.sum(np.square(pVariationDiff)))
+            l2SemiNormP[i, j] = l2SemiNormP[j, i] = np.sqrt(cellVolume*np.sum(np.square(pVariationDiff)))
 
-            gradXJ = 0.5/deltaX*(pJ[1:nY-1, 2:nX] - pJ[1:nY-1, 0:nX-2])
-            gradYJ = 0.5/deltaY*(pJ[2:nY, 1:nX-1] - pJ[0:nY-2, 1:nX-1])
-            gradXDiff = gradXI - gradXJ
-            gradYDiff = gradYI - gradYJ
-            # set difference to zero for impermeable and their neighboring cells
-            gradXDiff = np.nan_to_num(gradXDiff)
-            gradYDiff = np.nan_to_num(gradYDiff)
-            h1SemiNormP[i, j] = h1SemiNormP[j, i] = np.sqrt(deltaX*deltaY*(np.sum(np.square(gradXDiff)) + np.sum(np.square(gradYDiff))))
+    with open(f'spe11a_pressure_l2_diff_{hour}h.csv', 'w') as f:
+        print('#, ', ', '.join(map(str, groups)), file=f)
+        for i, groupI in zip(range(numGroups), groups):
+            print(groupI + ',', ', '.join(map(myStr, l2NormP[i])), file=f)
 
-    if not is_notebook():
-        with open(f'spe11a_pressure_l2_diff_{hour}h.csv', 'w') as f:
-            print('#, ', ', '.join(map(str, groups)), file=f)
-            for i, groupI in zip(range(numGroups), groups):
-                print(groupI + ',', ', '.join(map(myStr, l2NormP[i])), file=f)
+    with open(f'spe11a_pressure_l2semi_diff_{hour}h.csv', 'w') as f:
+        print('#, ', ', '.join(map(str, groups)), file=f)
+        for i, groupI in zip(range(numGroups), groups):
+            print(groupI + ',', ', '.join(map(myStr, l2SemiNormP[i])), file=f)
 
-        with open(f'spe11a_pressure_l2semi_diff_{hour}h.csv', 'w') as f:
-            print('#, ', ', '.join(map(str, groups)), file=f)
-            for i, groupI in zip(range(numGroups), groups):
-                print(groupI + ',', ', '.join(map(myStr, l2SemiNormP[i])), file=f)
-
-        with open(f'spe11a_pressure_h1semi_diff_{hour}h.csv', 'w') as f:
-            print('#, ', ', '.join(map(str, groups)), file=f)
-            for i, groupI in zip(range(numGroups), groups):
-                print(groupI + ',', ', '.join(map(myStr, h1SemiNormP[i])), file=f)
-
-        with open(f'spe11a_tmco2_l2_diff_{hour}h.csv', 'w') as f:
-            print('#, ', ', '.join(map(str, groups)), file=f)
-            for i, groupI in zip(range(numGroups), groups):
-                print(groupI + ',', ', '.join(map(myStr, l2NormM[i])), file=f)
+    with open(f'spe11a_tmco2_l2_diff_{hour}h.csv', 'w') as f:
+        print('#, ', ', '.join(map(str, groups)), file=f)
+        for i, groupI in zip(range(numGroups), groups):
+            print(groupI + ',', ', '.join(map(myStr, l2NormM[i])), file=f)
 
 
 if __name__ == "__main__":
