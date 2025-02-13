@@ -22,17 +22,28 @@ def addLegend(ax):
 
     if numAxes == 1:
         leg = ax.legend(by_label.values(), by_label.keys(), loc='upper left', title='result')
-    else:
+    elif numAxes == 2:
         leg = ax.legend(by_label.values(), by_label.keys(), loc='upper left', bbox_to_anchor=(0.85, -0.16), title='result', ncols=2)
+    else:
+        leg = ax.legend(by_label.values(), by_label.keys(), loc='upper left', bbox_to_anchor=(0.83, -0.16), title='result', ncols=2)
     ax.add_artist(leg)
     by_label = dict(zip(labels[:-4], handles[:-4]))
     if numAxes == 1:
         leg = ax.legend(by_label.values(), by_label.keys(), loc='center left', bbox_to_anchor=(1, 0.5))
-    else:
+    elif numAxes == 2:
         leg = ax.legend(by_label.values(), by_label.keys(), loc='upper left', bbox_to_anchor=(-1.5, -0.2), ncols=7)
+    elif numAxes == 4:
+        leg = ax.legend(by_label.values(), by_label.keys(), loc='upper left', bbox_to_anchor=(-1.45, -0.2), ncols=6)
+    else:
+        leg = ax.legend(by_label.values(), by_label.keys(), loc='upper left', bbox_to_anchor=(-1.28, -0.2), ncols=9)
     for line in leg.get_lines():
         line.set_linestyle('-')
         line.set_linewidth(4)
+        if line.get_label() == 'from dense data':
+            line.set_linewidth(0)
+            line.set_color('k')
+            line.set_marker('*')
+
 
 
 def assembleTimeSeries():
@@ -210,10 +221,10 @@ def assembleTimeSeries():
         if group in calculatedAB:
             columnName = group.lower().replace('-', '')
             axsA[0, 0].plot(tSpatialMaps, 1e3*mobileFromSpatialMapsA[columnName], label=label + r'$^*$', color=color, linestyle=ls)
-            axsPub[1, 0].plot(tSpatialMaps, 1e3*mobileFromSpatialMapsA[columnName], label=label + r'$^*$', color=color, linestyle=ls)
+            axsPub[1, 0].plot(tSpatialMaps, 1e3*mobileFromSpatialMapsA[columnName], label=label, color=color, linestyle=ls)
             axsA[0, 1].plot(tSpatialMaps, 1e3*immobileFromSpatialMapsA[columnName], label=label + r'$^*$', color=color, linestyle=ls)
             axsA[1, 0].plot(tSpatialMaps, 1e3*dissolvedFromSpatialMapsA[columnName], label=label + r'$^*$', color=color, linestyle=ls)
-            axsPub[1, 1].plot(tSpatialMaps, 1e3*dissolvedFromSpatialMapsA[columnName], label=label + r'$^*$', color=color, linestyle=ls)
+            axsPub[1, 1].plot(tSpatialMaps, 1e3*dissolvedFromSpatialMapsA[columnName], label=label, color=color, linestyle=ls)
             axsA[1, 1].plot(tSpatialMaps, 1e3*sealFromSpatialMapsA[columnName], label=label + r'$^*$', color=color, linestyle=ls)
         else:
             if np.isnan(csvData[:, 3]).all():
@@ -249,7 +260,7 @@ def assembleTimeSeries():
         if group in calculatedAB:
             columnName = group.lower().replace('-', '')
             axsB[0, 0].plot(tSpatialMaps, 1e3*mobileFromSpatialMapsB[columnName], label=label + r'$^*$', color=color, linestyle=ls)
-            axsPub[2, 0].plot(tSpatialMaps, 1e3*mobileFromSpatialMapsB[columnName], label=label + r'$^*$', color=color, linestyle=ls)
+            axsPub[2, 0].plot(tSpatialMaps, 1e3*mobileFromSpatialMapsB[columnName], label=label, color=color, linestyle=ls)
             axsB[0, 1].plot(tSpatialMaps, 1e3*immobileFromSpatialMapsB[columnName], label=label + r'$^*$', color=color, linestyle=ls)
             axsB[1, 0].plot(tSpatialMaps, 1e3*dissolvedFromSpatialMapsB[columnName], label=label + r'$^*$', color=color, linestyle=ls)
             axsB[1, 1].plot(tSpatialMaps, 1e3*sealFromSpatialMapsB[columnName], label=label + r'$^*$', color=color, linestyle=ls)
@@ -283,7 +294,7 @@ def assembleTimeSeries():
         if group in calculatedC:
             columnName = group.lower().replace('-', '')
             axsC.plot(tSpatialMaps, convectionFromSpatialMaps[columnName], label=label + r'$^*$', color=color, linestyle=ls)
-            axsPub[2, 1].plot(tSpatialMaps, convectionFromSpatialMaps[columnName], label=label + r'$^*$', color=color, linestyle=ls)
+            axsPub[2, 1].plot(tSpatialMaps, convectionFromSpatialMaps[columnName], label=label, color=color, linestyle=ls)
         else:
             if np.isnan(csvData[:, 11]).all():
                 print(f'{group} only reported nan for mC.')
@@ -322,6 +333,7 @@ def assembleTimeSeries():
     axsA[0, 0].set_xlim(1e-1, 7260.0/60)
     axsA[0, 0].set_xticklabels([])
     axsA[0, 0].set_xscale(r'log')
+    axsA[0, 0].set_xticklabels([])
     axsA[0, 1].set_title(r'Box A: immobile gaseous CO2')
     axsA[0, 1].set_xlim(1e-1, 7260.0/60)
     axsA[0, 1].set_xticklabels([])
@@ -329,6 +341,7 @@ def assembleTimeSeries():
     axsA[0, 1].set_ylabel(r'mass [g]')
     axsA[0, 1].yaxis.tick_right()
     axsA[0, 1].yaxis.set_label_position('right')
+    axsA[0, 1].set_xticklabels([])
     axsA[1, 0].set_title(r'Box A: dissolved CO2')
     axsA[1, 0].set_xlabel(r'time [h]')
     axsA[1, 0].set_ylabel(r'mass [g]')
@@ -342,7 +355,7 @@ def assembleTimeSeries():
     axsA[1, 1].yaxis.tick_right()
     axsA[1, 1].yaxis.set_label_position('right')
     if calculatedAB:
-        axsA[1, 1].plot([], [], ' ', label=r'$^*$from dense data')
+        axsA[1, 1].plot([], [], ' ', label=r'from dense data')
     addLegend(axsA[1, 1])
 
     axsB[0, 0].set_title(r'Box B: mobile gaseous CO2')
@@ -350,6 +363,7 @@ def assembleTimeSeries():
     axsB[0, 0].set_xlim(2e0, 7260.0/60)
     axsB[0, 0].set_xticklabels([])
     axsB[0, 0].set_xscale(r'log')
+    axsB[0, 0].set_xticklabels([])
     axsB[0, 1].set_title(r'Box B: immobile gaseous CO2')
     axsB[0, 1].set_xlim(2e0, 7260.0/60)
     axsB[0, 1].set_xticklabels([])
@@ -357,6 +371,7 @@ def assembleTimeSeries():
     axsB[0, 1].set_ylabel(r'mass [g]')
     axsB[0, 1].yaxis.tick_right()
     axsB[0, 1].yaxis.set_label_position('right')
+    axsB[0, 1].set_xticklabels([])
     axsB[1, 0].set_title(r'Box B: dissolved CO2')
     axsB[1, 0].set_xlabel(r'time [h]')
     axsB[1, 0].set_ylabel(r'mass [g]')
@@ -370,7 +385,7 @@ def assembleTimeSeries():
     axsB[1, 1].yaxis.tick_right()
     axsB[1, 1].yaxis.set_label_position('right')
     if calculatedAB:
-        axsB[1, 1].plot([], [], ' ', label=r'$^*$from dense data')
+        axsB[1, 1].plot([], [], ' ', label=r'from dense data')
     addLegend(axsB[1, 1])
 
     axsC.set_title(r'Box C: convection')
@@ -379,7 +394,7 @@ def assembleTimeSeries():
     axsC.set_xlim(1e0, 7260.0/60)
     axsC.set_xscale(r'log')
     if calculatedC:
-        axsC.plot([], [], ' ', label=r'$^*$from dense data')
+        axsC.plot([], [], ' ', label=r'from dense data')
     addLegend(axsC)
 
     axsT.set_title(r'CO2 in sealing units')
