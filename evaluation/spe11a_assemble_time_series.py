@@ -33,7 +33,7 @@ def addLegend(ax):
     elif numAxes == 2:
         leg = ax.legend(by_label.values(), by_label.keys(), loc='upper left', bbox_to_anchor=(-1.5, -0.2), ncols=7)
     elif numAxes == 4:
-        leg = ax.legend(by_label.values(), by_label.keys(), loc='upper left', bbox_to_anchor=(-1.45, -0.2), ncols=6)
+        leg = ax.legend(by_label.values(), by_label.keys(), loc='upper left', bbox_to_anchor=(-1.5, -0.2), ncols=6)
     else:
         leg = ax.legend(by_label.values(), by_label.keys(), loc='upper left', bbox_to_anchor=(-1.28, -0.2), ncols=9)
     for line in leg.get_lines():
@@ -42,7 +42,7 @@ def addLegend(ax):
         if line.get_label() == 'from dense data':
             line.set_linewidth(0)
             line.set_color('k')
-            line.set_marker('*')
+            line.set_marker('$\u2736$')
 
 
 
@@ -88,8 +88,10 @@ def assembleTimeSeries():
         tableFolder = cmdArgs["tablefolder"]
     groups = sorted(list(groups))
 
-    font = {'size' : 10}
+    font = {'size' : 10, 'family': 'DejaVu Sans'}
+#    print(sorted(matplotlib.font_manager.get_font_names()))
     matplotlib.rc('font', **font)
+#    plt.rcParams["mathtext.fontset"] = 'dejavusans'
     plt.rcParams['legend.title_fontsize'] = 'small'
     plt.rcParams['legend.fontsize'] = 'small'
 
@@ -220,12 +222,12 @@ def assembleTimeSeries():
         # scale mass to grams
         if group in calculatedAB:
             columnName = group.lower().replace('-', '')
-            axsA[0, 0].plot(tSpatialMaps, 1e3*mobileFromSpatialMapsA[columnName], label=label + r'$^*$', color=color, linestyle=ls)
+            axsA[0, 0].plot(tSpatialMaps, 1e3*mobileFromSpatialMapsA[columnName], label=label+ '\u2736', color=color, linestyle=ls)
             axsPub[1, 0].plot(tSpatialMaps, 1e3*mobileFromSpatialMapsA[columnName], label=label, color=color, linestyle=ls)
-            axsA[0, 1].plot(tSpatialMaps, 1e3*immobileFromSpatialMapsA[columnName], label=label + r'$^*$', color=color, linestyle=ls)
-            axsA[1, 0].plot(tSpatialMaps, 1e3*dissolvedFromSpatialMapsA[columnName], label=label + r'$^*$', color=color, linestyle=ls)
+            axsA[0, 1].plot(tSpatialMaps, 1e3*immobileFromSpatialMapsA[columnName], label=label+ '\u2736', color=color, linestyle=ls)
+            axsA[1, 0].plot(tSpatialMaps, 1e3*dissolvedFromSpatialMapsA[columnName], label=label+ '\u2736', color=color, linestyle=ls)
             axsPub[1, 1].plot(tSpatialMaps, 1e3*dissolvedFromSpatialMapsA[columnName], label=label, color=color, linestyle=ls)
-            axsA[1, 1].plot(tSpatialMaps, 1e3*sealFromSpatialMapsA[columnName], label=label + r'$^*$', color=color, linestyle=ls)
+            axsA[1, 1].plot(tSpatialMaps, 1e3*sealFromSpatialMapsA[columnName], label=label + '\u2736', color=color, linestyle=ls)
         else:
             if np.isnan(csvData[:, 3]).all():
                 print(f'{group} only reported nan for mobA.')
@@ -259,11 +261,11 @@ def assembleTimeSeries():
 
         if group in calculatedAB:
             columnName = group.lower().replace('-', '')
-            axsB[0, 0].plot(tSpatialMaps, 1e3*mobileFromSpatialMapsB[columnName], label=label + r'$^*$', color=color, linestyle=ls)
+            axsB[0, 0].plot(tSpatialMaps, 1e3*mobileFromSpatialMapsB[columnName], label=label+ '\u2736', color=color, linestyle=ls)
             axsPub[2, 0].plot(tSpatialMaps, 1e3*mobileFromSpatialMapsB[columnName], label=label, color=color, linestyle=ls)
-            axsB[0, 1].plot(tSpatialMaps, 1e3*immobileFromSpatialMapsB[columnName], label=label + r'$^*$', color=color, linestyle=ls)
-            axsB[1, 0].plot(tSpatialMaps, 1e3*dissolvedFromSpatialMapsB[columnName], label=label + r'$^*$', color=color, linestyle=ls)
-            axsB[1, 1].plot(tSpatialMaps, 1e3*sealFromSpatialMapsB[columnName], label=label + r'$^*$', color=color, linestyle=ls)
+            axsB[0, 1].plot(tSpatialMaps, 1e3*immobileFromSpatialMapsB[columnName], label=label+ '\u2736', color=color, linestyle=ls)
+            axsB[1, 0].plot(tSpatialMaps, 1e3*dissolvedFromSpatialMapsB[columnName], label=label+ '\u2736', color=color, linestyle=ls)
+            axsB[1, 1].plot(tSpatialMaps, 1e3*sealFromSpatialMapsB[columnName], label=label+ '\u2736', color=color, linestyle=ls)
         else:
             if np.isnan(csvData[:, 7]).all():
                 print(f'{group} only reported nan for mobB.')
@@ -293,7 +295,7 @@ def assembleTimeSeries():
 
         if group in calculatedC:
             columnName = group.lower().replace('-', '')
-            axsC.plot(tSpatialMaps, convectionFromSpatialMaps[columnName], label=label + r'$^*$', color=color, linestyle=ls)
+            axsC.plot(tSpatialMaps, convectionFromSpatialMaps[columnName], label=label+ '\u2736', color=color, linestyle=ls)
             axsPub[2, 1].plot(tSpatialMaps, convectionFromSpatialMaps[columnName], label=label, color=color, linestyle=ls)
         else:
             if np.isnan(csvData[:, 11]).all():
