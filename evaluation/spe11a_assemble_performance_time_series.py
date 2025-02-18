@@ -179,7 +179,7 @@ def assemblePerformanceTimeSeries():
     axsRT[1].set_xscale('log')
     axsRT[1].set_yscale('log')
     axsRT[1].set_xlim((9e-2, 2e2))
-    add_legend(axsRT[1])
+    add_legend(axsRT[0])
 
     axsPub[0, 0].set_title(r'avg time step size')
     axsPub[0, 0].set_ylabel(r'step size [s]')
@@ -210,7 +210,7 @@ def assemblePerformanceTimeSeries():
     axsPub[1, 1].set_xlim([1e-1, 1.2e2])
     axsPub[1, 1].yaxis.tick_right()
     axsPub[1, 1].yaxis.set_label_position('right')
-    add_legend(axsPub[1, 1])
+    add_legend(axsPub[0, 0])
 
     figT.savefig(f'spe11a_time_series_tstep.png', bbox_inches='tight', dpi=300)
     figF.savefig(f'spe11a_time_series_fsteps.png', bbox_inches='tight', dpi=300)
