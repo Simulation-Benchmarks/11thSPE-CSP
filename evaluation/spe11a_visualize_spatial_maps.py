@@ -235,7 +235,7 @@ def visualizeSpatialMaps():
     if len(groups) == 1:
         fig.suptitle(f'{groups[0]} at {time} hours')
         if not is_notebook():
-            fig.savefig(f'spe11a_{groups[0].lower()}_{time}h.png', bbox_inches='tight')
+            fig.savefig(f'spe11a_{groups[0].lower()}_{time}h.png', bbox_inches='tight', dpi=300)
             print('File spe11a_' + f'{groups[0].lower()}_{time}h.png has been generated.')
     else:
         figP.suptitle(f'pressure [bar] at {time} hours')
@@ -246,12 +246,12 @@ def visualizeSpatialMaps():
         figRhoL.suptitle(f'liquid phase density [kg/m3] at {time} hours')
         figTmCO2.suptitle(f'                          total CO2 mass [g] at {time} hours')
 
-        figP.savefig(f'spe11a_pressure_{time}h.png', bbox_inches='tight')
-        figS.savefig(f'spe11a_saturation_{time}h.png', bbox_inches='tight')
-        figMCO2.savefig(f'spe11a_mco2_{time}h.png', bbox_inches='tight')
-        figMH2O.savefig(f'spe11a_mh2o_{time}h.png', bbox_inches='tight')
-        figRhoG.savefig(f'spe11a_rhog_{time}h.png', bbox_inches='tight')
-        figRhoL.savefig(f'spe11a_rhol_{time}h.png', bbox_inches='tight')
+        figP.savefig(f'spe11a_pressure_{time}h.png', bbox_inches='tight', dpi=300)
+        figS.savefig(f'spe11a_saturation_{time}h.png', bbox_inches='tight', dpi=300)
+        figMCO2.savefig(f'spe11a_mco2_{time}h.png', bbox_inches='tight', dpi=300)
+        figMH2O.savefig(f'spe11a_mh2o_{time}h.png', bbox_inches='tight', dpi=300)
+        figRhoG.savefig(f'spe11a_rhog_{time}h.png', bbox_inches='tight', dpi=300)
+        figRhoL.savefig(f'spe11a_rhol_{time}h.png', bbox_inches='tight', dpi=300)
         figTmCO2.savefig(f'spe11a_tmco2_{time}h.png', bbox_inches='tight', dpi=300)
         print('Files spe11a_{pressure, saturation, mco2, mh2o, rhog, rhol, tmco2}' + f'_{time}h.png have been generated.')
 
