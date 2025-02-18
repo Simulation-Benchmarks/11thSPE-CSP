@@ -9,42 +9,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 from groups_and_colors import groups_and_colors
 from is_notebook import is_notebook
-
-def addLegend(ax):
-    ax.plot([], [], color='k', linestyle='-', label='1')
-    ax.plot([], [], color='k', linestyle='--', label='2')
-    ax.plot([], [], color='k', linestyle='-.', label='3')
-    ax.plot([], [], color='k', linestyle=':', label='4')
-
-    numAxes = len(ax.get_figure().axes)
-    handles, labels = ax.get_legend_handles_labels()
-    by_label = dict(zip(labels[-4:], handles[-4:]))
-
-    if numAxes == 1:
-        leg = ax.legend(by_label.values(), by_label.keys(), loc='upper left', title='result')
-    elif numAxes == 2:
-        leg = ax.legend(by_label.values(), by_label.keys(), loc='upper left', bbox_to_anchor=(0.85, -0.16), title='result', ncols=2)
-    else:
-        leg = ax.legend(by_label.values(), by_label.keys(), loc='upper left', bbox_to_anchor=(0.83, -0.16), title='result', ncols=2)
-    ax.add_artist(leg)
-    by_label = dict(zip(labels[:-4], handles[:-4]))
-    if numAxes == 1:
-        leg = ax.legend(by_label.values(), by_label.keys(), loc='center left', bbox_to_anchor=(1, 0.5))
-    elif numAxes == 2:
-        leg = ax.legend(by_label.values(), by_label.keys(), loc='upper left', bbox_to_anchor=(-1.5, -0.2), ncols=7)
-    elif numAxes == 4:
-        leg = ax.legend(by_label.values(), by_label.keys(), loc='upper left', bbox_to_anchor=(-1.5, -0.2), ncols=6)
-    else:
-        leg = ax.legend(by_label.values(), by_label.keys(), loc='upper left', bbox_to_anchor=(-1.28, -0.2), ncols=9)
-    for line in leg.get_lines():
-        line.set_linestyle('-')
-        line.set_linewidth(4)
-        if line.get_label() == 'from dense data':
-            line.set_linewidth(0)
-            line.set_color('k')
-            line.set_marker('$\u2736$')
-
-
+from add_legend import add_legend
 
 def assembleTimeSeries():
     """Visualize time series for Case A of the 11th SPE CSP"""
@@ -54,7 +19,7 @@ def assembleTimeSeries():
                     "as required by the CSP description."
     )
 
-    parser.add_argument('-g','--groups', nargs='+', help='names of groups, taking reported numbers', required=True)
+    parser.add_argument('-g','--groups', nargs='+', help='names of groups, taking reported numbers')
 
     parser.add_argument('-gf','--groupfolders', nargs='+', help='paths to group folders', required=False)
 
@@ -69,7 +34,10 @@ def assembleTimeSeries():
     parser.add_argument('-p','--percentiles', nargs='+', help='plot area between the two given percentiles')
 
     cmdArgs = vars(parser.parse_args())
-    groups = set(cmdArgs["groups"])
+    if cmdArgs["groups"]:
+        groups = set(cmdArgs["groups"])
+    else:
+        groups = set()
     groupFolders = cmdArgs["groupfolders"]
     folder = cmdArgs["folder"]
     calculatedAB = []
@@ -89,9 +57,7 @@ def assembleTimeSeries():
     groups = sorted(list(groups))
 
     font = {'size' : 10, 'family': 'DejaVu Sans'}
-#    print(sorted(matplotlib.font_manager.get_font_names()))
     matplotlib.rc('font', **font)
-#    plt.rcParams["mathtext.fontset"] = 'dejavusans'
     plt.rcParams['legend.title_fontsize'] = 'small'
     plt.rcParams['legend.fontsize'] = 'small'
 
@@ -127,6 +93,9 @@ def assembleTimeSeries():
     if calculatedC:
         convectionFromSpatialMapsFileName = os.path.join(tableFolder, 'spe11a_mC_from_spatial_maps.csv')
         convectionFromSpatialMaps = np.genfromtxt(convectionFromSpatialMapsFileName, delimiter=',', names=True)
+        tSpatialMaps = convectionFromSpatialMaps['time_s']/60/60
+        # project initial values to 1e-1 hours for improved visualization
+        tSpatialMaps[0] = 1e-1
 
     if cmdArgs["percentiles"]:
         p1PercentilesFileName = os.path.join(tableFolder, 'spe11a_p1_percentiles.csv')
@@ -328,7 +297,7 @@ def assembleTimeSeries():
     axsP[1].set_ylabel(r'pressure [bar]')
     axsP[1].yaxis.tick_right()
     axsP[1].yaxis.set_label_position('right')
-    addLegend(axsP[1])
+    add_legend(axsP[0])
 
     axsA[0, 0].set_title(r'Box A: mobile gaseous CO2')
     axsA[0, 0].set_ylabel(r'mass [g]')
@@ -357,8 +326,8 @@ def assembleTimeSeries():
     axsA[1, 1].yaxis.tick_right()
     axsA[1, 1].yaxis.set_label_position('right')
     if calculatedAB:
-        axsA[1, 1].plot([], [], ' ', label=r'from dense data')
-    addLegend(axsA[1, 1])
+        axsA[0, 0].plot([], [], ' ', label=r'from dense data')
+    add_legend(axsA[0, 0])
 
     axsB[0, 0].set_title(r'Box B: mobile gaseous CO2')
     axsB[0, 0].set_ylabel(r'mass [g]')
@@ -387,8 +356,8 @@ def assembleTimeSeries():
     axsB[1, 1].yaxis.tick_right()
     axsB[1, 1].yaxis.set_label_position('right')
     if calculatedAB:
-        axsB[1, 1].plot([], [], ' ', label=r'from dense data')
-    addLegend(axsB[1, 1])
+        axsB[0, 0].plot([], [], ' ', label=r'from dense data')
+    add_legend(axsB[0, 0])
 
     axsC.set_title(r'Box C: convection')
     axsC.set_xlabel(r'time [h]')
@@ -397,14 +366,14 @@ def assembleTimeSeries():
     axsC.set_xscale(r'log')
     if calculatedC:
         axsC.plot([], [], ' ', label=r'from dense data')
-    addLegend(axsC)
+    add_legend(axsC)
 
     axsT.set_title(r'CO2 in sealing units')
     axsT.set_xlabel(r'time [h]')
     axsT.set_ylabel(r'mass [g]')
     axsT.set_xlim(1e-1, 7260.0/60)
     axsT.set_xscale(r'log')
-    addLegend(axsT)
+    add_legend(axsT)
 
     axsPub[0, 0].set_title(r'sensor 1')
     axsPub[0, 0].set_xscale(r'log')
@@ -443,7 +412,7 @@ def assembleTimeSeries():
     axsPub[2, 1].yaxis.set_label_position('right')
     axsPub[2, 1].set_xlim((1e-1, 7260.0/60))
     axsPub[2, 1].set_xlabel(r'time [h]')
-    addLegend(axsPub[2, 1])
+    add_legend(axsPub[0, 0])
 
     figP.savefig('spe11a_time_series_pressure.png', bbox_inches='tight', dpi=300)
     figA.savefig('spe11a_time_series_boxA.png', bbox_inches='tight', dpi=300)
