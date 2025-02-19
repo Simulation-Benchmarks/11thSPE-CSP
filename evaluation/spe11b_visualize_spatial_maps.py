@@ -224,12 +224,12 @@ def visualizeSpatialMaps():
             plotColorMesh(fig, x, y, 1e-5*p, 0, "pressure [bar]", pRows, pCols)
             plotColorMesh(fig, x, y, s, 1, "gas saturation [-]", pRows, pCols, cmap)
             # scale mass fractions to g/kg
-            plotColorMesh(fig, x, y, 1e3*mCO2, 2, "CO2 mass frac in liquid [g/kg]", pRows, pCols, cmap)
+            plotColorMesh(fig, x, y, 1e3*mCO2, 2, "CO$_2$ mass frac in liquid [g/kg]", pRows, pCols, cmap)
             plotColorMesh(fig, x, y, 1e3*mH2O, 3, "H2O mass frac in gas [g/kg]", pRows, pCols, 'icefire')
             plotColorMesh(fig, x, y, rhoG, 4, "gas phase density [kg/m3]", pRows, pCols, 'icefire')
             plotColorMesh(fig, x, y, rhoL, 5, "liquid phase density [kg/m3]", pRows, pCols, 'icefire')
             # scale mass to tons
-            plotColorMesh(fig, x, y, 1e-3*tmCO2, 6, "total CO2 mass [t]", pRows, pCols, cmap)
+            plotColorMesh(fig, x, y, 1e-3*tmCO2, 6, "total CO$_2$ mass [t]", pRows, pCols, cmap)
             plotColorMesh(fig, x, y, temp, 7, "temperature [°C]", pRows, pCols, 'coolwarm')
         else:
             # scale pressure to bars
@@ -253,7 +253,7 @@ def visualizeSpatialMaps():
         figP.savefig(f'spe11b_pressure_{time}y.png', bbox_inches='tight', dpi=300)
         figS.suptitle(f'gas saturation [-] at {time} years')
         figS.savefig(f'spe11b_saturation_{time}y.png', bbox_inches='tight', dpi=300)
-        figMCO2.suptitle(f'CO2 mass fraction in liquid [g/kg] at {time} years')
+        figMCO2.suptitle(f'CO$_2$ mass fraction in liquid [g/kg] at {time} years')
         figMCO2.savefig(f'spe11b_mco2_{time}y.png', bbox_inches='tight', dpi=300)
         figMH2O.suptitle(f'H2O mass fraction in gas [g/kg] at {time} years')
         figMH2O.savefig(f'spe11b_mh2o_{time}y.png', bbox_inches='tight', dpi=300)
@@ -261,7 +261,7 @@ def visualizeSpatialMaps():
         figRhoG.savefig(f'spe11b_rhog_{time}y.png', bbox_inches='tight', dpi=300)
         figRhoL.suptitle(f'liquid phase density [kg/m3] at {time} years')
         figRhoL.savefig(f'spe11b_rhol_{time}y.png', bbox_inches='tight', dpi=300)
-        figTmCO2.suptitle(f'                          total CO2 mass [t] at {time} years')
+        figTmCO2.suptitle(f'                          total CO$_2$ mass [t] at {time} years')
         figTmCO2.savefig(f'spe11b_tmco2_{time}y.png', bbox_inches='tight', dpi=300)
         figTemp.suptitle(f'                           temperature [°C] at {time} years')
         figTemp.savefig(f'spe11b_temp_{time}y.png', bbox_inches='tight', dpi=300)

@@ -154,9 +154,9 @@ def visualizePerformanceSpatialMaps():
         if len(groups) == 1:
             plotColorMesh(fig, x, y, 1e6*cvol, 0, r"cell volume [cm$^3$]", pRows, pCols)
             plotColorMesh(fig, x, y, arat, 1, "aspect ratio [-]", pRows, pCols)
-            plotColorMesh(fig, x, y, co2_max_norm_res, 2, "CO2 maximum normalized residual [-]", pRows, pCols)
+            plotColorMesh(fig, x, y, co2_max_norm_res, 2, "CO$_2$ maximum normalized residual [-]", pRows, pCols)
             plotColorMesh(fig, x, y, h2o_max_norm_res, 3, "H2O maximum normalized residual [-]", pRows, pCols)
-            plotColorMesh(fig, x, y, co2_mb_error, 4, "CO2 mass-balance error [-]", pRows, pCols)
+            plotColorMesh(fig, x, y, co2_mb_error, 4, "CO$_2$ mass-balance error [-]", pRows, pCols)
             plotColorMesh(fig, x, y, h2o_mb_error, 5, "H2O mass-balance error [-]", pRows, pCols)
             plotColorMesh(fig, x, y, post_est, 6, "a posteriori error estimate [-]", pRows, pCols)
         else:
@@ -176,9 +176,9 @@ def visualizePerformanceSpatialMaps():
     else:
         figCVol.suptitle(r'cell volume [cm$^3$] at' + f' {time} hours')
         figARat.suptitle(f'aspect ratio [-] at {time} hours')
-        figCO2MNR.suptitle(f'CO2 maximum normalized residual [-] at {time} hours')
+        figCO2MNR.suptitle(f'CO$_2$ maximum normalized residual [-] at {time} hours')
         figH2OMNR.suptitle(f'H2O maximum normalized residual [-] at {time} hours')
-        figCO2MBE.suptitle(f'CO2 mass-balance error [-] at {time} hours')
+        figCO2MBE.suptitle(f'CO$_2$ mass-balance error [-] at {time} hours')
         figH2OMBE.suptitle(f'H2O mass-balance error [-] at {time} hours')
         figPostEst.suptitle(f'a posteriori error estimate [-] at {time} hours')
 

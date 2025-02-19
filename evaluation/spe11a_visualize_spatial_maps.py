@@ -214,12 +214,12 @@ def visualizeSpatialMaps():
             plotColorMesh(fig, x, y, 1e-5*p, 0, "pressure [bar]", pRows, pCols)
             plotColorMesh(fig, x, y, s, 1, "gas saturation [-]", pRows, pCols, cmap)
             # scale mass fractions to g/kg
-            plotColorMesh(fig, x, y, 1e3*mCO2, 2, "CO2 mass frac in liquid [g/kg]", pRows, pCols, cmap)
+            plotColorMesh(fig, x, y, 1e3*mCO2, 2, "CO$_2$ mass frac in liquid [g/kg]", pRows, pCols, cmap)
             plotColorMesh(fig, x, y, 1e3*mH2O, 3, "H2O mass frac in gas [g/kg]", pRows, pCols, 'icefire')
             plotColorMesh(fig, x, y, rhoG, 4, "gas phase density [kg/m3]", pRows, pCols, 'icefire')
             plotColorMesh(fig, x, y, rhoL, 5, "liquid phase density [kg/m3]", pRows, pCols, 'icefire')
             # scale mass to grams
-            plotColorMesh(fig, x, y, 1e3*tmCO2, 6, "total CO2 mass [g]", pRows, pCols, cmap)
+            plotColorMesh(fig, x, y, 1e3*tmCO2, 6, "total CO$_2$ mass [g]", pRows, pCols, cmap)
         else:
             # scale pressure to bars
             plotColorMesh(figP, x, y, 1e-5*p, i, group, pRows, pCols, 'viridis', 1.1, 1.22)
@@ -240,11 +240,11 @@ def visualizeSpatialMaps():
     else:
         figP.suptitle(f'pressure [bar] at {time} hours')
         figS.suptitle(f'gas saturation [-] at {time} hours')
-        figMCO2.suptitle(f'CO2 mass fraction in liquid [g/kg] at {time} hours')
+        figMCO2.suptitle(f'CO$_2$ mass fraction in liquid [g/kg] at {time} hours')
         figMH2O.suptitle(f'H2O mass fraction in gas [g/kg] at {time} hours')
         figRhoG.suptitle(f'gas phase density [kg/m3] at {time} hours')
         figRhoL.suptitle(f'liquid phase density [kg/m3] at {time} hours')
-        figTmCO2.suptitle(f'                          total CO2 mass [g] at {time} hours')
+        figTmCO2.suptitle(f'                          total CO$_2$ mass [g] at {time} hours')
 
         figP.savefig(f'spe11a_pressure_{time}h.png', bbox_inches='tight', dpi=300)
         figS.savefig(f'spe11a_saturation_{time}h.png', bbox_inches='tight', dpi=300)

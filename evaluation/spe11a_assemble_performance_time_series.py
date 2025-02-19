@@ -9,7 +9,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 from groups_and_colors import groups_and_colors
 from is_notebook import is_notebook
-from add_legend import add_legend
+import utils
 
 def assemblePerformanceTimeSeries():
     """Visualize performance time series for Case A of the 11th SPE CSP"""
@@ -37,10 +37,7 @@ def assemblePerformanceTimeSeries():
         groups = groups.union(detailed)
     groups = sorted(list(groups))
 
-    font = {'size' : 10, 'family': 'DejaVu Sans'}
-    matplotlib.rc('font', **font)
-    plt.rcParams['legend.title_fontsize'] = 'small'
-    plt.rcParams['legend.fontsize'] = 'small'
+    utils.set_fonts()
 
     figT, axsT = plt.subplots(figsize=(5, 3))
     figF, axsF = plt.subplots(figsize=(5, 3))
@@ -99,7 +96,7 @@ def assemblePerformanceTimeSeries():
         axsT.plot(t, dtAvg, label=label, color=color, linestyle=ls)
         axsPub[0, 0].plot(t, dtAvg, label=label, color=color, linestyle=ls)
         axsF.plot(t, np.cumsum(csvData[:, 2]), label=label, color=color, linestyle=ls)
-        axsM.plot(t, 1e3*csvData[:, 3], label=label, color=color, linestyle=ls)
+        axsM.plot(t, csvData[:, 3], label=label, color=color, linestyle=ls)
         axsD.plot(t, csvData[:, 4], label=label, color=color, linestyle=ls)
         axsN.plot(t, np.cumsum(csvData[:, 5]), label=label, color=color, linestyle=ls)
         axsPub[1, 0].plot(t, np.cumsum(csvData[:, 5]), label=label, color=color, linestyle=ls)
@@ -115,78 +112,78 @@ def assemblePerformanceTimeSeries():
     axsT.set_ylabel(r'step size [s]')
     axsT.set_xscale('log')
     axsT.set_yscale('log')
-    axsT.set_xlim((9e-2, 2e2))
-    axsT.set_ylim((1e-2, 1e3))
-    add_legend(axsT)
+    axsT.set_xlim((9e-2, 1.2e2))
+    utils.add_legend(axsT)
 
     axsF.set_title(r'acc number of failed time steps')
     axsF.set_xlabel(r'time [h]')
     axsF.set_ylabel(r'failed steps [-]')
     axsF.set_xscale('log')
     axsF.set_yscale('log')
-    axsF.set_xlim((9e-2, 2e2))
-    add_legend(axsF)
+    axsF.set_xlim((9e-2, 1.2e2))
+    utils.add_legend(axsF)
 
     axsM.set_title(r'mass balance')
     axsM.set_xlabel(r'time [h]')
-    axsM.set_ylabel(r'mass [g]')
+    axsM.set_ylabel(r'mass [kg]')
     axsM.set_xscale('log')
-    axsM.set_xlim((9e-2, 2e2))
-    add_legend(axsM)
+    axsM.set_xlim((9e-2, 1.2e2))
+    utils.add_legend(axsM)
 
     axsD.set_title(r'avg degrees of freedom')
     axsD.set_xlabel(r'time [h]')
     axsD.set_ylabel(r'dof [-]')
     axsD.set_xscale('log')
     axsD.set_yscale('log')
-    axsD.set_xlim((9e-2, 2e2))
+    axsD.set_xlim((9e-2, 1.2e2))
     axsD.set_ylim((1e4, 1e7))
-    add_legend(axsD)
+    utils.add_legend(axsD)
 
     axsN.set_title(r'acc number of nonlinear iterations')
     axsN.set_xlabel(r'time [h]')
     axsN.set_ylabel(r'nonlinear iterations [-]')
     axsN.set_xscale('log')
     axsN.set_yscale('log')
-    axsN.set_xlim((9e-2, 2e2))
-    add_legend(axsN)
+    axsN.set_xlim((9e-2, 1.2e2))
+    utils.add_legend(axsN)
 
     axsR.set_title(r'acc number of local residual evaluations')
     axsR.set_xlabel(r'time [h]')
     axsR.set_ylabel(r'residual evaluations [-]')
     axsR.set_xscale('log')
     axsR.set_yscale('log')
-    axsR.set_xlim((9e-2, 2e2))
-    add_legend(axsR)
+    axsR.set_xlim((9e-2, 1.2e2))
+    utils.add_legend(axsR)
 
     axsL.set_title(r'acc number of linear iterations')
     axsL.set_xlabel(r'time [h]')
     axsL.set_ylabel(r'linear iterations [-]')
     axsL.set_xscale('log')
     axsL.set_yscale('log')
-    axsL.set_xlim((9e-2, 2e2))
-    add_legend(axsL)
+    axsL.set_xlim((9e-2, 1.2e2))
+    utils.add_legend(axsL)
 
     axsRT[0].set_title(r'acc runtime')
     axsRT[0].set_xlabel(r'time [h]')
     axsRT[0].set_ylabel(r'runtime [s]')
     axsRT[0].set_xscale('log')
     axsRT[0].set_yscale('log')
-    axsRT[0].set_xlim((9e-2, 2e2))
+    axsRT[0].set_xlim((9e-2, 1.2e2))
     axsRT[1].set_title(r'acc time spent in linear solver')
     axsRT[1].set_xlabel(r'time [h]')
     axsRT[1].set_ylabel(r'runtime [s]')
     axsRT[1].set_xscale('log')
     axsRT[1].set_yscale('log')
-    axsRT[1].set_xlim((9e-2, 2e2))
-    add_legend(axsRT[0])
+    axsRT[1].yaxis.tick_right()
+    axsRT[1].yaxis.set_label_position('right')
+    axsRT[1].set_xlim((9e-2, 1.2e2))
+    utils.add_legend(axsRT[0])
 
     axsPub[0, 0].set_title(r'avg time step size')
     axsPub[0, 0].set_ylabel(r'step size [s]')
     axsPub[0, 0].set_xscale('log')
     axsPub[0, 0].set_yscale('log')
     axsPub[0, 0].set_xlim([1e-1, 1.2e2])
-    axsPub[0, 0].set_ylim([1e-2, 1e3])
     axsPub[0, 0].set_xticklabels([])
     axsPub[0, 1].set_title(r'acc runtime')
     axsPub[0, 1].set_ylabel(r'runtime [s]')
@@ -210,7 +207,7 @@ def assemblePerformanceTimeSeries():
     axsPub[1, 1].set_xlim([1e-1, 1.2e2])
     axsPub[1, 1].yaxis.tick_right()
     axsPub[1, 1].yaxis.set_label_position('right')
-    add_legend(axsPub[0, 0])
+    utils.add_legend(axsPub[0, 0])
 
     figT.savefig(f'spe11a_time_series_tstep.png', bbox_inches='tight', dpi=300)
     figF.savefig(f'spe11a_time_series_fsteps.png', bbox_inches='tight', dpi=300)

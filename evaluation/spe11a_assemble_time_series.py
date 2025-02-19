@@ -9,7 +9,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 from groups_and_colors import groups_and_colors
 from is_notebook import is_notebook
-from add_legend import add_legend
+import utils
 
 def assembleTimeSeries():
     """Visualize time series for Case A of the 11th SPE CSP"""
@@ -56,10 +56,7 @@ def assembleTimeSeries():
         tableFolder = cmdArgs["tablefolder"]
     groups = sorted(list(groups))
 
-    font = {'size' : 10, 'family': 'DejaVu Sans'}
-    matplotlib.rc('font', **font)
-    plt.rcParams['legend.title_fontsize'] = 'small'
-    plt.rcParams['legend.fontsize'] = 'small'
+    utils.set_fonts()
 
     figP, axsP = plt.subplots(1, 2, figsize=(9, 3))
     figA, axsA = plt.subplots(2, 2, figsize=(9, 6))
@@ -101,40 +98,40 @@ def assembleTimeSeries():
         p1PercentilesFileName = os.path.join(tableFolder, 'spe11a_p1_percentiles.csv')
         p1Percentiles = np.genfromtxt(p1PercentilesFileName, delimiter=',', names=True)
         tPercentiles = p1Percentiles['time_s']/60/60
-        axsP[0].fill_between(tPercentiles, 1e-5*p1Percentiles[f'P{lowerPercentile}_Pa'], 1e-5*p1Percentiles[f'P{upperPercentile}_Pa'], color='lightgray', label=f'[P{lowerPercentile}, P{upperPercentile}]')
+        axsP[0].fill_between(tPercentiles, p1Percentiles[f'P{lowerPercentile}_Pa'], p1Percentiles[f'P{upperPercentile}_Pa'], color='lightgray', label=f'[P{lowerPercentile}, P{upperPercentile}]')
         p2PercentilesFileName = os.path.join(tableFolder, 'spe11a_p2_percentiles.csv')
         p2Percentiles = np.genfromtxt(p2PercentilesFileName, delimiter=',', names=True)
-        axsP[1].fill_between(tPercentiles, 1e-5*p2Percentiles[f'P{lowerPercentile}_Pa'], 1e-5*p2Percentiles[f'P{upperPercentile}_Pa'], color='lightgray', label=f'[P{lowerPercentile}, P{upperPercentile}]')
+        axsP[1].fill_between(tPercentiles, p2Percentiles[f'P{lowerPercentile}_Pa'], p2Percentiles[f'P{upperPercentile}_Pa'], color='lightgray', label=f'[P{lowerPercentile}, P{upperPercentile}]')
         mobAPercentilesFileName = os.path.join(tableFolder, 'spe11a_mobA_percentiles.csv')
         mobAPercentiles = np.genfromtxt(mobAPercentilesFileName, delimiter=',', names=True)
-        axsA[0, 0].fill_between(tPercentiles, 1e3*mobAPercentiles[f'P{lowerPercentile}_kg'], 1e3*mobAPercentiles[f'P{upperPercentile}_kg'], color='lightgray', label=f'[P{lowerPercentile}, P{upperPercentile}]')
+        axsA[0, 0].fill_between(tPercentiles, mobAPercentiles[f'P{lowerPercentile}_kg'], mobAPercentiles[f'P{upperPercentile}_kg'], color='lightgray', label=f'[P{lowerPercentile}, P{upperPercentile}]')
         immAPercentilesFileName = os.path.join(tableFolder, 'spe11a_immA_percentiles.csv')
         immAPercentiles = np.genfromtxt(immAPercentilesFileName, delimiter=',', names=True)
-        axsA[0, 1].fill_between(tPercentiles, 1e3*immAPercentiles[f'P{lowerPercentile}_kg'], 1e3*immAPercentiles[f'P{upperPercentile}_kg'], color='lightgray', label=f'[P{lowerPercentile}, P{upperPercentile}]')
+        axsA[0, 1].fill_between(tPercentiles, immAPercentiles[f'P{lowerPercentile}_kg'], immAPercentiles[f'P{upperPercentile}_kg'], color='lightgray', label=f'[P{lowerPercentile}, P{upperPercentile}]')
         dissAPercentilesFileName = os.path.join(tableFolder, 'spe11a_dissA_percentiles.csv')
         dissAPercentiles = np.genfromtxt(dissAPercentilesFileName, delimiter=',', names=True)
-        axsA[1, 0].fill_between(tPercentiles, 1e3*dissAPercentiles[f'P{lowerPercentile}_kg'], 1e3*dissAPercentiles[f'P{upperPercentile}_kg'], color='lightgray', label=f'[P{lowerPercentile}, P{upperPercentile}]')
+        axsA[1, 0].fill_between(tPercentiles, dissAPercentiles[f'P{lowerPercentile}_kg'], dissAPercentiles[f'P{upperPercentile}_kg'], color='lightgray', label=f'[P{lowerPercentile}, P{upperPercentile}]')
         sealAPercentilesFileName = os.path.join(tableFolder, 'spe11a_sealA_percentiles.csv')
         sealAPercentiles = np.genfromtxt(sealAPercentilesFileName, delimiter=',', names=True)
-        axsA[1, 1].fill_between(tPercentiles, 1e3*sealAPercentiles[f'P{lowerPercentile}_kg'], 1e3*sealAPercentiles[f'P{upperPercentile}_kg'], color='lightgray', label=f'[P{lowerPercentile}, P{upperPercentile}]')
+        axsA[1, 1].fill_between(tPercentiles, sealAPercentiles[f'P{lowerPercentile}_kg'], sealAPercentiles[f'P{upperPercentile}_kg'], color='lightgray', label=f'[P{lowerPercentile}, P{upperPercentile}]')
         mobBPercentilesFileName = os.path.join(tableFolder, 'spe11a_mobB_percentiles.csv')
         mobBPercentiles = np.genfromtxt(mobBPercentilesFileName, delimiter=',', names=True)
-        axsB[0, 0].fill_between(tPercentiles, 1e3*mobBPercentiles[f'P{lowerPercentile}_kg'], 1e3*mobBPercentiles[f'P{upperPercentile}_kg'], color='lightgray', label=f'[P{lowerPercentile}, P{upperPercentile}]')
+        axsB[0, 0].fill_between(tPercentiles, mobBPercentiles[f'P{lowerPercentile}_kg'], mobBPercentiles[f'P{upperPercentile}_kg'], color='lightgray', label=f'[P{lowerPercentile}, P{upperPercentile}]')
         immBPercentilesFileName = os.path.join(tableFolder, 'spe11a_immB_percentiles.csv')
         immBPercentiles = np.genfromtxt(immBPercentilesFileName, delimiter=',', names=True)
-        axsB[0, 1].fill_between(tPercentiles, 1e3*immBPercentiles[f'P{lowerPercentile}_kg'], 1e3*immBPercentiles[f'P{upperPercentile}_kg'], color='lightgray', label=f'[P{lowerPercentile}, P{upperPercentile}]')
+        axsB[0, 1].fill_between(tPercentiles, immBPercentiles[f'P{lowerPercentile}_kg'], immBPercentiles[f'P{upperPercentile}_kg'], color='lightgray', label=f'[P{lowerPercentile}, P{upperPercentile}]')
         dissBPercentilesFileName = os.path.join(tableFolder, 'spe11a_dissB_percentiles.csv')
         dissBPercentiles = np.genfromtxt(dissBPercentilesFileName, delimiter=',', names=True)
-        axsB[1, 0].fill_between(tPercentiles, 1e3*dissBPercentiles[f'P{lowerPercentile}_kg'], 1e3*dissBPercentiles[f'P{upperPercentile}_kg'], color='lightgray', label=f'[P{lowerPercentile}, P{upperPercentile}]')
+        axsB[1, 0].fill_between(tPercentiles, dissBPercentiles[f'P{lowerPercentile}_kg'], dissBPercentiles[f'P{upperPercentile}_kg'], color='lightgray', label=f'[P{lowerPercentile}, P{upperPercentile}]')
         sealBPercentilesFileName = os.path.join(tableFolder, 'spe11a_sealB_percentiles.csv')
         sealBPercentiles = np.genfromtxt(sealBPercentilesFileName, delimiter=',', names=True)
-        axsB[1, 1].fill_between(tPercentiles, 1e3*sealBPercentiles[f'P{lowerPercentile}_kg'], 1e3*sealBPercentiles[f'P{upperPercentile}_kg'], color='lightgray', label=f'[P{lowerPercentile}, P{upperPercentile}]')
+        axsB[1, 1].fill_between(tPercentiles, sealBPercentiles[f'P{lowerPercentile}_kg'], sealBPercentiles[f'P{upperPercentile}_kg'], color='lightgray', label=f'[P{lowerPercentile}, P{upperPercentile}]')
         mCPercentilesFileName = os.path.join(tableFolder, 'spe11a_mC_percentiles.csv')
         mCPercentiles = np.genfromtxt(mCPercentilesFileName, delimiter=',', names=True)
         axsC.fill_between(tPercentiles, mCPercentiles[f'P{lowerPercentile}_m'], mCPercentiles[f'P{upperPercentile}_m'], color='lightgray', label=f'[P{lowerPercentile}, P{upperPercentile}]')
         sealTotPercentilesFileName = os.path.join(tableFolder, 'spe11a_sealTot_percentiles.csv')
         sealTotPercentiles = np.genfromtxt(sealTotPercentilesFileName, delimiter=',', names=True)
-        axsT.fill_between(tPercentiles, 1e3*sealTotPercentiles[f'P{lowerPercentile}_kg'], 1e3*sealTotPercentiles[f'P{upperPercentile}_kg'], color='lightgray', label=f'[P{lowerPercentile}, P{upperPercentile}]')
+        axsT.fill_between(tPercentiles, sealTotPercentiles[f'P{lowerPercentile}_kg'], sealTotPercentiles[f'P{upperPercentile}_kg'], color='lightgray', label=f'[P{lowerPercentile}, P{upperPercentile}]')
 
     for i, group in zip(range(len(groups)), groups):
         color = f'C{i}'
@@ -173,98 +170,96 @@ def assembleTimeSeries():
         csvData = np.genfromtxt(fileName, delimiter=delimiter, skip_header=skip_header)
         t = csvData[:, 0]/60/60
 
-        # scale pressure to bars
         if np.isnan(csvData[:, 1]).all():
             print(f'{group} only reported nan for p1.')
         elif all(val < 0 for val in csvData[:, 1]):
             print(f'{group} only reported negative values for p1.')
         else:
-            axsP[0].plot(t, 1e-5*csvData[:, 1], label=label, color=color, linestyle=ls)
-            axsPub[0, 0].plot(t, 1e-5*csvData[:, 1], label=label, color=color, linestyle=ls)
+            axsP[0].plot(t, csvData[:, 1], label=label, color=color, linestyle=ls)
+            axsPub[0, 0].plot(t, csvData[:, 1], label=label, color=color, linestyle=ls)
         if np.isnan(csvData[:, 2]).all():
             print(f'{group} only reported nan for p2.')
         elif all(val < 0 for val in csvData[:, 2]):
             print(f'{group} only reported negative values for p2.')
         else:
-            axsP[1].plot(t, 1e-5*csvData[:, 2], label=label, color=color, linestyle=ls)
+            axsP[1].plot(t, csvData[:, 2], label=label, color=color, linestyle=ls)
 
-        # scale mass to grams
         if group in calculatedAB:
             columnName = group.lower().replace('-', '')
-            axsA[0, 0].plot(tSpatialMaps, 1e3*mobileFromSpatialMapsA[columnName], label=label+ '\u2736', color=color, linestyle=ls)
-            axsPub[1, 0].plot(tSpatialMaps, 1e3*mobileFromSpatialMapsA[columnName], label=label, color=color, linestyle=ls)
-            axsA[0, 1].plot(tSpatialMaps, 1e3*immobileFromSpatialMapsA[columnName], label=label+ '\u2736', color=color, linestyle=ls)
-            axsA[1, 0].plot(tSpatialMaps, 1e3*dissolvedFromSpatialMapsA[columnName], label=label+ '\u2736', color=color, linestyle=ls)
-            axsPub[1, 1].plot(tSpatialMaps, 1e3*dissolvedFromSpatialMapsA[columnName], label=label, color=color, linestyle=ls)
-            axsA[1, 1].plot(tSpatialMaps, 1e3*sealFromSpatialMapsA[columnName], label=label + '\u2736', color=color, linestyle=ls)
+            axsA[0, 0].plot(tSpatialMaps, mobileFromSpatialMapsA[columnName], label=label+'*', color=color, linestyle=ls)
+            axsPub[1, 0].plot(tSpatialMaps, mobileFromSpatialMapsA[columnName], label=label, color=color, linestyle=ls)
+            axsA[0, 1].plot(tSpatialMaps, immobileFromSpatialMapsA[columnName], label=label+'*', color=color, linestyle=ls)
+            axsA[1, 0].plot(tSpatialMaps, dissolvedFromSpatialMapsA[columnName], label=label+'*', color=color, linestyle=ls)
+            axsPub[1, 1].plot(tSpatialMaps, dissolvedFromSpatialMapsA[columnName], label=label, color=color, linestyle=ls)
+            axsA[1, 1].plot(tSpatialMaps, sealFromSpatialMapsA[columnName], label=label +'*', color=color, linestyle=ls)
         else:
             if np.isnan(csvData[:, 3]).all():
                 print(f'{group} only reported nan for mobA.')
             elif all(val < 0 for val in csvData[:, 3]):
                 print(f'{group} only reported negative values for mobA.')
             else:
-                axsA[0, 0].plot(t, 1e3*csvData[:, 3], label=label, color=color, linestyle=ls)
-                axsPub[1, 0].plot(t, 1e3*csvData[:, 3], label=label, color=color, linestyle=ls)
+                axsA[0, 0].plot(t, csvData[:, 3], label=label, color=color, linestyle=ls)
+                axsPub[1, 0].plot(t, csvData[:, 3], label=label, color=color, linestyle=ls)
             if np.isnan(csvData[:, 4]).all():
                 print(f'{group} only reported nan for immA.')
             elif all(val < 0 for val in csvData[:, 4]):
                 print(f'{group} only reported negative values for immA.')
             else:
-                axsA[0, 1].plot(t, 1e3*csvData[:, 4], label=label, color=color, linestyle=ls)
+                axsA[0, 1].plot(t, csvData[:, 4], label=label, color=color, linestyle=ls)
             if np.isnan(csvData[:, 5]).all():
                 print(f'{group} only reported nan for dissA.')
             elif all(val < 0 for val in csvData[:, 5]):
                 print(f'{group} only reported negative values for dissA.')
             else:
-                axsA[1, 0].plot(t, 1e3*csvData[:, 5], label=label, color=color, linestyle=ls)
-                axsPub[1, 1].plot(t, 1e3*csvData[:, 5], label=label, color=color, linestyle=ls)
+                axsA[1, 0].plot(t, csvData[:, 5], label=label, color=color, linestyle=ls)
+                axsPub[1, 1].plot(t, csvData[:, 5], label=label, color=color, linestyle=ls)
             if np.isnan(csvData[:, 6]).all():
                 print(f'{group} only reported nan for sealA.')
             elif all(val < 0 for val in csvData[:, 6]):
                 print(f'{group} only reported negative values for sealA.')
             else:
-                axsA[1, 1].plot(t, 1e3*csvData[:, 6], label=label, color=color, linestyle=ls)
+                axsA[1, 1].plot(t, csvData[:, 6], label=label, color=color, linestyle=ls)
             # detect if immobile CO2 has been evaluated wrong potentially
-            if max(1e3*csvData[:, 4]) > 0.05:
+            if max(csvData[:, 4]) > 0.05e-3:
                 print(f"{group} potentially used inconsistent evaluation of immobile CO2.")
 
         if group in calculatedAB:
             columnName = group.lower().replace('-', '')
-            axsB[0, 0].plot(tSpatialMaps, 1e3*mobileFromSpatialMapsB[columnName], label=label+ '\u2736', color=color, linestyle=ls)
-            axsPub[2, 0].plot(tSpatialMaps, 1e3*mobileFromSpatialMapsB[columnName], label=label, color=color, linestyle=ls)
-            axsB[0, 1].plot(tSpatialMaps, 1e3*immobileFromSpatialMapsB[columnName], label=label+ '\u2736', color=color, linestyle=ls)
-            axsB[1, 0].plot(tSpatialMaps, 1e3*dissolvedFromSpatialMapsB[columnName], label=label+ '\u2736', color=color, linestyle=ls)
-            axsB[1, 1].plot(tSpatialMaps, 1e3*sealFromSpatialMapsB[columnName], label=label+ '\u2736', color=color, linestyle=ls)
+            axsB[0, 0].plot(tSpatialMaps, mobileFromSpatialMapsB[columnName], label=label+'*', color=color, linestyle=ls)
+            axsPub[2, 0].plot(tSpatialMaps, mobileFromSpatialMapsB[columnName], label=label, color=color, linestyle=ls)
+            axsB[0, 1].plot(tSpatialMaps, immobileFromSpatialMapsB[columnName], label=label+'*', color=color, linestyle=ls)
+            axsB[1, 0].plot(tSpatialMaps, dissolvedFromSpatialMapsB[columnName], label=label+'*', color=color, linestyle=ls)
+            axsB[1, 1].plot(tSpatialMaps, sealFromSpatialMapsB[columnName], label=label+'*', color=color, linestyle=ls)
         else:
             if np.isnan(csvData[:, 7]).all():
                 print(f'{group} only reported nan for mobB.')
             elif all(val < 0 for val in csvData[:, 7]):
                 print(f'{group} only reported negative values for mobB.')
             else:
-                axsB[0, 0].plot(t, 1e3*csvData[:, 7], label=label, color=color, linestyle=ls)
-                axsPub[2, 0].plot(t, 1e3*csvData[:, 7], label=label, color=color, linestyle=ls)
+                axsB[0, 0].plot(t, csvData[:, 7], label=label, color=color, linestyle=ls)
+                axsPub[2, 0].plot(t, csvData[:, 7], label=label, color=color, linestyle=ls)
             if np.isnan(csvData[:, 8]).all():
                 print(f'{group} only reported nan for immB.')
             elif all(val < 0 for val in csvData[:, 8]):
                 print(f'{group} only reported negative values for immB.')
             else:
-                axsB[0, 1].plot(t, 1e3*csvData[:, 8], label=label, color=color, linestyle=ls)
+                axsB[0, 1].plot(t, csvData[:, 8], label=label, color=color, linestyle=ls)
             if np.isnan(csvData[:, 9]).all():
                 print(f'{group} only reported nan for dissB.')
             elif all(val < 0 for val in csvData[:, 9]):
                 print(f'{group} only reported negative values for dissB.')
             else:
-                axsB[1, 0].plot(t, 1e3*csvData[:, 9], label=label, color=color, linestyle=ls)
+                axsB[1, 0].plot(t, csvData[:, 9], label=label, color=color, linestyle=ls)
             if np.isnan(csvData[:, 10]).all():
                 print(f'{group} only reported nan for sealB.')
             elif all(val < 0 for val in csvData[:, 10]):
                 print(f'{group} only reported negative values for sealB.')
             else:
-                axsB[1, 1].plot(t, 1e3*csvData[:, 10], label=label, color=color, linestyle=ls)
+                axsB[1, 1].plot(t, csvData[:, 10], label=label, color=color, linestyle=ls)
 
         if group in calculatedC:
             columnName = group.lower().replace('-', '')
-            axsC.plot(tSpatialMaps, convectionFromSpatialMaps[columnName], label=label+ '\u2736', color=color, linestyle=ls)
+            axsC.plot(tSpatialMaps, convectionFromSpatialMaps[columnName], label=label+'*', color=color, linestyle=ls)
             axsPub[2, 1].plot(tSpatialMaps, convectionFromSpatialMaps[columnName], label=label, color=color, linestyle=ls)
         else:
             if np.isnan(csvData[:, 11]).all():
@@ -275,89 +270,84 @@ def assembleTimeSeries():
                 axsC.plot(t, csvData[:, 11], label=label, color=color, linestyle=ls)
                 axsPub[2, 1].plot(t, csvData[:, 11], label=label, color=color, linestyle=ls)
 
-        # scale mass to grams
         if np.isnan(csvData[:, 12]).all():
             print(f'{group} only reported nan for sealTot.')
         elif all(val < 0 for val in csvData[:, 12]):
             print(f'{group} only reported negative values for sealTot.')
         else:
-            axsT.plot(t, 1e3*csvData[:, 12], label=label, color=color, linestyle=ls)
-            axsPub[0, 1].plot(t, 1e3*csvData[:, 12], label=label, color=color, linestyle=ls)
+            axsT.plot(t, csvData[:, 12], label=label, color=color, linestyle=ls)
+            axsPub[0, 1].plot(t, csvData[:, 12], label=label, color=color, linestyle=ls)
 
-    axsP[0].set_title(r'sensor 1')
+    axsP[0].set_title(r'POP 1')
     axsP[0].set_xlabel(r'time [h]')
-    axsP[0].set_ylabel(r'pressure [bar]')
+    axsP[0].set_ylabel(r'pressure [Pa]')
     axsP[0].set_xlim(1e-1, 7260.0/60)
-    axsP[0].set_ylim(1.15, 1.18)
+    axsP[0].set_ylim(1.15e5, 1.18e5)
     axsP[0].set_xscale(r'log')
-    axsP[1].set_title(r'sensor 2')
+    axsP[1].set_title(r'POP 2')
     axsP[1].set_xlabel(r'time [h]')
     axsP[1].set_xlim(1e-1, 7260.0/60)
     axsP[1].set_xscale(r'log')
-    axsP[1].set_ylabel(r'pressure [bar]')
+    axsP[1].set_ylabel(r'pressure [Pa]')
     axsP[1].yaxis.tick_right()
     axsP[1].yaxis.set_label_position('right')
-    add_legend(axsP[0])
+    utils.add_legend(axsP[0])
 
-    axsA[0, 0].set_title(r'Box A: mobile gaseous CO2')
-    axsA[0, 0].set_ylabel(r'mass [g]')
+    axsA[0, 0].set_title(r'Box A: mobile gaseous CO$_2$')
+    axsA[0, 0].set_ylabel(r'mass [kg]')
     axsA[0, 0].set_xlim(1e-1, 7260.0/60)
-    axsA[0, 0].set_xticklabels([])
     axsA[0, 0].set_xscale(r'log')
     axsA[0, 0].set_xticklabels([])
-    axsA[0, 1].set_title(r'Box A: immobile gaseous CO2')
+    axsA[0, 1].set_title(r'Box A: immobile gaseous CO$_2$')
     axsA[0, 1].set_xlim(1e-1, 7260.0/60)
-    axsA[0, 1].set_xticklabels([])
     axsA[0, 1].set_xscale(r'log')
-    axsA[0, 1].set_ylabel(r'mass [g]')
+    axsA[0, 1].set_ylabel(r'mass [kg]')
     axsA[0, 1].yaxis.tick_right()
     axsA[0, 1].yaxis.set_label_position('right')
     axsA[0, 1].set_xticklabels([])
-    axsA[1, 0].set_title(r'Box A: dissolved CO2')
+    axsA[1, 0].set_title(r'Box A: dissolved CO$_2$')
     axsA[1, 0].set_xlabel(r'time [h]')
-    axsA[1, 0].set_ylabel(r'mass [g]')
+    axsA[1, 0].set_ylabel(r'mass [kg]')
     axsA[1, 0].set_xlim(1e-1, 7260.0/60)
     axsA[1, 0].set_xscale(r'log')
     axsA[1, 1].set_xscale(r'log')
-    axsA[1, 1].set_title(r'Box A: CO2 in the seal facies')
+    axsA[1, 1].set_title(r'Box A: CO$_2$ in the seal facies')
     axsA[1, 1].set_xlabel(r'time [h]')
     axsA[1, 1].set_xlim(1e-1, 7260.0/60)
-    axsA[1, 1].set_ylabel(r'mass [g]')
+    axsA[1, 1].set_ylabel(r'mass [kg]')
     axsA[1, 1].yaxis.tick_right()
     axsA[1, 1].yaxis.set_label_position('right')
     if calculatedAB:
         axsA[0, 0].plot([], [], ' ', label=r'from dense data')
-    add_legend(axsA[0, 0])
+    utils.add_legend(axsA[0, 0])
 
-    axsB[0, 0].set_title(r'Box B: mobile gaseous CO2')
-    axsB[0, 0].set_ylabel(r'mass [g]')
+    axsB[0, 0].set_title(r'Box B: mobile gaseous CO$_2$')
+    axsB[0, 0].set_ylabel(r'mass [kg]')
     axsB[0, 0].set_xlim(2e0, 7260.0/60)
-    axsB[0, 0].set_xticklabels([])
     axsB[0, 0].set_xscale(r'log')
     axsB[0, 0].set_xticklabels([])
-    axsB[0, 1].set_title(r'Box B: immobile gaseous CO2')
+    axsB[0, 1].set_title(r'Box B: immobile gaseous CO$_2$')
     axsB[0, 1].set_xlim(2e0, 7260.0/60)
-    axsB[0, 1].set_xticklabels([])
     axsB[0, 1].set_xscale(r'log')
-    axsB[0, 1].set_ylabel(r'mass [g]')
+    axsB[0, 1].set_ylabel(r'mass [kg]')
     axsB[0, 1].yaxis.tick_right()
     axsB[0, 1].yaxis.set_label_position('right')
     axsB[0, 1].set_xticklabels([])
-    axsB[1, 0].set_title(r'Box B: dissolved CO2')
+    axsB[1, 0].set_title(r'Box B: dissolved CO$_2$')
     axsB[1, 0].set_xlabel(r'time [h]')
-    axsB[1, 0].set_ylabel(r'mass [g]')
+    axsB[1, 0].set_ylabel(r'mass [kg]')
     axsB[1, 0].set_xlim(2e0, 7260.0/60)
     axsB[1, 0].set_xscale(r'log')
-    axsB[1, 1].set_title(r'Box B: CO2 in the seal facies')
+    axsB[1, 1].set_title(r'Box B: CO$_2$ in the seal facies')
     axsB[1, 1].set_xlabel(r'time [h]')
     axsB[1, 1].set_xlim(2e0, 7260.0/60)
     axsB[1, 1].set_xscale(r'log')
-    axsB[1, 1].set_ylabel(r'mass [g]')
+    axsB[1, 1].set_ylabel(r'mass [kg]')
     axsB[1, 1].yaxis.tick_right()
     axsB[1, 1].yaxis.set_label_position('right')
     if calculatedAB:
         axsB[0, 0].plot([], [], ' ', label=r'from dense data')
-    add_legend(axsB[0, 0])
+    utils.add_legend(axsB[0, 0])
 
     axsC.set_title(r'Box C: convection')
     axsC.set_xlabel(r'time [h]')
@@ -366,42 +356,42 @@ def assembleTimeSeries():
     axsC.set_xscale(r'log')
     if calculatedC:
         axsC.plot([], [], ' ', label=r'from dense data')
-    add_legend(axsC)
+    utils.add_legend(axsC)
 
-    axsT.set_title(r'CO2 in sealing units')
+    axsT.set_title(r'CO$_2$ in sealing units')
     axsT.set_xlabel(r'time [h]')
-    axsT.set_ylabel(r'mass [g]')
+    axsT.set_ylabel(r'mass [kg]')
     axsT.set_xlim(1e-1, 7260.0/60)
     axsT.set_xscale(r'log')
-    add_legend(axsT)
+    utils.add_legend(axsT)
 
-    axsPub[0, 0].set_title(r'sensor 1')
+    axsPub[0, 0].set_title(r'POP 1')
     axsPub[0, 0].set_xscale(r'log')
-    axsPub[0, 0].set_ylabel(r'pressure [bar]')
+    axsPub[0, 0].set_ylabel(r'pressure [Pa]')
     axsPub[0, 0].set_xlim((1e-1, 7260.0/60))
-    axsPub[0, 0].set_ylim(1.15, 1.18)
+    axsPub[0, 0].set_ylim(1.15e5, 1.18e5)
     axsPub[0, 0].set_xticklabels([])
-    axsPub[0, 1].set_title(r'CO2 in sealing units')
-    axsPub[0, 1].set_ylabel(r'mass [g]')
+    axsPub[0, 1].set_title(r'CO$_2$ in sealing units')
+    axsPub[0, 1].set_ylabel(r'mass [kg]')
     axsPub[0, 1].set_xlim(1e-1, 7260.0/60)
     axsPub[0, 1].set_xscale(r'log')
     axsPub[0, 1].yaxis.tick_right()
     axsPub[0, 1].yaxis.set_label_position('right')
     axsPub[0, 1].set_xticklabels([])
-    axsPub[1, 0].set_title(r'Box A: mobile gaseous CO2')
-    axsPub[1, 0].set_ylabel(r'mass [g]')
+    axsPub[1, 0].set_title(r'Box A: mobile gaseous CO$_2$')
+    axsPub[1, 0].set_ylabel(r'mass [kg]')
     axsPub[1, 0].set_xscale(r'log')
     axsPub[1, 0].set_xlim((1e-1, 7260.0/60))
     axsPub[1, 0].set_xticklabels([])
-    axsPub[1, 1].set_title(r'Box A: dissolved CO2')
-    axsPub[1, 1].set_ylabel(r'mass [g]')
+    axsPub[1, 1].set_title(r'Box A: dissolved CO$_2$')
+    axsPub[1, 1].set_ylabel(r'mass [kg]')
     axsPub[1, 1].set_xlim(1e-1, 7260.0/60)
     axsPub[1, 1].set_xscale(r'log')
     axsPub[1, 1].yaxis.tick_right()
     axsPub[1, 1].yaxis.set_label_position('right')
     axsPub[1, 1].set_xticklabels([])
-    axsPub[2, 0].set_title(r'Box B: mobile gaseous CO2')
-    axsPub[2, 0].set_ylabel(r'mass [g]')
+    axsPub[2, 0].set_title(r'Box B: mobile gaseous CO$_2$')
+    axsPub[2, 0].set_ylabel(r'mass [kg]')
     axsPub[2, 0].set_xlim(1e-1, 7260.0/60)
     axsPub[2, 0].set_xscale(r'log')
     axsPub[2, 0].set_xlabel(r'time [h]')
@@ -412,7 +402,7 @@ def assembleTimeSeries():
     axsPub[2, 1].yaxis.set_label_position('right')
     axsPub[2, 1].set_xlim((1e-1, 7260.0/60))
     axsPub[2, 1].set_xlabel(r'time [h]')
-    add_legend(axsPub[0, 0])
+    utils.add_legend(axsPub[0, 0])
 
     figP.savefig('spe11a_time_series_pressure.png', bbox_inches='tight', dpi=300)
     figA.savefig('spe11a_time_series_boxA.png', bbox_inches='tight', dpi=300)
