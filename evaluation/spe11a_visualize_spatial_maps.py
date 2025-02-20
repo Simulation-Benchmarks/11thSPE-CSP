@@ -2,23 +2,20 @@
 #
 # SPDX-License-Identifier: MIT
 #!/usr/bin/env python3
-
 """"
 Script to visualize the spatial maps
 on an evenly spaced grid as required by the description
 """
 
 import os
-import sys
 import argparse
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
-import seaborn as sns
 import groups_and_colors
-from is_notebook import is_notebook
 from round_to_digits import round_to_digits
+import utils
 
 def getFieldValues(fileName, nX, nY):
     p = np.zeros([nY, nX]); p[:] = np.nan
@@ -68,7 +65,7 @@ def getFieldValues(fileName, nX, nY):
     mCO2[np.isnan(s)] = np.nan
     return p, s, mCO2, mH2O, rhoG, rhoL, tmCO2
 
-def plotColorMesh(fig, x, y, z, idx, name, pRows, pCols, cmap='viridis', vmin=None, vmax=None):
+def plotColorMesh(fig, x, y, z, idx, name, pRows, pCols, cmap='viridis', vmin=None, vmax=None, title=None):
     if cmap == 'viridis' or cmap == 'coolwarm':
         resetUnder = False
     else:
@@ -81,17 +78,21 @@ def plotColorMesh(fig, x, y, z, idx, name, pRows, pCols, cmap='viridis', vmin=No
         cmap.set_under([1, 1, 1])
     cmap.set_bad([0.5, 0.5, 0.5])
 
+    onecbar = True
     if vmin is None:
         vmin = np.nanmin(np.where(z > 0, z, np.inf))
-
+        onecbar = False
     if vmax is None:
         vmax = np.nanmax(z)
+        onecbar = False
 
     ax = fig.add_subplot(pRows, pCols, 1 + idx)
     if vmax == vmin:
         im = ax.pcolormesh(x, y, z, shading='flat', cmap=cmap)
+        onecbar = False
     else:
         im = ax.pcolormesh(x, y, z, shading='flat', cmap=cmap, vmin=vmin, vmax=vmax)
+
     ax.axis([x.min(), x.max(), y.min(), y.max()])
     ax.axis('scaled')
     ax.set_title(f'{name}')
@@ -99,22 +100,29 @@ def plotColorMesh(fig, x, y, z, idx, name, pRows, pCols, cmap='viridis', vmin=No
     ax.set_xticklabels([])
     ax.set_yticks([])
     ax.set_yticklabels([])
-#    divider = make_axes_locatable(ax)
-#    cax = divider.append_axes('right', size='5%', pad=0.05)
-    cbformat = matplotlib.ticker.ScalarFormatter()
-    cbformat.set_powerlimits((-2,2))
-#    fig.colorbar(im, cax=cax, orientation='vertical', format=cbformat)
-#    fig.tight_layout(rect=[0, 0.03, 1, 0.95])
-    fig.subplots_adjust(right=1.0)
-    cbar_ax = fig.add_axes([1.02, 0.14, 0.025, 0.7])
-    fig.colorbar(im, cax=cbar_ax, format=cbformat)
+
+    if onecbar:
+        fig.subplots_adjust(right=1.0)
+        cbar_ax = fig.add_axes([1.03, 0.14, 0.025, 0.7])
+        cbar = fig.colorbar(im, cax=cbar_ax)
+        cbar.ax.tick_params(axis='y', labelsize='large')
+        cbar.ax.ticklabel_format(style='sci', axis='y', scilimits=(-1,2))
+        if title:
+            cbar.ax.set_ylabel(title, fontsize='large')
+            cbar.ax.yaxis.set_label_position('left')
+    else:
+        divider = make_axes_locatable(ax)
+        cax = divider.append_axes('right', size='5%', pad=0.05)
+        cbformat = matplotlib.ticker.ScalarFormatter()
+        cbformat.set_powerlimits((-2,2))
+        fig.colorbar(im, cax=cax, orientation='vertical', format=cbformat)
+        fig.tight_layout()
 
 
 def visualizeSpatialMaps():
     """Visualize spatial maps for Case A of the 11th SPE CSP"""
 
-    font = {'size' : 14}
-    matplotlib.rc('font', **font)
+    utils.set_fonts(14)
 
     parser = argparse.ArgumentParser(
         description="This script visualizes the spatial maps "
@@ -144,43 +152,60 @@ def visualizeSpatialMaps():
     nY = ySpace.size - 1
 
     if len(groups) == 1:
-        fig = plt.figure(figsize=(14, 8))
-    else:
-        figP = plt.figure(figsize=(15, 9))
-        figS = plt.figure(figsize=(15, 9))
-        figMCO2 = plt.figure(figsize=(15, 9))
-        figMH2O = plt.figure(figsize=(15, 9))
-        figRhoG = plt.figure(figsize=(15, 9))
-        figRhoL = plt.figure(figsize=(15, 9))
-        figTmCO2 = plt.figure(figsize=(14, 7.2))
-
-    if len(groups) == 1:
         pRows = 3
         pCols = 3
+        figsize = (14, 7.5)
     elif len(groups) < 3:
         pRows = 1
         pCols = 2
+        figsize = (14, 6.3)
     elif len(groups) < 5:
         pRows = 2
         pCols = 2
+        figsize = (14, 7.2)
     elif len(groups) < 7:
         pRows = 2
         pCols = 3
+        figsize = (14, 6.3)
     elif len(groups) < 10:
         pRows = 3
         pCols = 3
+        figsize = (14, 8)
     elif len(groups) < 13:
         pRows = 3
         pCols = 4
+        figsize = (14, 6.5)
     elif len(groups) < 17:
         pRows = 4
         pCols = 4
+        figsize = (14, 8.5)
     elif len(groups) < 21:
         pRows = 4
         pCols = 5
+        figsize = (14, 7.2)
     else:
         pRows = 5
         pCols = 5
+        figsize = (14, 9.3)
+
+    if len(groups) == 1:
+        fig = plt.figure(figsize=figsize)
+    else:
+        figP = plt.figure(figsize=figsize)
+        figS = plt.figure(figsize=figsize)
+        figMCO2 = plt.figure(figsize=figsize)
+        figMH2O = plt.figure(figsize=figsize)
+        figRhoG = plt.figure(figsize=figsize)
+        figRhoL = plt.figure(figsize=figsize)
+        figTmCO2 = plt.figure(figsize=figsize)
+
+        titleP = f'pressure [Pa] at {time} hours'
+        titleS = f'gas saturation [-] at {time} hours'
+        titleMCO2 = f'CO$_2$ mass fraction in liquid [-] at {time} hours'
+        titleMH2O = f'H2O mass fraction in gas [-] at {time} hours'
+        titleRhoG = f'gas phase density [kg/m3] at {time} hours'
+        titleRhoL = f'liquid phase density [kg/m3] at {time} hours'
+        titleTmCO2 = f'total CO$_2$ mass [kg] at {time} hours'
 
     # select file that contains impermeable cells with 'nan' pressure values
     fileNameSLB = os.path.join(folder, 'slb', 'spe11a', 'result1', f'spe11a_spatial_map_{time}h.csv')
@@ -210,41 +235,34 @@ def visualizeSpatialMaps():
         cmap = groups_and_colors.mass_cmap
 
         if len(groups) == 1:
-            # scale pressure to bars
-            plotColorMesh(fig, x, y, 1e-5*p, 0, "pressure [bar]", pRows, pCols)
+            plotColorMesh(fig, x, y, p, 0, "pressure [Pa]", pRows, pCols)
             plotColorMesh(fig, x, y, s, 1, "gas saturation [-]", pRows, pCols, cmap)
-            # scale mass fractions to g/kg
-            plotColorMesh(fig, x, y, 1e3*mCO2, 2, "CO$_2$ mass frac in liquid [g/kg]", pRows, pCols, cmap)
-            plotColorMesh(fig, x, y, 1e3*mH2O, 3, "H2O mass frac in gas [g/kg]", pRows, pCols, 'icefire')
+            plotColorMesh(fig, x, y, mCO2, 2, "CO$_2$ mass frac in liquid [-]", pRows, pCols, cmap)
+            plotColorMesh(fig, x, y, mH2O, 3, "H2O mass frac in gas [-]", pRows, pCols, 'icefire')
             plotColorMesh(fig, x, y, rhoG, 4, "gas phase density [kg/m3]", pRows, pCols, 'icefire')
             plotColorMesh(fig, x, y, rhoL, 5, "liquid phase density [kg/m3]", pRows, pCols, 'icefire')
-            # scale mass to grams
-            plotColorMesh(fig, x, y, 1e3*tmCO2, 6, "total CO$_2$ mass [g]", pRows, pCols, cmap)
+            plotColorMesh(fig, x, y, tmCO2, 6, "total CO$_2$ mass [kg]", pRows, pCols, cmap)
         else:
-            # scale pressure to bars
-            plotColorMesh(figP, x, y, 1e-5*p, i, group, pRows, pCols, 'viridis', 1.1, 1.22)
-            plotColorMesh(figS, x, y, s, i, group, pRows, pCols, cmap, 0, 1)
-            # scale mass fractions to g/kg
-            plotColorMesh(figMCO2, x, y, 1e3*mCO2, i, group, pRows, pCols, cmap, 0, 2)
-            plotColorMesh(figMH2O, x, y, 1e3*mH2O, i, group, pRows, pCols, 'icefire', 8.1, 8.7)
-            plotColorMesh(figRhoG, x, y, rhoG, i, group, pRows, pCols, 'icefire', 2.0, 2.2)
-            plotColorMesh(figRhoL, x, y, rhoL, i, group, pRows, pCols, 'icefire', 9.973e2, 9.987e2)
-            # scale mass to grams
-            plotColorMesh(figTmCO2, x, y, 1e3*tmCO2, i, group, pRows, pCols, cmap, 0, 1e-3)
+            plotColorMesh(figP, x, y, 1e-5*p, i, group, pRows, pCols, 'viridis', 1.1e5, 1.22e5, titleP)
+            plotColorMesh(figS, x, y, s, i, group, pRows, pCols, cmap, 0, 1, titleS)
+            plotColorMesh(figMCO2, x, y, mCO2, i, group, pRows, pCols, cmap, 0, 2e-3, titleMCO2)
+            plotColorMesh(figMH2O, x, y, mH2O, i, group, pRows, pCols, 'icefire', 8.1e-3, 8.7e-3, titleMH2O)
+            plotColorMesh(figRhoG, x, y, rhoG, i, group, pRows, pCols, 'icefire', 2.0, 2.2, titleRhoG)
+            plotColorMesh(figRhoL, x, y, rhoL, i, group, pRows, pCols, 'icefire', 9.973e2, 9.987e2, titleRhoL)
+            plotColorMesh(figTmCO2, x, y, tmCO2, i, group, pRows, pCols, cmap, 0, 1e-6, titleTmCO2)
     
     if len(groups) == 1:
         fig.suptitle(f'{groups[0]} at {time} hours')
-        if not is_notebook():
-            fig.savefig(f'spe11a_{groups[0].lower()}_{time}h.png', bbox_inches='tight', dpi=300)
-            print('File spe11a_' + f'{groups[0].lower()}_{time}h.png has been generated.')
+        fig.savefig(f'spe11a_{groups[0].lower()}_{time}h.png', bbox_inches='tight', dpi=300)
+        print('File spe11a_' + f'{groups[0].lower()}_{time}h.png has been generated.')
     else:
-        figP.suptitle(f'pressure [bar] at {time} hours')
-        figS.suptitle(f'gas saturation [-] at {time} hours')
-        figMCO2.suptitle(f'CO$_2$ mass fraction in liquid [g/kg] at {time} hours')
-        figMH2O.suptitle(f'H2O mass fraction in gas [g/kg] at {time} hours')
-        figRhoG.suptitle(f'gas phase density [kg/m3] at {time} hours')
-        figRhoL.suptitle(f'liquid phase density [kg/m3] at {time} hours')
-        figTmCO2.suptitle(f'                          total CO$_2$ mass [g] at {time} hours')
+        figP.subplots_adjust(wspace=0.03)
+        figS.subplots_adjust(wspace=0.03)
+        figMCO2.subplots_adjust(wspace=0.03)
+        figMH2O.subplots_adjust(wspace=0.03)
+        figRhoG.subplots_adjust(wspace=0.03)
+        figRhoL.subplots_adjust(wspace=0.03)
+        figTmCO2.subplots_adjust(wspace=0.03)
 
         figP.savefig(f'spe11a_pressure_{time}h.png', bbox_inches='tight', dpi=300)
         figS.savefig(f'spe11a_saturation_{time}h.png', bbox_inches='tight', dpi=300)

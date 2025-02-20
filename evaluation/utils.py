@@ -4,11 +4,11 @@
 #!/usr/bin/env python3
 import matplotlib.pyplot as plt
 
-def set_fonts():
+def set_fonts(size = 10):
     plt.rcParams.update({
         "text.usetex": True,
         "font.family": "Computer Modern",
-        "font.size": 10,
+        "font.size": size,
         "legend.title_fontsize": "small",
         "legend.fontsize": "small"
     })
