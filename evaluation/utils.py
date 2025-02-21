@@ -8,7 +8,7 @@ from is_notebook import is_notebook
 def set_fonts(size = 10):
     plt.rcParams.update({
         "text.usetex": not is_notebook(),
-        "font.family": "Computer Modern",
+        "font.family": "DejaVu Sans" if is_notebook() else "Computer Modern",
         "font.size": size,
         "legend.title_fontsize": "small",
         "legend.fontsize": "small"
