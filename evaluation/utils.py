@@ -3,10 +3,11 @@
 # SPDX-License-Identifier: MIT
 #!/usr/bin/env python3
 import matplotlib.pyplot as plt
+from is_notebook import is_notebook
 
 def set_fonts(size = 10):
     plt.rcParams.update({
-        "text.usetex": True,
+        "text.usetex": not is_notebook(),
         "font.family": "Computer Modern",
         "font.size": size,
         "legend.title_fontsize": "small",
