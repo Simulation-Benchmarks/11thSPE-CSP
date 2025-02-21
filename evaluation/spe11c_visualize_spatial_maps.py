@@ -114,6 +114,7 @@ def plotColorMesh(fig, x, y, z, idx, name, pRows, pCols, cmap='viridis', vmin=No
     ax.set_yticks([])
     ax.set_yticklabels([])
     ax.plot(x[0], y[-1], color='k')
+    ax.plot(x[0], y[0], color='k')
 #    ax.tick_params(axis="x", direction="in")
 #    ax.set_yticks([600, 800])
 #    ax.set_yticklabels([300, 400])
@@ -185,7 +186,10 @@ def visualizeSpatialMaps():
     elif len(groups) < 5:
         pRows = 2
         pCols = 2
-        figsize = (14, 7.2)
+        if cutPlane == 'vw':
+            figsize = (11, 7.2)
+        else:
+            figsize = (14, 7.2)
     elif len(groups) < 7:
         pRows = 2
         pCols = 3
@@ -194,17 +198,23 @@ def visualizeSpatialMaps():
         pRows = 3
         pCols = 3
         if cutPlane == 'vw':
-            figsize = (14, 8.3)
+            figsize = (14, 9.5)
         else:
             figsize = (14, 8)
     elif len(groups) < 13:
         pRows = 3
         pCols = 4
-        figsize = (14, 6.5)
+        if cutPlane == 'vw':
+            figsize = (14, 7.5)
+        else:
+            figsize = (14, 6.5)
     elif len(groups) < 17:
         pRows = 4
         pCols = 4
-        figsize = (14, 8.5)
+        if cutPlane == 'vw':
+            figsize = (14, 10.5)
+        else:
+            figsize = (14, 8.5)
     elif len(groups) < 21:
         pRows = 4
         pCols = 5
@@ -307,7 +317,7 @@ def visualizeSpatialMaps():
             plotColorMesh(fig, x, y, temp, 7, "temperature [°C]", pRows, pCols, 'coolwarm')
         else:
             plotColorMesh(figP, x, y, p, i, group, pRows, pCols, 'viridis', 2e7, 3.5e7, titleP)
-            plotColorMesh(figS, x, y, s, i, group, pRows, pCols, cmap, 0, 0, titleS)
+            plotColorMesh(figS, x, y, s, i, group, pRows, pCols, cmap, 0, 1, titleS)
             plotColorMesh(figMCO2, x, y, mCO2, i, group, pRows, pCols, cmap, 0, 7e-2, titleMCO2)
             plotColorMesh(figMH2O, x, y, mH2O, i, group, pRows, pCols, 'icefire', 1e-3, 4e-3, titleMH2O)
             plotColorMesh(figRhoG, x, y, rhoG, i, group, pRows, pCols, 'icefire', 0.8e3, 1.0e3, titleRhoG)
