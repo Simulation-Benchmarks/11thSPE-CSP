@@ -2,7 +2,6 @@
 
 import argparse
 import logging
-from datetime import datetime
 from pathlib import Path
 
 import matplotlib.pyplot as plt
@@ -21,9 +20,7 @@ from cluster_analysis import (
     centroid_analysis,
     determine_median_cluster,
     mean_distance_to_group,
-    plot_linkage_clustering_for_subgroups,
     plot_linkage_clustering_with_colors,
-    plot_subgroup_distance_matrix_values,
     std_distance_to_group,
 )
 from datastructure import SPECase, convert_result_name, update_team_name
@@ -68,38 +65,66 @@ logger = logging.getLogger(__name__)
 if __name__ == "__main__":
     # ! ---- SETUP ----
 
-    # Get the current date including hour and minutes
-    date = datetime.now().strftime("%Y-%m-%d_%H-%M")
-
     # Parse the variant and the use of petsc
     parser = argparse.ArgumentParser(
-        description="Perform the data analysis based on sparse and dense data."
+        description="This script performs the SPE11 data analysis for the submitted data."
     )
     parser.add_argument(
+        "-v",
         "--variant",
-        type=str,
-        default="B",
-        choices=["A", "B", "C"],
         help="The variant of the SPE11 testcase.",
     )
     parser.add_argument(
-        "--data",
-        type=str,
-        default="sparse_data",
-        help="The folder with the submission data.",
+        "-f",
+        "--folder",
+        default="../shared_data/data",
+        help="path to folder containing group subfolders",
     )
+
     parser.add_argument(
-        "--evaluation",
-        type=str,
-        default="evaluation",
-        help="The folder with precomputed dense data (from official SPE11-CSP git repo).",
+        "-t",
+        "--tablefolder",
+        default="../shared_data/evaluation",
+        help="path to folder containing calculated tables",
     )
+
     parser.add_argument(
+        "-o",
         "--output",
-        type=str,
         default="output",
-        help="The csv file to save the results.",
+        help="path to folder for saving output",
     )
+
+    parser.add_argument(
+        "-g",
+        "--groups",
+        nargs="+",
+        help="names of groups, taking reported numbers",
+        required=True,
+    )
+
+    parser.add_argument(
+        "-gf",
+        "--groupfolders",
+        nargs="+",
+        help="paths to group folders",
+        required=False,
+    )
+
+    parser.add_argument(
+        "-cAB",
+        "--calculatedAB",
+        nargs="+",
+        help="names of groups, taking calculated numbers for Boxes A and B",
+    )
+
+    parser.add_argument(
+        "-cC",
+        "--calculatedC",
+        nargs="+",
+        help="names of groups, taking calculated numbers for Box C",
+    )
+
     args = parser.parse_args()
 
     # Define SPECase
@@ -107,12 +132,14 @@ if __name__ == "__main__":
     spe_case = SPECase(variant)
 
     # Data management
-    data_folder = Path(args.data)
-    evaluation_folder = Path(args.evaluation)
+    data_folder = Path(args.folder)
+    evaluation_folder = Path(args.tablefolder)
     sparse_evaluation_folder = evaluation_folder / spe_case.variant / "sparse"
     dense_evaluation_folder = evaluation_folder / spe_case.variant / "dense"
-    save_folder = Path(args.output) / f"{date}"
+    save_folder = Path(args.output)
+    cache_folder = save_folder / "cache"
     save_folder.mkdir(parents=True, exist_ok=True)
+    cache_folder.mkdir(parents=True, exist_ok=True)
 
     # ! ---- READ SPARSE DATA ----
 
@@ -425,7 +452,7 @@ if __name__ == "__main__":
         spe_case,
         add_mean_to_diagonal=True,
         mean_type="ag",
-        path=f"{spe_case.variant}_heatmap_distance_matrix_all.png",
+        path=save_folder / f"{spe_case.variant}_heatmap_distance_matrix_all.png",
     )
 
     # ! ---- SENSIITIVITY ANALYSIS ----
@@ -449,11 +476,6 @@ if __name__ == "__main__":
 
     print("Pearson correlation analysis:")
     ic(pearson_correlation_result)
-
-    # ! ---- DATA VARIATION/VALUES ----
-
-    if False:
-        plot_subgroup_distance_matrix_values(subgroups_global_distance_matrix)
 
     # ! ---- MINIMUM AG MEAN DISTANCE ON ALL SUBMISSIONS ----
 
@@ -510,7 +532,7 @@ if __name__ == "__main__":
         spe_case,
         subgroups_global_distance_matrix[("all", "all")],
         [convert_result_name(r) for r in spe_case.subgroups["all"]],
-        path=f"{spe_case.variant}_dendrogram",
+        path=save_folder / f"{spe_case.variant}_dendrogram",
     )
 
     # Quantitative inspection of the "median" data
@@ -1144,7 +1166,9 @@ if __name__ == "__main__":
         plt.ylim(0.25, 1.15)
         plt.ylabel("SPE11 distance")
         plt.tight_layout()
-        plt.savefig("mesh_refinement_study.png", dpi=1000)
+        plt.savefig(
+            save_folder / f"{spe_case.variant}_mesh_refinement_study.png", dpi=1000
+        )
         plt.show()
 
         p_value_variability_moderate_static_refinement_smaller_than_srg = (
