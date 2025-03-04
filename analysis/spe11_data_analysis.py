@@ -57,8 +57,6 @@ from variability_analysis import (
     variability_analysis,
 )
 
-logging.basicConfig(level=logging.INFO)
-
 logger = logging.getLogger(__name__)
 
 
@@ -125,6 +123,13 @@ if __name__ == "__main__":
         help="names of groups, taking calculated numbers for Box C",
     )
 
+    parser.add_argument(
+        "-verbose",
+        "--verbose",
+        action="store_true",
+        help="increase output verbosity",
+    )
+
     args = parser.parse_args()
 
     # Define SPECase
@@ -140,6 +145,10 @@ if __name__ == "__main__":
     cache_folder = save_folder / "cache"
     save_folder.mkdir(parents=True, exist_ok=True)
     cache_folder.mkdir(parents=True, exist_ok=True)
+
+    # Verbosity
+    if args.verbose:
+        logging.basicConfig(level=logging.INFO)
 
     # ! ---- READ SPARSE DATA ----
 
@@ -185,7 +194,7 @@ if __name__ == "__main__":
     # Read data for each participant and clean the data
     errors = []
     for key, participant in participants.items():
-        print("Processing submission", key)
+        logging.info("Processing submission", key)
 
         team, resultID = split_result_name(key)
 
@@ -455,6 +464,33 @@ if __name__ == "__main__":
         path=save_folder / f"{spe_case.variant}_heatmap_distance_matrix_all.png",
     )
 
+    # Visual inspection in form of a dendrogram
+    plot_linkage_clustering_with_colors(
+        spe_case,
+        subgroups_global_distance_matrix[("all", "all")],
+        [convert_result_name(r) for r in spe_case.subgroups["all"]],
+        path=save_folder / f"{spe_case.variant}_dendrogram",
+    )
+
+    # Store the main distance matrix as csv file
+    np.savetxt(
+        save_folder / f"{spe_case.variant}_distance_matrix.csv",
+        subgroups_global_distance_matrix[("all", "all")],
+        delimiter=",",
+    )
+
+    # TODO store median values as csv file etc
+
+    # Cache results for further analysis, in form of csv file
+    for key, matrix in subgroups_global_distance_matrix.items():
+        np.savetxt(
+            cache_folder / f"{spe_case.variant}_{key[0]}_{key[1]}.csv",
+            matrix,
+            delimiter=",",
+        )
+
+    assert False
+
     # ! ---- SENSIITIVITY ANALYSIS ----
 
     # Monitor median values
@@ -526,14 +562,6 @@ if __name__ == "__main__":
     )
 
     # ! ---- MEDIAN ANALYSIS BASED ON ALL SUBMISSIONS ----
-
-    # Visual inspection of the "median" data
-    plot_linkage_clustering_with_colors(
-        spe_case,
-        subgroups_global_distance_matrix[("all", "all")],
-        [convert_result_name(r) for r in spe_case.subgroups["all"]],
-        path=save_folder / f"{spe_case.variant}_dendrogram",
-    )
 
     # Quantitative inspection of the "median" data
     median_cluster_all = determine_median_cluster(
