@@ -7,66 +7,6 @@ from scipy.stats import t
 
 from spe11_io import nonlinear_transform
 
-# def variability_analysis(
-#    distance_matrix: np.ndarray,
-#    mean_type: Literal["arithmetic", "geometric"] = "arithmetic",
-# ):
-#    distance_values = squareform(distance_matrix)
-#    assert mean_type in [
-#        "arithmetic",
-#        "geometric",
-#    ], "Mean type must be arithmetic or geometric."
-#    if mean_type == "geometric":
-#        assert np.all(distance_values > 0), "All distances must be positive."
-#        distance_values = np.log(distance_values)
-#
-#    # Plot distribution of distance_values_all
-#    if False:
-#
-#        plt.figure()
-#        plt.title("Distribution of distances for all submissions")
-#        plt.hist(distance_values_all, bins=20)
-#        plt.show()
-#
-#    # Averages
-#    mean = np.mean(distance_values)
-#    median = np.median(distance_values)
-#
-#    # Percentiles
-#    percentile = {p: np.percentile(distance_values, p) for p in [5, 25, 50, 75, 95]}
-#
-#    # Margin of error
-#    std = np.std(distance_values)
-#    std_error = std / np.sqrt(len(distance_values))
-#    # confidence_level = 0.95
-#    z_value = 1.96
-#    margin_of_error = std_error * z_value
-#    upper_limit_95 = mean + margin_of_error
-#    lower_limit_95 = mean - margin_of_error
-#
-#    if mean_type == "geometric":
-#        # Main statistics
-#        mean = np.exp(mean)
-#        upper_limit_95 = np.exp(upper_limit_95)
-#        lower_limit_95 = np.exp(lower_limit_95)
-#        margin_of_error = upper_limit_95 - mean
-#
-#        # Other quantities
-#        median = np.exp(median)
-#        percentile = {p: np.exp(percentile[p]) for p in percentile}
-#
-#    interquartile_range = percentile[75] - percentile[25]
-#
-#    return {
-#        "mean": mean,
-#        "std": std,
-#        "std_error": std_error,
-#        "margin_of_error": margin_of_error,
-#        "median": median,
-#        "percentile": percentile,
-#        "interquartile_range": interquartile_range,
-#    }
-
 
 def variability_analysis(
     distance_matrix: np.ndarray,

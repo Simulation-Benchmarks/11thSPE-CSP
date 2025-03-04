@@ -100,19 +100,6 @@ if __name__ == "__main__":
         default="output",
         help="The csv file to save the results.",
     )
-    # TODO make hardcoded
-    parser.add_argument(
-        "--bochner-order",
-        type=int,
-        default=2,
-        help="The order of the Bochner norm, i.e., polynomial order used in space-time integration.",
-    )
-    parser.add_argument(
-        "--linkage",
-        type=str,
-        default="average",
-        help="The linkage method for the cluster analysis.",
-    )
     args = parser.parse_args()
 
     # Define SPECase
@@ -126,10 +113,6 @@ if __name__ == "__main__":
     dense_evaluation_folder = evaluation_folder / spe_case.variant / "dense"
     save_folder = Path(args.output) / f"{date}"
     save_folder.mkdir(parents=True, exist_ok=True)
-
-    # TODO make hardcoded
-    bochner_order = args.bochner_order
-    linkage_type = args.linkage
 
     # ! ---- READ SPARSE DATA ----
 
@@ -299,7 +282,6 @@ if __name__ == "__main__":
             participant_index,
             quantity,
             spe_case,
-            order=bochner_order,
         )
         for quantity in spe_case.data_format.keys()
     }
@@ -320,7 +302,6 @@ if __name__ == "__main__":
                 quantity,
                 timing,
                 spe_case,
-                order=bochner_order,
             )
             for timing in ["early", "late", "full"]
             for quantity in ["pressure_l2", "pressure_l2s", "mass_w1"]
@@ -335,7 +316,6 @@ if __name__ == "__main__":
                     quantity,
                     timing,
                     spe_case,
-                    order=bochner_order,
                 )
                 for timing in ["early", "late", "full"]
                 for quantity in [
@@ -359,10 +339,8 @@ if __name__ == "__main__":
             "M_C",
             "sealTot",
             # Dense data
-            # "early_pressure_l2",
             "late_pressure_l2",
             "early_pressure_l2s",
-            # "late_pressure_l2s",
             "early_mass_w1",
             "late_mass_w1",
         ]
@@ -396,32 +374,6 @@ if __name__ == "__main__":
             if spe_case.variant in ["spe11b", "spe11c"]
             else []
         ),
-        #    # Boxes
-        #    "boxA": ["mobA", "immA", "dissA"],
-        #    "boxB": ["mobB", "immB", "dissB"],
-        #    # Phases
-        #    "mob": ["mobA", "mobB"],
-        #    "imm": ["immA", "immB"],
-        #    "diss": ["dissA", "dissB"],
-        #    # Single criteria
-        #    "mobA": ["mobA"],
-        #    "immA": ["immA"],
-        #    "dissA": ["dissA"],
-        #    "mobB": ["mobB"],
-        #    "immB": ["immB"],
-        #    "dissB": ["dissB"],
-        #    "M_C": ["M_C"],
-        #    "sealTot": ["sealTot"],
-        #    "boundaryCO2": ["boundaryCO2"],
-        #    "early_pressure_l2": ["early_pressure_l2"],
-        #    "late_pressure_l2": ["late_pressure_l2"],
-        #    "early_pressure_l2s": ["early_pressure_l2s"],
-        #    "late_pressure_l2s": ["late_pressure_l2s"],
-        #    "early_temperature_l2s": ["early_temperature_l2s"],
-        #    "late_temperature_l2s": ["late_temperature_l2s"],
-        #    "early_mass_w1": ["early_mass_w1"],
-        #    "late_mass_w1": ["late_mass_w1"],
-        #    "full_mass_w1": ["full_mass_w1"],
     }
 
     # Compute global metrics for the selected criteria
@@ -466,14 +418,6 @@ if __name__ == "__main__":
         for subgroup in spe_case.subgroups.keys()
     }
 
-    # ! ---- CONVERT RESULTS NAMES ----
-    # warn("This function should be removed after the data is updated.")
-    # converted_result_names = []
-    # for name in spe_case.subgroups["all"]:
-    #     team, resultID = split_result_name(name)
-    #     converted_team_name = update_team_name(team)
-    #     converted_result_names.append(f"{converted_team_name}{resultID}")
-
     # ! ---- DISTANCE MATRIX VALUES -----
     plot_heatmap_distance_matrix(
         subgroups_global_distance_matrix[("all", "all")],
@@ -506,23 +450,10 @@ if __name__ == "__main__":
     print("Pearson correlation analysis:")
     ic(pearson_correlation_result)
 
-    # Cross comparisons
-    # all_metrics = {key: median_scaled_distance_matrix[key] for key in criteria["all"]}
-    # all_metrics.update({"SPE11": subgroups_global_distance_matrix[("all", "all")]})
-    # pearson_cross_correlation_result = pearson_cross_correlation_analysis(all_metrics)
-
     # ! ---- DATA VARIATION/VALUES ----
 
     if False:
         plot_subgroup_distance_matrix_values(subgroups_global_distance_matrix)
-
-    # ! ---- CLUSTER ANALYSIS ----
-
-    # Plot all possibilities
-    if False:
-        plot_linkage_clustering_for_subgroups(
-            subgroups_global_distance_matrix, spe_case.subgroups, linkage_type
-        )
 
     # ! ---- MINIMUM AG MEAN DISTANCE ON ALL SUBMISSIONS ----
 
@@ -574,35 +505,18 @@ if __name__ == "__main__":
 
     # ! ---- MEDIAN ANALYSIS BASED ON ALL SUBMISSIONS ----
 
-    # threshold_distance = {
-    #    "spe11a": 0.995,
-    #    "spe11b": 0.91,
-    #    "spe11c": 0.97,
-    # }
-    # threshold_position = {
-    #    "spe11a": 110,
-    #    "spe11b": 150,
-    #    "spe11c": 110,
-    # }
-
     # Visual inspection of the "median" data
     plot_linkage_clustering_with_colors(
-        subgroups_global_distance_matrix[("all", "all")],
-        # spe_case.subgroups["all"],
-        [convert_result_name(r) for r in spe_case.subgroups["all"]],
-        linkage_type,
         spe_case,
-        "linear",  # "symlog" for symlog scaling
-        threshold_distance=None,  # threshold_distance[spe_case.variant],
-        threshold_position=None,  # threshold_position[spe_case.variant],
-        path=f"{spe_case.variant}_dendrogram_{linkage_type}_linkage",
+        subgroups_global_distance_matrix[("all", "all")],
+        [convert_result_name(r) for r in spe_case.subgroups["all"]],
+        path=f"{spe_case.variant}_dendrogram",
     )
 
     # Quantitative inspection of the "median" data
     median_cluster_all = determine_median_cluster(
         subgroups_global_distance_matrix[("all", "all")],
         spe_case.subgroups["all"],
-        linkage_type,
         mean_type="ag",
     )
 
@@ -623,42 +537,8 @@ if __name__ == "__main__":
     centroid_analysis(
         subgroups_global_distance_matrix[("all", "all")],
         spe_case.subgroups["all"],
-        linkage_type,
         mean_type="ag",
     )
-
-    # ! ---- MEDIAN ANALYSIS BASED ON SRG ----
-
-    # Visual inspection of the "median" data
-    # plot_linkage_clustering_with_colors(
-    #     subgroups_global_distance_matrix[("base case", "all")],
-    #     spe_case.subgroups["base case"],
-    #     linkage_type,
-    #     spe_case,
-    #     f"{spe_case.variant}_dendrogram_{linkage_type}_linkage_srg",
-    # )
-
-    # # Quantitative inspection of the "median" data
-    # median_cluster_srg = determine_median_cluster(
-    #     subgroups_global_distance_matrix[("base case", "all")],
-    #     spe_case.subgroups["base case"],
-    #     linkage_type,
-    #     mean_type="ag",
-    # )
-
-    # # Determine the mean distances of the two representatives of the median cluster to the other participants
-    # mean_distance_cluster_srg = {
-    #     key: mean_distance_to_group(
-    #         subgroups_global_distance_matrix[("all", "all")],
-    #         key,
-    #         spe_case.subgroups["all"],
-    #         mean_type="ag",
-    #     )
-    #     for key in median_cluster_srg
-    # }
-    # print(
-    #     f"The median cluster within SRG consists of {median_cluster_srg}, and {argmin_distance(mean_distance_cluster_srg)} is the closest to all other participants."
-    # )
 
     # ! ---- CREATE A DISCRETE PROBABILIY DISTRIBUTION FROM ALL SUBMISSIONS ----
 
@@ -676,94 +556,6 @@ if __name__ == "__main__":
     variability_ag_srg = variability_analysis(
         subgroups_global_distance_matrix[("base case", "all")], mean_type="ag"
     )
-
-    if True:
-        plt.figure("Probability distribution")
-
-        # Distribution
-        plt.hist(
-            probability_distribution_all,
-            bins=100,
-            # density=True,
-            color="lightgray",
-            label="All submissions",
-        )
-        plt.hist(
-            probability_distribution_srg,
-            bins=100,
-            # density=True,
-            color="gray",
-            label="Baseline submissions",
-        )
-
-        # Mean
-        plt.axvline(
-            x=variability_ag_all["mean"],
-            color="red",
-            linestyle="-",
-            label=f"Overall variability: {variability_ag_all['mean']:.2f}",
-        )
-        plt.axvline(
-            x=variability_ag_srg["mean"],
-            color=[1, 0.5, 0],
-            linestyle="--",
-            label=f"Baseline variability: {variability_ag_srg['mean']:.2f}",
-        )
-
-        # Margin of error
-        plt.axvline(
-            x=variability_ag_all["lower_limit_margin_of_error"],
-            color="green",
-            linestyle="--",
-            label=f"Margin of error: {variability_ag_all['margin_of_error']:.2f}",
-        )
-        plt.axvline(
-            x=variability_ag_all["upper_limit_margin_of_error"],
-            color="green",
-            linestyle="--",
-        )
-        plt.axvline(
-            x=variability_ag_srg["lower_limit_margin_of_error"],
-            color=[0.5, 1, 0],
-            linestyle="--",
-            label=f"Margin of error (baseline): {variability_ag_srg['margin_of_error']:.2f}",
-        )
-        plt.axvline(
-            x=variability_ag_srg["upper_limit_margin_of_error"],
-            color=[0.5, 1, 0],
-            linestyle="--",
-        )
-
-        # Standard deviation
-        plt.axvline(
-            x=variability_ag_all["lower_limit_std"],
-            color="blue",
-            linestyle="--",
-            label=f"Standard deviation: {variability_ag_all['std']:.2f}",
-        )
-        plt.axvline(
-            x=variability_ag_all["upper_limit_std"],
-            color="blue",
-            linestyle="--",
-        )
-        plt.axvline(
-            x=variability_ag_srg["lower_limit_std"],
-            color=[0, 0.5, 1],
-            linestyle="--",
-            label=f"Standard deviation (baseline): {variability_ag_srg['std']:.2f}",
-        )
-        plt.axvline(
-            x=variability_ag_srg["upper_limit_std"],
-            color=[0, 0.5, 1],
-            linestyle="--",
-        )
-
-        plt.xlabel("Distance")
-        plt.ylabel("Probability")
-        plt.legend()
-        plt.tight_layout()
-        plt.savefig("probability_distribution.png", dpi=800)
-        plt.show()
 
     # ! ---- GROUP WITH MINIMUM MEAN DISTANCE TO ALL PARTICIPANTS ----
 

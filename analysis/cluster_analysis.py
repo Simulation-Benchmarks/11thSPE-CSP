@@ -15,7 +15,7 @@ def _cluster_analysis(
     labels: list,
     linkage_type: Literal[
         "single", "complete", "average", "weighted", "centroid", "median", "ward"
-    ],
+    ] = "average",
 ):
     assert len(labels) == distance_matrix.shape[0]
     dm = squareform(distance_matrix)
@@ -71,7 +71,7 @@ def plot_linkage_clustering(
     labels: list,
     linkage_type: Literal[
         "single", "complete", "average", "weighted", "centroid", "median", "ward"
-    ],
+    ] = "average",
 ) -> None:
     Z = _cluster_analysis(distance_matrix, labels, linkage_type)
     plt.figure("dendrogram")
@@ -91,7 +91,7 @@ def plot_linkage_clustering_for_subgroups(
     subgroups_labels: list,
     linkage_type: Literal[
         "single", "complete", "average", "weighted", "centroid", "median", "ward"
-    ],
+    ] = "average",
 ) -> None:
     for key, matrix in subgroups_distance_matrix.items():
         labels = subgroups_labels[key[0]]
@@ -110,48 +110,24 @@ def plot_linkage_clustering_for_subgroups(
 
 
 def plot_linkage_clustering_with_colors(
+    spe_case: SPECase,
     distance_matrix: np.ndarray,
     labels: list,
     linkage_type: Literal[
         "single", "complete", "average", "weighted", "centroid", "median", "ward"
-    ],
-    spe_case: SPECase,
+    ] = "average",
     nonlinear_transformation: Literal["linear", "symlog"] = "linear",
-    threshold_distance: float = None,
-    threshold_position: float = None,
     path: str = None,
 ):
     plt.figure("dendrogram with colors")
     ax = plt.gca()
-    fig = plt.gcf()
 
     Z = _cluster_analysis(distance_matrix, labels, linkage_type)
-    dendro = dendrogram(
-        Z,
-        orientation="left",
-        count_sort=True,
-        distance_sort=True,
-        no_plot=True,
-    )
-    icoord = dendro["icoord"]
-    dcoord = dendro["dcoord"]
-    dcoord_max = [max(d) for d in dcoord]
 
     def color_func(k):
-        num_leaves = Z.shape[0] + 1
-        d = Z[k - num_leaves, 2]
-        i = np.where(np.isclose(dcoord_max, d))[0][0]
-        return (
-            "gray"
-            if (
-                threshold_distance is not None
-                and threshold_position is not None
-                and (max(icoord[i]) < threshold_position or d > threshold_distance)
-            )
-            else "black"
-        )
+        return "black"
 
-    dendro = dendrogram(
+    dendrogram(
         Z,
         ax=ax,
         labels=labels,
@@ -199,22 +175,6 @@ def plot_linkage_clustering_with_colors(
                 ),
             )
 
-    # Color all canvas below y=10 with light gray
-    # ax.axvline(0.95, color="gray", lw=0.5, linestyle="--")
-    # ax.axhline(150, color="k", lw=0.5, linestyle="--")
-    # ax.fill_between([0, 0.95], 150, 450, color="lightgray")
-    # Add a boundary around the box
-    if threshold_distance is not None and threshold_position is not None:
-        rect = patches.Rectangle(
-            (0, threshold_position),
-            threshold_distance,
-            5 * threshold_position,
-            linewidth=1,
-            edgecolor="gray",
-            facecolor=[0.95, 0.95, 0.95],
-        )
-        ax.add_patch(rect)
-
     plt.title(
         f"{spe_case.variant.upper()} - Hierarchical clustering of submissions based on SPE11 distance"
     )
@@ -239,7 +199,7 @@ def determine_median_cluster(
     labels: list,
     linkage_type: Literal[
         "single", "complete", "average", "weighted", "centroid", "median", "ward"
-    ],
+    ] = "average",
     mean_type: Literal["arithmetic", "geometric", "ag"] = "ag",
 ):
     Z = _cluster_analysis(distance_matrix, labels, linkage_type)
@@ -380,7 +340,9 @@ def argmin_distance(distances: dict[str, float]) -> str:
 def centroid_analysis(
     distance_matrix: np.ndarray,
     labels: list,
-    linkage_type: str,
+    linkage_type: Literal[
+        "single", "complete", "average", "weighted", "ward"
+    ] = "average",
     mean_type: Literal["arithmetic", "geometric", "ag"] = "ag",
 ):
     # Perform hierarchical clustering
