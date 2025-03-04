@@ -34,7 +34,7 @@ from spe11_io import (
     read_time_series_data,
     reduce_distance_matrix_to_participating_groups,
     reduce_to_increase_over_time,
-    replace_M_values,
+    replace_mC_values,
     replace_sparse_values,
     rescale_distance_matrix,
     set_zero_boundaryCO2_values,
@@ -42,7 +42,7 @@ from spe11_io import (
 )
 from safety import (
     check_boundaryCO2_values,
-    check_M_values,
+    check_mC_values,
     check_sanity,
     clean_data,
 )
@@ -138,13 +138,19 @@ if __name__ == "__main__":
 
     # Data management
     data_folder = Path(args.folder)
-    evaluation_folder = Path(args.tablefolder)
-    sparse_evaluation_folder = evaluation_folder / spe_case.variant / "sparse"
-    dense_evaluation_folder = evaluation_folder / spe_case.variant / "dense"
+    tablefolder = Path(args.tablefolder)
+    sparse_tablefolder = tablefolder / spe_case.variant / "sparse"
+    dense_tablefolder = tablefolder / spe_case.variant / "dense"
     save_folder = Path(args.output)
     cache_folder = save_folder / "cache"
     save_folder.mkdir(parents=True, exist_ok=True)
     cache_folder.mkdir(parents=True, exist_ok=True)
+
+    # Group management
+    groups = args.groups
+    groupfolders = args.groupfolders
+    calculatedAB = args.calculatedAB
+    calculatedC = args.calculatedC
 
     # Verbosity
     if args.verbose:
@@ -156,29 +162,28 @@ if __name__ == "__main__":
     participants = {}
     participants = identify_sparse_data(data_folder, spe_case, participants)
 
-    # Read extra data - compute convection from spatial maps using the official SPE11-CSP git repo
+    # Read post-processed data - ImmA, ImmB, mC, sealA, sealB
     immA_values_path = (
-        sparse_evaluation_folder / f"{spe_case.variant}_immA_from_spatial_maps.csv"
+        sparse_tablefolder / f"{spe_case.variant}_immA_from_spatial_maps.csv"
     )
     immB_values_path = (
-        sparse_evaluation_folder / f"{spe_case.variant}_immB_from_spatial_maps.csv"
+        sparse_tablefolder / f"{spe_case.variant}_immB_from_spatial_maps.csv"
     )
-    m_values_path = (
-        sparse_evaluation_folder / f"{spe_case.variant}_mC_from_spatial_maps.csv"
-    )
+    mC_values_path = sparse_tablefolder / f"{spe_case.variant}_mC_from_spatial_maps.csv"
     sealA_values_path = (
-        sparse_evaluation_folder / f"{spe_case.variant}_sealA_from_spatial_maps.csv"
+        sparse_tablefolder / f"{spe_case.variant}_sealA_from_spatial_maps.csv"
     )
     sealB_values_path = (
-        sparse_evaluation_folder / f"{spe_case.variant}_sealB_from_spatial_maps.csv"
+        sparse_tablefolder / f"{spe_case.variant}_sealB_from_spatial_maps.csv"
     )
 
     immA_values = read_extra_data(immA_values_path, participants)
     immB_values = read_extra_data(immB_values_path, participants)
-    m_values = read_extra_data(m_values_path, participants)
+    mC_values = read_extra_data(mC_values_path, participants)
     sealA_values = read_extra_data(sealA_values_path, participants)
     sealB_values = read_extra_data(sealB_values_path, participants)
 
+    # Post-process seal data - compute total seal data
     sealTot_values = {}
     sealTot_values["t"] = sealA_values["t"].copy()
     sealTot_values.update(
@@ -194,7 +199,7 @@ if __name__ == "__main__":
     # Read data for each participant and clean the data
     errors = []
     for key, participant in participants.items():
-        logging.info("Processing submission", key)
+        logging.info(f"Processing submission {key}")
 
         team, resultID = split_result_name(key)
 
@@ -224,8 +229,8 @@ if __name__ == "__main__":
         if key in spe_case.inconsistent_convection:
             participant["scalar_data"] = replace_sparse_values(
                 participant["scalar_data"],
-                m_values["t"],
-                m_values[key],
+                mC_values["t"],
+                mC_values[key],
                 "M_C",
                 spe_case,
                 key,
@@ -249,18 +254,18 @@ if __name__ == "__main__":
             participant["scalar_data"], replace_nan=False
         )
 
-        # Check availbiity of M_values - replace with precomputed values if necessary
-        status_m_values = check_M_values(participant["scalar_data"], spe_case, key)
-        if not status_m_values:
+        # Check availbiity of mC_values - replace with precomputed values if necessary
+        status_mC_values = check_mC_values(participant["scalar_data"], spe_case, key)
+        if not status_mC_values:
             raise ValueError("M-values are missing - stop the analysis.")
-            participant["scalar_data"] = replace_M_values(
+            participant["scalar_data"] = replace_mC_values(
                 participant["scalar_data"],
-                m_values["t"],
-                m_values[key],
+                mC_values["t"],
+                mC_values[key],
                 spe_case=spe_case,
                 key=key,
             )
-            assert check_M_values(participant["scalar_data"], spe_case, key), (
+            assert check_mC_values(participant["scalar_data"], spe_case, key), (
                 "Replacement of M-values failed - recomputation required."
             )
 
@@ -326,7 +331,7 @@ if __name__ == "__main__":
 
     # Read evaluated field data distance matrices for selected snapshots
     distance_matrix_snapshots = read_field_data_distance_matrix_snapshots(
-        dense_evaluation_folder, participants, spe_case
+        dense_tablefolder, participants, spe_case
     )
 
     # Integrate in time
@@ -343,7 +348,7 @@ if __name__ == "__main__":
             for quantity in ["pressure_l2", "pressure_l2s", "mass_w1"]
         }
     )
-    if spe_case.variant in ["spe11b", "spe11c"]:
+    if spe_case.non_isothermal:
         distance_matrix.update(
             {
                 timing + "_" + quantity: field_data_distance_matrix(
@@ -385,31 +390,31 @@ if __name__ == "__main__":
             if spe_case.variant in ["spe11b", "spe11c"]
             else []
         ),
-        # Sparse vs. dense
-        "sparse": [
-            "mobA",
-            "immA",
-            "dissA",
-            "mobB",
-            "immB",
-            "dissB",
-            "M_C",
-            "sealTot",
-        ]
-        + (["boundaryCO2"] if spe_case.variant in ["spe11b", "spe11c"] else []),
-        "dense": [
-            "early_pressure_l2",
-            "late_pressure_l2",
-            "early_pressure_l2s",
-            "late_pressure_l2s",
-            "early_mass_w1",
-            "late_mass_w1",
-        ]
-        + (
-            ["early_temperature_l2s", "late_temperature_l2s"]
-            if spe_case.variant in ["spe11b", "spe11c"]
-            else []
-        ),
+        ## Sparse vs. dense
+        # "sparse": [
+        #    "mobA",
+        #    "immA",
+        #    "dissA",
+        #    "mobB",
+        #    "immB",
+        #    "dissB",
+        #    "M_C",
+        #    "sealTot",
+        # ]
+        # + (["boundaryCO2"] if spe_case.variant in ["spe11b", "spe11c"] else []),
+        # "dense": [
+        #    "early_pressure_l2",
+        #    "late_pressure_l2",
+        #    "early_pressure_l2s",
+        #    "late_pressure_l2s",
+        #    "early_mass_w1",
+        #    "late_mass_w1",
+        # ]
+        # + (
+        #    ["early_temperature_l2s", "late_temperature_l2s"]
+        #    if spe_case.variant in ["spe11b", "spe11c"]
+        #    else []
+        # ),
     }
 
     # Compute global metrics for the selected criteria

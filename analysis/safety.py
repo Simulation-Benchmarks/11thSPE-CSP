@@ -31,9 +31,9 @@ def standard_check(data, key: str):
     return True
 
 
-def check_M_values(data, speCase: SPECase, key: str):
-    m_values = data[:, speCase.data_format["M_C"]]
-    return standard_check(m_values, key)
+def check_mC_values(data, speCase: SPECase, key: str):
+    mC_values = data[:, speCase.data_format["M_C"]]
+    return standard_check(mC_values, key)
 
 
 def check_boundaryCO2_values(data, speCase: SPECase, key: str):

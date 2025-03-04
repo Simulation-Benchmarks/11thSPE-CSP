@@ -162,7 +162,7 @@ def read_extra_data(path, data_types):
 #    return clean_data
 
 
-def replace_M_values(data, extra_time, extra_data, spe_case: SPECase, key):
+def replace_mC_values(data, extra_time, extra_data, spe_case: SPECase, key):
     """Replace M values in the data with the corresponding values from the extra data."""
 
     logger.info(f"Replace M-values for submission {key}.")

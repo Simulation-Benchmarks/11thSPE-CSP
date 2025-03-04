@@ -54,13 +54,12 @@ def convert_result_name(name):
 
 class SPECase:
     def __init__(self, variant):
-        self.variant = variant
         """Initialize the SPE case."""
 
-        # Define the test case - TODO move
-        if variant == "A":
-            self.variant = "spe11a"
+        self.variant = variant
 
+        # Define the test case
+        if self.variant == "spe11a":
             # Columns in the sparse reporting data which are relevant for the analysis
             self.data_format = {
                 "t": 0,  # Time [s]
@@ -222,9 +221,7 @@ class SPECase:
             )
             self.inconsistent_boundary_co2 = []
 
-        elif variant == "B":
-            self.variant = "spe11b"
-
+        elif variant == "spe11b":
             # Columns in the sparse reporting data which are relevant for the analysis
             self.data_format = {
                 "t": 0,  # Time [s]
@@ -492,9 +489,7 @@ class SPECase:
             )
             self.inconsistent_boundary_co2 = ["pflotran", "pau-inria"]
 
-        elif variant == "C":
-            self.variant = "spe11c"
-
+        elif variant == "spe11c":
             # Columns in the sparse reporting data which are relevant for the analysis
             self.data_format = {
                 "t": 0,  # Time [s]
