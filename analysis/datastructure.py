@@ -53,15 +53,12 @@ def convert_result_name(name):
 
 
 class SPECase:
-
     def __init__(self, variant):
-
         self.variant = variant
         """Initialize the SPE case."""
 
         # Define the test case - TODO move
         if variant == "A":
-
             self.variant = "spe11a"
 
             # Columns in the sparse reporting data which are relevant for the analysis
@@ -80,6 +77,9 @@ class SPECase:
                 "M_C": 11,  # Convection measure [m]
                 "sealTot": 12,  # Total CO2 in seal [kg]
             }
+
+            # Isothermal
+            self.non_isothermal = False
 
             # Reporting times - sparse data analysis
             self.time_unit = 3600  # seconds in an hour
@@ -223,7 +223,6 @@ class SPECase:
             self.inconsistent_boundary_co2 = []
 
         elif variant == "B":
-
             self.variant = "spe11b"
 
             # Columns in the sparse reporting data which are relevant for the analysis
@@ -243,6 +242,9 @@ class SPECase:
                 "sealTot": 12,  # Total CO2 in seal [kg]
                 "boundaryCO2": 13,  # CO2 at the boundary [kg]
             }
+
+            # Non-isothermal
+            self.non_isothermal = True
 
             # Reporting times - sparse data analysis
             self.time_unit = 31536000
@@ -491,7 +493,6 @@ class SPECase:
             self.inconsistent_boundary_co2 = ["pflotran", "pau-inria"]
 
         elif variant == "C":
-
             self.variant = "spe11c"
 
             # Columns in the sparse reporting data which are relevant for the analysis
@@ -511,6 +512,9 @@ class SPECase:
                 "sealTot": 12,  # Total CO2 in seal [kg]
                 "boundaryCO2": 13,  # CO2 at the boundary [kg]
             }
+
+            # Non-isothermal
+            self.non_isothermal = True
 
             # Reporting times
             self.time_unit = 31536000
@@ -683,7 +687,6 @@ class SPECase:
             self.inconsistent_boundary_co2 = ["pflotran"]  # "pflotran", "pau-inria"]
 
         else:
-
             raise ValueError(f"Variant {variant} not known.")
 
         # ! ---- Common for all variants ----

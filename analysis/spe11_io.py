@@ -402,41 +402,33 @@ def rescale_dense_distance_matrices(
         distance_matrix[key] = distance_matrix[key] * scaling_value
 
 
-def read_field_data_distance_matrix_snapshots(
-    folder, folder_w1, participants, spe_case: SPECase
-):
+def read_field_data_distance_matrix_snapshots(folder, participants, spe_case: SPECase):
     distance_matrix_snapshots = {
         time: {
             "pressure_l2": read_dense_distance_data(
                 folder
-                / spe_case.variant
-                / "dense"
                 / f"{spe_case.variant}_pressure_l2_diff_{time}{spe_case.reporting_time_unit}.csv",
                 participants,
             ),
             "pressure_l2s": read_dense_distance_data(
                 folder
-                / spe_case.variant
-                / "dense"
                 / f"{spe_case.variant}_pressure_l2semi_diff_{time}{spe_case.reporting_time_unit}.csv",
                 participants,
             ),
             "mass_w1": read_dense_distance_data(
-                folder_w1
+                folder
                 / f"{spe_case.variant}_co2mass_w1_diff_{time}{spe_case.reporting_time_unit}.csv",
                 participants,
             ),
         }
         for time in spe_case.reporting_times_dense
     }
-    if spe_case.variant in ["spe11b", "spe11c"]:
+    if spe_case.non_isothermal:
         for time in spe_case.reporting_times_dense:
             distance_matrix_snapshots[time].update(
                 {
                     "temperature_l2s": read_dense_distance_data(
                         folder
-                        / spe_case.variant
-                        / "dense"
                         / f"{spe_case.variant}_temperature_l2semi_diff_{time}{spe_case.reporting_time_unit}.csv",
                         participants,
                     )

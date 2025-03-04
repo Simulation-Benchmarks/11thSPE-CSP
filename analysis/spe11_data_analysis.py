@@ -94,14 +94,6 @@ if __name__ == "__main__":
         default="evaluation",
         help="The folder with precomputed dense data (from official SPE11-CSP git repo).",
     )
-    # TODO integrate in difference-data
-    # TODO remove
-    parser.add_argument(
-        "--evaluation-w1",
-        type=str,
-        default="dense_data_w1",
-        help="The folder with precomputed dense data (W1 differences).",
-    )
     parser.add_argument(
         "--output",
         type=str,
@@ -123,19 +115,21 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
+    # Define SPECase
+    variant = args.variant
+    spe_case = SPECase(variant)
+
+    # Data management
     data_folder = Path(args.data)
     evaluation_folder = Path(args.evaluation)
-    dense_data_folder_w1 = Path(args.evaluation_w1)
-    variant = args.variant
-
+    sparse_evaluation_folder = evaluation_folder / spe_case.variant / "sparse"
+    dense_evaluation_folder = evaluation_folder / spe_case.variant / "dense"
     save_folder = Path(args.output) / f"{date}"
     save_folder.mkdir(parents=True, exist_ok=True)
 
+    # TODO make hardcoded
     bochner_order = args.bochner_order
-
     linkage_type = args.linkage
-
-    spe_case = SPECase(variant)
 
     # ! ---- READ SPARSE DATA ----
 
@@ -144,7 +138,6 @@ if __name__ == "__main__":
     participants = identify_sparse_data(data_folder, spe_case, participants)
 
     # Read extra data - compute convection from spatial maps using the official SPE11-CSP git repo
-    sparse_evaluation_folder = evaluation_folder / spe_case.variant / "sparse"
     immA_values_path = (
         sparse_evaluation_folder / f"{spe_case.variant}_immA_from_spatial_maps.csv"
     )
@@ -315,7 +308,7 @@ if __name__ == "__main__":
 
     # Read evaluated field data distance matrices for selected snapshots
     distance_matrix_snapshots = read_field_data_distance_matrix_snapshots(
-        evaluation_folder, dense_data_folder_w1, participants, spe_case
+        dense_evaluation_folder, participants, spe_case
     )
 
     # Integrate in time
