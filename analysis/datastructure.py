@@ -235,7 +235,7 @@ class SPECase:
                 "immB": 8,  # Immobile free phase Box B [kg]
                 "dissB": 9,  # Dissolved CO2 in water Box B [kg]
                 "sealB": 10,  # CO2 in seal Box B [kg]
-                "M_C": 11,  # Convection measure [m]
+                "mC": 11,  # Convection measure [m]
                 "sealTot": 12,  # Total CO2 in seal [kg]
                 "boundaryCO2": 13,  # CO2 at the boundary [kg]
             }
@@ -459,35 +459,6 @@ class SPECase:
                 "rice1": 10000,
                 "rice2": 30000,
             }
-
-            self.inconsistent_immobile_saturations = [
-                "calgary",
-                "ctc-cne",
-                "opengosim1",
-                "opengosim2",
-                "opengosim3",
-            ]
-            self.inconsistent_convection = [
-                "calgary",
-                "cau-kiel",
-                "ctc-cne",
-                "pflotran",
-                "sintef1",
-                "sintef2",
-                "sintef3",
-                "sintef4",
-                "slb",
-                "stuttgart1",
-                "stuttgart2",
-                "stuttgart3",
-                "stuttgart4",
-            ]
-            self.inconsistent_seal_a = ["pflotran"]
-            self.inconsistent_seal_b = ["pflotran"]
-            self.inconsistent_seal = list(
-                set(self.inconsistent_seal_a + self.inconsistent_seal_b)
-            )
-            self.inconsistent_boundary_co2 = ["pflotran", "pau-inria"]
 
         elif variant == "spe11c":
             # Columns in the sparse reporting data which are relevant for the analysis

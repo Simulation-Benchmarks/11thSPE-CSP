@@ -124,6 +124,13 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
+        "-zBCO2",
+        "--zero_boundaryCO2",
+        nargs="+",
+        help="names of groups, where boundary CO2 values are set to zero",
+    )
+
+    parser.add_argument(
         "-verbose",
         "--verbose",
         action="store_true",
@@ -147,10 +154,11 @@ if __name__ == "__main__":
     cache_folder.mkdir(parents=True, exist_ok=True)
 
     # Group management
-    groups = args.groups
-    groupfolders = args.groupfolders
-    calculatedAB = args.calculatedAB
-    calculatedC = args.calculatedC
+    groups = [g.lower() for g in args.groups]
+    # groupfolders = args.groupfolders
+    calculatedAB = [g.lower() for g in args.calculatedAB]
+    calculatedC = [g.lower() for g in args.calculatedC]
+    zero_boundaryCO2 = [g.lower() for g in args.zero_boundaryCO2]
 
     # Verbosity
     if args.verbose:
@@ -209,7 +217,7 @@ if __name__ == "__main__":
         )
 
         # Replace inconsistent data
-        if key in spe_case.inconsistent_immobile_saturations:
+        if key in calculatedAB:
             participant["scalar_data"] = replace_sparse_values(
                 participant["scalar_data"],
                 immA_values["t"],
@@ -226,16 +234,6 @@ if __name__ == "__main__":
                 spe_case,
                 key,
             )
-        if key in spe_case.inconsistent_convection:
-            participant["scalar_data"] = replace_sparse_values(
-                participant["scalar_data"],
-                mC_values["t"],
-                mC_values[key],
-                "M_C",
-                spe_case,
-                key,
-            )
-        if key in spe_case.inconsistent_seal:
             participant["scalar_data"] = replace_sparse_values(
                 participant["scalar_data"],
                 sealTot_values["t"],
@@ -244,38 +242,18 @@ if __name__ == "__main__":
                 spe_case,
                 key,
             )
-        if key in spe_case.inconsistent_boundary_co2:
-            participant["scalar_data"] = set_zero_boundaryCO2_values(
-                participant["scalar_data"], spe_case
-            )
-
-        # Clean data
-        participant["scalar_data"] = clean_data(
-            participant["scalar_data"], replace_nan=False
-        )
-
-        # Check availbiity of mC_values - replace with precomputed values if necessary
-        status_mC_values = check_mC_values(participant["scalar_data"], spe_case, key)
-        if not status_mC_values:
-            raise ValueError("M-values are missing - stop the analysis.")
-            participant["scalar_data"] = replace_mC_values(
+        if key in calculatedC:
+            participant["scalar_data"] = replace_sparse_values(
                 participant["scalar_data"],
                 mC_values["t"],
                 mC_values[key],
-                spe_case=spe_case,
-                key=key,
-            )
-            assert check_mC_values(participant["scalar_data"], spe_case, key), (
-                "Replacement of M-values failed - recomputation required."
+                "M_C",
+                spe_case,
+                key,
             )
 
-        # Check availability of boundary CO2 data - data not required for the analysis at the moment
-        status_boundary_co2_values = check_boundaryCO2_values(
-            participant["scalar_data"], spe_case, key
-        )
-        if not status_boundary_co2_values:
-            raise ValueError("Boundary CO2 values are missing - stop the analysis.")
-            logger.info(f"Set zero boundary CO2 values for submission {key}.")
+        # Check inconsistent boundary co2 data
+        if key in zero_boundaryCO2:
             participant["scalar_data"] = set_zero_boundaryCO2_values(
                 participant["scalar_data"], spe_case
             )
@@ -285,12 +263,26 @@ if __name__ == "__main__":
             participant["scalar_data"], replace_nan=True
         )
 
-        status_sanity = check_sanity(participant["scalar_data"], key)
-        if not status_sanity:
-            raise ValueError("Error in the data - stop the analysis.")
-            errors.append(key)
-            logging.info(f"Error in data - exclude submission {key}.")
-            continue
+        # Check sanity of the data
+        for data_type, index in spe_case.data_format.items():
+            if data_type not in [
+                "mobA",
+                "mobB",
+                "immA",
+                "immB",
+                "dissA",
+                "dissB",
+                "sealA",
+                "sealB",
+                "M_C",
+                "sealTot",
+                "boundaryCO2",
+            ]:
+                continue
+            if not check_sanity(participant["scalar_data"][:, index], key):
+                raise ValueError(
+                    f"Error in the data for {key} in {index}-th column - stop the analysis."
+                )
 
     # Remove non-admissible participants
     for key in errors:
@@ -368,54 +360,29 @@ if __name__ == "__main__":
     # ! ---- COMBINED DATA DISTANCES / GLOBAL METRIC ----
 
     # Define criteria for global metrics
-    criteria = {
-        "all": [
-            # Sparse data
-            "mobA",
-            "immA",
-            "dissA",
-            "mobB",
-            "immB",
-            "dissB",
-            "M_C",
-            "sealTot",
-            # Dense data
-            "late_pressure_l2",
-            "early_pressure_l2s",
-            "early_mass_w1",
-            "late_mass_w1",
+    criteria = [
+        # Sparse data
+        "mobA",
+        "immA",
+        "dissA",
+        "mobB",
+        "immB",
+        "dissB",
+        "M_C",
+        "sealTot",
+        # Dense data
+        "late_pressure_l2",
+        "early_pressure_l2s",
+        "early_mass_w1",
+        "late_mass_w1",
+    ]
+    # Add SPE11B and SPE11C specific data
+    if spe_case.variant in ["spe11b", "spe11c"]:
+        criteria += [
+            "boundaryCO2",
+            "early_temperature_l2s",
+            "late_temperature_l2s",
         ]
-        + (
-            ["boundaryCO2", "early_temperature_l2s", "late_temperature_l2s"]
-            if spe_case.variant in ["spe11b", "spe11c"]
-            else []
-        ),
-        ## Sparse vs. dense
-        # "sparse": [
-        #    "mobA",
-        #    "immA",
-        #    "dissA",
-        #    "mobB",
-        #    "immB",
-        #    "dissB",
-        #    "M_C",
-        #    "sealTot",
-        # ]
-        # + (["boundaryCO2"] if spe_case.variant in ["spe11b", "spe11c"] else []),
-        # "dense": [
-        #    "early_pressure_l2",
-        #    "late_pressure_l2",
-        #    "early_pressure_l2s",
-        #    "late_pressure_l2s",
-        #    "early_mass_w1",
-        #    "late_mass_w1",
-        # ]
-        # + (
-        #    ["early_temperature_l2s", "late_temperature_l2s"]
-        #    if spe_case.variant in ["spe11b", "spe11c"]
-        #    else []
-        # ),
-    }
 
     # Compute global metrics for the selected criteria
     assert len(set([matrix.shape for matrix in distance_matrix.values()])) == 1, (
@@ -439,29 +406,25 @@ if __name__ == "__main__":
 
     # ! ---- NONLINEAR TRANSFORM ----
 
-    global_distance_matrix = {
-        key: mean_matrix(
-            median_scaled_distance_matrix,
-            keys=criteria[key],
-            mean_type="ag",
-        )
-        for key in criteria.keys()
-    }
+    global_distance_matrix = mean_matrix(
+        median_scaled_distance_matrix,
+        keys=criteria,
+        mean_type="ag",
+    )
 
     # Restrict data to subgroups
     subgroups_global_distance_matrix = {
-        (subgroup, key): reduce_distance_matrix_to_participating_groups(
-            matrix,
+        subgroup: reduce_distance_matrix_to_participating_groups(
+            global_distance_matrix,
             spe_case.subgroups[subgroup],
             participant_index,
         )
-        for key, matrix in global_distance_matrix.items()
         for subgroup in spe_case.subgroups.keys()
     }
 
     # ! ---- DISTANCE MATRIX VALUES -----
     plot_heatmap_distance_matrix(
-        subgroups_global_distance_matrix[("all", "all")],
+        subgroups_global_distance_matrix["all"],
         [convert_result_name(r) for r in spe_case.subgroups["all"]],
         spe_case,
         add_mean_to_diagonal=True,
@@ -472,7 +435,7 @@ if __name__ == "__main__":
     # Visual inspection in form of a dendrogram
     plot_linkage_clustering_with_colors(
         spe_case,
-        subgroups_global_distance_matrix[("all", "all")],
+        subgroups_global_distance_matrix["all"],
         [convert_result_name(r) for r in spe_case.subgroups["all"]],
         path=save_folder / f"{spe_case.variant}_dendrogram",
     )
@@ -480,8 +443,17 @@ if __name__ == "__main__":
     # Store the main distance matrix as csv file
     np.savetxt(
         save_folder / f"{spe_case.variant}_distance_matrix.csv",
-        subgroups_global_distance_matrix[("all", "all")],
+        subgroups_global_distance_matrix["all"],
         delimiter=",",
+    )
+
+    # Store the main distance matrix as csv file with labels as row and column headers
+    labels = [convert_result_name(r) for r in spe_case.subgroups["all"]]
+    np.savetxt(
+        save_folder / f"{spe_case.variant}_distance_matrix.csv",
+        subgroups_global_distance_matrix["all"],
+        delimiter=",",
+        header=",".join(labels),
     )
 
     # TODO store median values as csv file etc
@@ -489,34 +461,37 @@ if __name__ == "__main__":
     # Cache results for further analysis, in form of csv file
     for key, matrix in subgroups_global_distance_matrix.items():
         np.savetxt(
-            cache_folder / f"{spe_case.variant}_{key[0]}_{key[1]}.csv",
+            cache_folder / f"{spe_case.variant}_distance_matrix_{key}.csv",
             matrix,
             delimiter=",",
         )
 
-    assert False
-
     # ! ---- SENSIITIVITY ANALYSIS ----
 
-    # Monitor median values
-    ic(median_values_distance_matrix)
-
     # Correlation analysis
-    for key in criteria["all"]:
+    for key in criteria:
         plot_correlation_test(
             median_scaled_distance_matrix[key],
-            subgroups_global_distance_matrix[("all", "all")],
+            subgroups_global_distance_matrix["all"],
             key,
             "SPE11 distance",
         )
 
     pearson_correlation_result = pearson_correlation_analysis(
-        {key: median_scaled_distance_matrix[key] for key in criteria["all"]},
-        subgroups_global_distance_matrix[("all", "all")],
+        {key: median_scaled_distance_matrix[key] for key in criteria},
+        subgroups_global_distance_matrix["all"],
     )
+
+    # Combine median values and pearson correlation analysis in a table
+    # TODO
+
+    # Monitor median values
+    ic(median_values_distance_matrix)
 
     print("Pearson correlation analysis:")
     ic(pearson_correlation_result)
+
+    assert False
 
     # ! ---- MINIMUM AG MEAN DISTANCE ON ALL SUBMISSIONS ----
 
@@ -528,7 +503,7 @@ if __name__ == "__main__":
 
     mean_distance_all = {
         key: mean_distance_to_group(
-            subgroups_global_distance_matrix[("all", "all")],
+            subgroups_global_distance_matrix["all"],
             key,
             spe_case.subgroups["all"],
             mean_type="ag",
@@ -537,7 +512,7 @@ if __name__ == "__main__":
     }
     std_distance_all = {
         key: std_distance_to_group(
-            subgroups_global_distance_matrix[("all", "all")],
+            subgroups_global_distance_matrix["all"],
             key,
             spe_case.subgroups["all"],
             mean_type="ag",
@@ -555,7 +530,7 @@ if __name__ == "__main__":
 
     mean_distance_srg = {
         key: mean_distance_to_group(
-            subgroups_global_distance_matrix[("all", "all")],
+            subgroups_global_distance_matrix["all"],
             key,
             spe_case.subgroups["all"],
             mean_type="ag",
@@ -570,7 +545,7 @@ if __name__ == "__main__":
 
     # Quantitative inspection of the "median" data
     median_cluster_all = determine_median_cluster(
-        subgroups_global_distance_matrix[("all", "all")],
+        subgroups_global_distance_matrix["all"],
         spe_case.subgroups["all"],
         mean_type="ag",
     )
@@ -578,7 +553,7 @@ if __name__ == "__main__":
     # Determine the mean distances of the two representatives of the median cluster to the other participants
     mean_distance_cluster_all = {
         key: mean_distance_to_group(
-            subgroups_global_distance_matrix[("all", "all")],
+            subgroups_global_distance_matrix["all"],
             key,
             spe_case.subgroups["all"],
             mean_type="ag",
@@ -590,7 +565,7 @@ if __name__ == "__main__":
     )
 
     centroid_analysis(
-        subgroups_global_distance_matrix[("all", "all")],
+        subgroups_global_distance_matrix["all"],
         spe_case.subgroups["all"],
         mean_type="ag",
     )
@@ -598,25 +573,25 @@ if __name__ == "__main__":
     # ! ---- CREATE A DISCRETE PROBABILIY DISTRIBUTION FROM ALL SUBMISSIONS ----
 
     probability_distribution_all = np.sort(
-        squareform(subgroups_global_distance_matrix[("all", "all")])
+        squareform(subgroups_global_distance_matrix["all"])
     )
     variability_ag_all = variability_analysis(
-        subgroups_global_distance_matrix[("all", "all")],
+        subgroups_global_distance_matrix["all"],
         mean_type="ag",
     )
 
     probability_distribution_srg = np.sort(
-        squareform(subgroups_global_distance_matrix[("base case", "all")])
+        squareform(subgroups_global_distance_matrix["base case"])
     )
     variability_ag_srg = variability_analysis(
-        subgroups_global_distance_matrix[("base case", "all")], mean_type="ag"
+        subgroups_global_distance_matrix["base case"], mean_type="ag"
     )
 
     # ! ---- GROUP WITH MINIMUM MEAN DISTANCE TO ALL PARTICIPANTS ----
 
     mean_distance_all = {
         key: mean_distance_to_group(
-            subgroups_global_distance_matrix[("all", "all")],
+            subgroups_global_distance_matrix["all"],
             key,
             spe_case.subgroups["all"],
             mean_type="ag",
@@ -630,7 +605,7 @@ if __name__ == "__main__":
     # ! ---- VARIABILITY ANALYSIS ALL ----
 
     variability_ag_all = variability_analysis(
-        subgroups_global_distance_matrix[("all", "all")], mean_type="ag"
+        subgroups_global_distance_matrix["all"], mean_type="ag"
     )
 
     print()
@@ -645,16 +620,16 @@ if __name__ == "__main__":
     # ! ---- VARIABILITY ANALYSIS SRG ----
 
     variability_ag_srg = variability_analysis(
-        subgroups_global_distance_matrix[("base case", "all")], mean_type="ag"
+        subgroups_global_distance_matrix["base case"], mean_type="ag"
     )
 
     variability_ag_srg_commercial = variability_analysis(
-        subgroups_global_distance_matrix[("base case commercial", "all")],
+        subgroups_global_distance_matrix["base case commercial"],
         mean_type="ag",
     )
 
     variability_ag_srg_non_commercial = variability_analysis(
-        subgroups_global_distance_matrix[("base case non-commercial", "all")],
+        subgroups_global_distance_matrix["base case non-commercial"],
         mean_type="ag",
     )
 
@@ -724,7 +699,7 @@ if __name__ == "__main__":
         print("-" * 80)
         print()
         distance_values_tetratech = squareform(
-            subgroups_global_distance_matrix[("tetratech", "all")]
+            subgroups_global_distance_matrix["tetratech"]
         )
         print(
             f"The distance between the two tetratech submissions is {distance_values_tetratech}."
@@ -733,7 +708,7 @@ if __name__ == "__main__":
         # ! ---- VARIABILITY ANALYSIS UT-CSEE (DIFFERENT SIMULATORS) ----
 
         distance_values_ut_csee = squareform(
-            subgroups_global_distance_matrix[("ut-csee", "all")]
+            subgroups_global_distance_matrix["ut-csee"]
         )
         print(
             f"The distance between the two ut-csee submissions is {distance_values_ut_csee}."
@@ -755,9 +730,7 @@ if __name__ == "__main__":
             value=max(
                 np.max(distance_values_tetratech), np.max(distance_values_ut_csee)
             ),
-            distribution=np.sort(
-                squareform(subgroups_global_distance_matrix[("all", "all")])
-            ),
+            distribution=np.sort(squareform(subgroups_global_distance_matrix["all"])),
         )
 
         print()
@@ -809,10 +782,8 @@ if __name__ == "__main__":
 
         variability_analysis_different_groups = variability_analysis(
             np.array(
-                squareform(subgroups_global_distance_matrix[("opm", "all")]).tolist()
-                + squareform(
-                    subgroups_global_distance_matrix[("slb-IX", "all")]
-                ).tolist()
+                squareform(subgroups_global_distance_matrix["opm"]).tolist()
+                + squareform(subgroups_global_distance_matrix["slb-IX"]).tolist()
             ).flatten(),
             mean_type="ag",
         )
@@ -880,10 +851,8 @@ if __name__ == "__main__":
 
         variability_analysis_different_groups = variability_analysis(
             np.array(
-                squareform(subgroups_global_distance_matrix[("dumux", "all")]).tolist()
-                + squareform(
-                    subgroups_global_distance_matrix[("slb-IX", "all")]
-                ).tolist()
+                squareform(subgroups_global_distance_matrix["dumux"]).tolist()
+                + squareform(subgroups_global_distance_matrix["slb-IX"]).tolist()
             ).flatten(),
             mean_type="ag",
         )
@@ -922,7 +891,7 @@ if __name__ == "__main__":
     # ! ---- MESH REFINEMENT ANALYSIS ----
 
     # plot_linkage_clustering_with_colors(
-    #     subgroups_global_distance_matrix[("refined-vs-base-case", "all")],
+    #     subgroups_global_distance_matrix["refined-vs-base-case"],
     #     spe_case.subgroups["refined-vs-base-case"],
     #     linkage_type,
     #     spe_case,
@@ -933,7 +902,7 @@ if __name__ == "__main__":
         print(
             "OPM1 vs OPM4:",
             find_distance(
-                subgroups_global_distance_matrix[("all", "all")],
+                subgroups_global_distance_matrix["all"],
                 ("opm1", "opm4"),
                 spe_case.subgroups["all"],
             ),
@@ -941,7 +910,7 @@ if __name__ == "__main__":
         print(
             "GEOS1 vs GEOS2:",
             find_distance(
-                subgroups_global_distance_matrix[("all", "all")],
+                subgroups_global_distance_matrix["all"],
                 ("geos1", "geos2"),
                 spe_case.subgroups["all"],
             ),
@@ -950,7 +919,7 @@ if __name__ == "__main__":
         print(
             "GEOS2 vs OPM4:",
             find_distance(
-                subgroups_global_distance_matrix[("all", "all")],
+                subgroups_global_distance_matrix["all"],
                 ("geos2", "opm4"),
                 spe_case.subgroups["all"],
             ),
@@ -958,9 +927,7 @@ if __name__ == "__main__":
 
     if spe_case.variant in ["spe11b"]:
         variability_mesh_opengosim = variability_analysis(
-            subgroups_global_distance_matrix[
-                ("mesh_refinement_study_opengosim", "all")
-            ],
+            subgroups_global_distance_matrix["mesh_refinement_study_opengosim"],
             mean_type="ag",
         )
 
@@ -1041,7 +1008,7 @@ if __name__ == "__main__":
         distance_values_refinement = {
             "opengosim": [
                 find_distance(
-                    subgroups_global_distance_matrix[("all", "all")],
+                    subgroups_global_distance_matrix["all"],
                     (key_i, key_j),
                     spe_case.subgroups["all"],
                 )
@@ -1053,29 +1020,29 @@ if __name__ == "__main__":
             ],
             "sintef": [
                 find_distance(
-                    subgroups_global_distance_matrix[("all", "all")],
+                    subgroups_global_distance_matrix["all"],
                     (key_i, key_j),
                     spe_case.subgroups["all"],
                 )
                 for key_i, key_j in [("sintef1", "sintef3"), ("sintef2", "sintef4")]
             ],
             "ifpen": find_distance(
-                subgroups_global_distance_matrix[("all", "all")],
+                subgroups_global_distance_matrix["all"],
                 ("ifpen1", "ifpen2"),
                 spe_case.subgroups["all"],
             ),
             "geos": find_distance(
-                subgroups_global_distance_matrix[("all", "all")],
+                subgroups_global_distance_matrix["all"],
                 ("geos1", "geos2"),
                 spe_case.subgroups["all"],
             ),
             "opm": find_distance(
-                subgroups_global_distance_matrix[("all", "all")],
+                subgroups_global_distance_matrix["all"],
                 ("opm1", "opm4"),
                 spe_case.subgroups["all"],
             ),
             # "rice": find_distance(
-            #    subgroups_global_distance_matrix[("all", "all")],
+            #    subgroups_global_distance_matrix["all"],
             #    ("rice1", "rice2"),
             #    spe_case.subgroups["all"],
             # ),
@@ -1242,11 +1209,11 @@ if __name__ == "__main__":
         # Variability within the two groups
 
         variability_100k = variability_analysis(
-            subgroups_global_distance_matrix[("100k-cartesian-mesh", "all")],
+            subgroups_global_distance_matrix["100k-cartesian-mesh"],
             mean_type="ag",
         )
         variability_1M = variability_analysis(
-            subgroups_global_distance_matrix[("1.6m-cartesian-mesh", "all")],
+            subgroups_global_distance_matrix["1.6m-cartesian-mesh"],
             mean_type="ag",
         )
         p_value_variability_100k_1M_different = (
@@ -1287,7 +1254,7 @@ if __name__ == "__main__":
         # ! ---- FACIES-ADAPTED MESHES ----
 
         # plot_linkage_clustering_with_colors(
-        #     subgroups_global_distance_matrix[("facies-adapted-vs-base-case", "all")],
+        #     subgroups_global_distance_matrix["facies-adapted-vs-base-case"],
         #     spe_case.subgroups["facies-adapted-vs-base-case"],
         #     linkage_type,
         #     spe_case,
@@ -1297,7 +1264,7 @@ if __name__ == "__main__":
         print(
             "OPM1 vs CAU-KIEL:",
             find_distance(
-                subgroups_global_distance_matrix[("all", "all")],
+                subgroups_global_distance_matrix["all"],
                 ("opm1", "cau-kiel"),
                 spe_case.subgroups["all"],
             ),
@@ -1305,7 +1272,7 @@ if __name__ == "__main__":
         print(
             "SLB1 vs CAU-KIEL:",
             find_distance(
-                subgroups_global_distance_matrix[("all", "all")],
+                subgroups_global_distance_matrix["all"],
                 ("opm1", "cau-kiel"),
                 spe_case.subgroups["all"],
             ),
