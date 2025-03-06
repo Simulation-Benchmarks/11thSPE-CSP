@@ -384,9 +384,9 @@ def plot_heatmap_distance_matrix(
                 team = lbl.get_text()
                 if team[-1].isdigit():
                     team = team[:-1]
-                team_color = spe_case.groups_and_colors[team]
-                category = spe_case.results_and_categories[result]
-                category_color = spe_case.categories_and_colors[category]
+                team_color = spe_case.groups_and_colors[team.lower()]
+                category = spe_case.results_and_categories[result.lower()]
+                category_color = spe_case.categories_and_colors[category.lower()]
                 # Set two boxes, one surrounding the text with pad just to the left, and the other with a smaller pad, but surrounding all
                 bb = lbl.set_bbox(
                     dict(
@@ -399,10 +399,6 @@ def plot_heatmap_distance_matrix(
     if path is not None:
         plt.tight_layout()
         plt.savefig(path, dpi=1200)
+        print(f"Saved heatmap to {path}.")
 
     plt.show()
-
-    # Clean up and make sure the diagonal of the distance matrix has the same values
-    if add_mean_to_diagonal:
-        for i in range(distance_matrix.shape[0]):
-            distance_matrix[i, i] = diagonal_values[i]
