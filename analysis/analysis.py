@@ -316,22 +316,12 @@ def plot_heatmap_distance_matrix(
     distance_matrix: np.ndarray,
     labels: list,
     spe_case: SPECase,
-    add_mean_to_diagonal=False,
     mean_type="ag",
     path=None,
 ):
     assert distance_matrix.shape[0] == distance_matrix.shape[1]
     assert distance_matrix.shape[0] == len(labels)
 
-    if add_mean_to_diagonal:
-        diagonal_values = np.diag(distance_matrix).copy()
-        for i in range(distance_matrix.shape[0]):
-            distances = distance_matrix[i, :].tolist()
-            distances.pop(i)
-            distances = np.array(distances)
-            distance_matrix[i, i] = mean(distances, mean_type)
-
-    # cmap = plt.get_cmap("icefire")
     # Plot the distance matrix using a heatmap
     fig, ax = plt.subplots()
     # Adjust figure size
