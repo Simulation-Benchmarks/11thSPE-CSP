@@ -316,7 +316,6 @@ def plot_heatmap_distance_matrix(
     distance_matrix: np.ndarray,
     labels: list,
     spe_case: SPECase,
-    mean_type="ag",
     path=None,
 ):
     assert distance_matrix.shape[0] == distance_matrix.shape[1]
@@ -359,11 +358,7 @@ def plot_heatmap_distance_matrix(
                 fontsize=7,
             )
 
-    # # Add raster to around the diagonal
-    # for i in range(len(labels)):
-    #     ax.axvline(i - 0.5, color="w", lw=0.5)
-    #     ax.axhline(i - 0.5, color="w", lw=0.5)
-    # Add boxes around the elements on the diagonal only
+    # Add raster to around the diagonal
     for i in range(len(labels)):
         ax.add_patch(
             plt.Rectangle(
@@ -379,7 +374,6 @@ def plot_heatmap_distance_matrix(
     for orientation, lbls in zip(
         ["x", "y"], [ax.get_xticklabels(), ax.get_yticklabels()]
     ):
-        # lbls = ax.get_ymajorticklabels()
         for lbl in lbls:
             result = lbl.get_text()
             if result in labels:
@@ -387,16 +381,18 @@ def plot_heatmap_distance_matrix(
                 if team[-1].isdigit():
                     team = team[:-1]
                 team_color = spe_case.groups_and_colors[team.lower()]
+                team_text_color = spe_case.groups_and_text_colors[team.lower()]
                 category = spe_case.results_and_categories[result.lower()]
                 category_color = spe_case.categories_and_colors[category.lower()]
-                # Set two boxes, one surrounding the text with pad just to the left, and the other with a smaller pad, but surrounding all
-                bb = lbl.set_bbox(
+                lbl.set_bbox(
                     dict(
                         facecolor=category_color if orientation == "x" else team_color,
                         edgecolor="k",  # team_color,
                         boxstyle="square, pad=0.3",
                     ),
                 )
+                if orientation == "y":
+                    lbl.set_color(team_text_color)
 
     if path is not None:
         plt.tight_layout()
