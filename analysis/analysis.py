@@ -7,7 +7,7 @@ import numpy as np
 from matplotlib.colors import LinearSegmentedColormap
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-from cluster_analysis import mean, nonlinear_transform
+from cluster_analysis import nonlinear_transform
 from datastructure import SPECase
 
 
@@ -138,37 +138,6 @@ def field_data_distance_matrix(
     return distance_matrix
 
 
-def rms_distance(data: dict, index_map: dict, key: str, spe_case: SPECase):
-    rms = {}
-    for key in spe_case.data_format.keys():
-        rms[key] = np.zeros((len(data), len(data)))
-
-        # Cross comparisons
-        for key1, result1 in data.items():
-            for key2, result2 in data.items():
-                # Compute the RMS distance - L2-type integral over time weighted in time relative to total time
-                # TODO use weighted_time_integral_diff
-                rms[key][index_map[key1], index_map[key2]] = np.sqrt(
-                    np.sum(
-                        time_weight
-                        * np.square(
-                            result1["rescaled_data"][:, spe_case.data_format[key]]
-                            - result2["rescaled_data"][:, spe_case.data_format[key]]
-                        )
-                    )
-                    / np.sum(time_weight)
-                )
-                # (
-                #    weighted_time_integral_diff(
-                #        result1["rescaled_data"][:, spe_case.data_format[key]],
-                #        result2["rescaled_data"][:, spe_case.data_format[key]],
-                #        spe_case,
-                #    )
-                # )
-
-    return rms
-
-
 def mean_matrix(
     data: dict,
     keys: Optional[list] = None,
@@ -207,106 +176,6 @@ def mean_matrix(
     #    )
     else:
         raise ValueError("Order not supported.")
-
-
-def cluster_eig(dM, rel_tol, abs_tol, depth, participants):
-    """Cluster eigenvector analysis of a distance matrix.
-
-    Parameters:
-    dM (np.ndarray): Distance matrix
-    rel_tol (float): Relative tolerance for stopping
-    abs_tol (float): Absolute tolerance for stopping
-    depth (int): Maximum depth of analysis
-    participants (list): List of participants
-
-    """
-
-    # Make sure that the diagonal is zero (note: non-linear transformations may lead to non-zero diagonal)
-    np.fill_diagonal(dM, 0)
-
-    tree_cluster = {}
-    tree_cluster["mean_dist"] = np.sum(dM) / (dM.size - len(dM))
-
-    # Build something like a
-    dM = dM + np.eye(len(dM))
-    idM = np.reciprocal(dM)
-    idM[np.eye(len(idM)) == 1] = 0
-    isinfdM = np.isinf(idM)
-    idM[isinfdM] = 0
-    idM[isinfdM] = np.mean(idM) * 100
-    idM = idM - np.diag(np.sum(idM, axis=1))
-    e1, _ = np.linalg.eig(idM)
-    big = e1[:, -2] > 0
-    if np.sum(big) < len(idM) / 2:
-        big = ~big
-    small = ~big
-    tree_cluster["hmean_dist_cut"] = np.mean(dM[big][:, small])
-    big_min_mean = tree_cluster["hmean_dist_cut"]
-
-    if (
-        depth > 1
-        and (tree_cluster["hmean_dist_cut"] / tree_cluster["mean_dist"] > rel_tol)
-        and (tree_cluster["mean_dist"] > abs_tol)
-    ):
-        tree_cluster["big_part"] = [
-            participants[i] for i in range(len(participants)) if big[i]
-        ]
-        tree_cluster["small_part"] = [
-            participants[i] for i in range(len(participants)) if small[i]
-        ]
-        if np.sum(big) > 1:
-            tree_cluster["big_cl"], big_min_mean, leaf_clusters_big = cluster_eig(
-                dM[big][:, big], rel_tol, abs_tol, depth - 1, tree_cluster["big_part"]
-            )
-            leaf_clusters = leaf_clusters_big
-        else:
-            leaf_clusters = [tree_cluster["big_part"]]
-        if np.sum(small) > 1:
-            tree_cluster["small_cl"], _, leaf_clusters_small = cluster_eig(
-                dM[small][:, small],
-                rel_tol,
-                abs_tol,
-                depth - 1,
-                tree_cluster["small_part"],
-            )
-            leaf_clusters.extend(leaf_clusters_small)
-        else:
-            leaf_clusters.append(tree_cluster["small_part"])
-    else:
-        tree_cluster["big_part"] = [
-            participants[i] for i in range(len(participants)) if big[i]
-        ]
-        tree_cluster["small_part"] = [
-            participants[i] for i in range(len(participants)) if small[i]
-        ]
-        sorted_indices = np.argsort(np.sum(dM, axis=0))
-        leaf_clusters = [[participants[i] for i in sorted_indices]]
-
-    tree_cluster["big"] = big
-    tree_cluster["small"] = small
-
-    return tree_cluster, big_min_mean, leaf_clusters
-
-
-def cluster_intersect(C1, C2):
-    intersect = []
-    unique1 = []
-
-    for item1 in C1:
-        flag = False
-        for item2 in C2:
-            if item1 == item2:
-                flag = True
-                intersect.append(item1)
-        if not flag:
-            unique1.append(item1)
-
-    if len(intersect) < len(C2):
-        _, unique2 = cluster_intersect(C2, intersect)
-    else:
-        unique2 = []
-
-    return intersect, unique1, unique2
 
 
 # ! ---- PLOTTING ----
