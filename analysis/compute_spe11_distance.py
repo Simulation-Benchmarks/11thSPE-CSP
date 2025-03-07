@@ -342,8 +342,8 @@ if __name__ == "__main__":
 
     dense_data_criteria = [
         # Dense data
-        "late_pressure_l2",
         "early_pressure_l2s",
+        "late_pressure_l2",
         "early_mass_w1",
         "late_mass_w1",
     ]
