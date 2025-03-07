@@ -6,7 +6,6 @@ from pathlib import Path
 import pandas as pd
 
 import numpy as np
-from icecream import ic
 
 from analysis import (
     field_data_distance_matrix,
@@ -14,7 +13,7 @@ from analysis import (
     scalar_data_series_to_distance_matrix,
 )
 from datastructure import SPECase
-from spe11_io import (
+from utilities import (
     determine_reference_value_distance_matrix,
     identify_sparse_data,
     interpolate_data_reporting_times,
@@ -32,7 +31,6 @@ from safety import (
 )
 from sensitivity_analysis import (
     pearson_correlation_analysis,
-    plot_correlation_test,
 )
 from cluster_analysis import mean
 
@@ -42,7 +40,6 @@ logger = logging.getLogger(__name__)
 if __name__ == "__main__":
     # ! ---- SETUP ----
 
-    # Parse the variant and the use of petsc
     parser = argparse.ArgumentParser(
         description="This script performs the SPE11 data analysis for the submitted data."
     )

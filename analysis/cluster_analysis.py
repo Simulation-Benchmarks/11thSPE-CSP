@@ -1,13 +1,12 @@
 from typing import Literal
 
-import matplotlib.patches as patches
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.cluster.hierarchy import dendrogram, fcluster, linkage
-from scipy.spatial.distance import cdist, squareform
+from scipy.spatial.distance import squareform
 
 from datastructure import SPECase
-from spe11_io import nonlinear_transform
+from utilities import nonlinear_transform
 
 
 def _cluster_analysis(

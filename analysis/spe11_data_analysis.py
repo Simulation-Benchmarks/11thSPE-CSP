@@ -24,7 +24,7 @@ from cluster_analysis import (
     std_distance_to_group,
 )
 from datastructure import SPECase, convert_result_name, update_team_name
-from spe11_io import (
+from utilities import (
     determine_reference_value_distance_matrix,
     find_distance,
     identify_sparse_data,

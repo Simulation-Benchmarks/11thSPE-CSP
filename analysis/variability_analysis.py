@@ -5,7 +5,7 @@ import numpy as np
 from scipy.spatial.distance import squareform
 from scipy.stats import t
 
-from spe11_io import nonlinear_transform
+from utilities import nonlinear_transform
 
 
 def variability_analysis(

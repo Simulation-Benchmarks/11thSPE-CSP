@@ -4,10 +4,7 @@ import argparse
 import logging
 from pathlib import Path
 
-import matplotlib.pyplot as plt
 import numpy as np
-from icecream import ic
-from scipy.spatial.distance import squareform
 import pandas as pd
 
 from analysis import (
@@ -22,16 +19,8 @@ from cluster_analysis import (
     plot_linkage_clustering_with_colors,
 )
 from datastructure import SPECase
-from spe11_io import (
-    find_distance,
-    identify_sparse_data,
+from utilities import (
     reduce_distance_matrix_to_subset,
-)
-from variability_analysis import (
-    cummulative_distribution_function,
-    left_tailed_test_for_alternative_hypothesis,
-    two_tailed_test_for_alternative_hypothesis,
-    variability_analysis,
 )
 
 logger = logging.getLogger(__name__)
