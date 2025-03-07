@@ -78,7 +78,7 @@ def identify_sparse_data(
                 "sparse": spe_input_folder / f"{spe_case.variant}_time_series.csv",
             }
         else:
-            warn(f"Results missing - skipping {team}.")
+            warn(f"Results missing for {spe_case.variant} - skipping {team}.")
 
     return participants
 
@@ -226,20 +226,6 @@ def reduce_to_increase_over_time(data):
     reduced_data = data.copy()
     reduced_data -= data[0]
     return reduced_data
-
-
-# def rescale_data(data, spe_case: SPECase):
-#     """Rescale the data to the correct units."""
-#     # Start with unit scaling
-#     scaling = spe_case.scaling
-#     if False:
-#         ...
-#     elif True:
-#         # Scale data based on the weighted time integral
-#         scaling.update({})
-#     scaling_matrix = np.diag([scaling[key] for key in scaling.keys()])
-#     rescaled_data = data @ scaling_matrix
-#     return rescaled_data
 
 
 def rescale_clean_sparse_data(
@@ -517,53 +503,16 @@ def find_distance(distance_matrix, key, labels):
     return distance_matrix[i, j]
 
 
-def reduce_distance_matrix_to_participating_groups(
-    distance_matrix: np.ndarray, participating_groups: list, participant_index: dict
+def reduce_distance_matrix_to_subset(
+    distance_matrix: np.ndarray,
+    subset_participating_groups: list,
+    all_participating_groups: list,
 ):
     """Reduce square matrix to rows and columns/participants of interest."""
     group_indices = np.array(
-        [
-            participant_index[g]
-            for g in sorted(participating_groups)
-            if g in participant_index
-        ]
+        [all_participating_groups.index(g) for g in subset_participating_groups]
+    ).astype(int)
+    assert len(group_indices) == len(subset_participating_groups), (
+        "expected length mismatch"
     )
     return distance_matrix[group_indices, :][:, group_indices]
-
-
-# def read_spe11b_sparse_data(participants: dict, spe_case: SPECase):
-#     # timeunit = 31536000
-#     # IS = 50 * timeunit
-#     # report_times = np.arange(0, 1000 + 0.1, 0.1) * timeunit
-#     # clustering_type = [
-#     #     linear_analysis,
-#     #     linear_analysis,
-#     #     linear_analysis,
-#     #     linear_analysis,
-#     #     linear_analysis,
-#     # ]
-#     # rel_tols_cluster = [1.2, 1.2, 1.2, 1.5, 1.4]
-#     # plot_type = ["semilogx", "semilogx", "semilogx", "loglog", "semilogx"]
-#     # plot_min_exp = [5, 3, -2, 2, 0]
-#     # plot_max_exp = [7.7, 7, 4.2, 7.9179, 5]
-#
-#     for participant in participants.keys():
-#         data = participants[participant]["data"]
-#         timestamps = data[:, spe_case.data_format["t"]]
-#         mass_boxA = (
-#             data[:, data_format["mobA"]]
-#             + data[:, data_format["immA"]]
-#             + data[:, data_format["dissA"]]
-#         )
-#         mass_boxB = (
-#             data[:, data_format["mobB"]]
-#             + data[:, data_format["immB"]]
-#             + data[:, data_format["dissB"]]
-#         )
-#         M_C = data[:, data_format["M_C"]]
-#         sealTot = data[:, data_format["sealTot"]]
-#         boundaryCO2 = data[:, data_format["boundaryCO2"]]
-#     for key, value in data_groups.items():
-#         data = participants[key]["data"]
-#         timestamps = data[iter1].iloc[:, data_groups["time"]].values
-#         resultstemp = data[iter1].iloc[:, data_groups[key]].values
