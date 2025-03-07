@@ -13,7 +13,7 @@ from utilities import (
     find_distance,
     reduce_distance_matrix_to_subset,
 )
-from variability_analysis import (
+from variability_analysis_spe11_distance_matrix import (
     variability_analysis,
 )
 
