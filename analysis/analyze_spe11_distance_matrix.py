@@ -139,7 +139,6 @@ if __name__ == "__main__":
                 distance_matrix,
                 groups_flat,
                 spe_case,
-                mean_type="ag",
                 path=save_folder / f"{spe_case.variant}_heatmap_distance_matrix.png",
             )
 
