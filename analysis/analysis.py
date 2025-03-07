@@ -376,7 +376,9 @@ def plot_heatmap_distance_matrix(
             )
         )
 
-    for lbls in [ax.get_xticklabels(), ax.get_yticklabels()]:
+    for orientation, lbls in zip(
+        ["x", "y"], [ax.get_xticklabels(), ax.get_yticklabels()]
+    ):
         # lbls = ax.get_ymajorticklabels()
         for lbl in lbls:
             result = lbl.get_text()
@@ -390,7 +392,7 @@ def plot_heatmap_distance_matrix(
                 # Set two boxes, one surrounding the text with pad just to the left, and the other with a smaller pad, but surrounding all
                 bb = lbl.set_bbox(
                     dict(
-                        facecolor=category_color,
+                        facecolor=category_color if orientation == "x" else team_color,
                         edgecolor="k",  # team_color,
                         boxstyle="square, pad=0.3",
                     ),
