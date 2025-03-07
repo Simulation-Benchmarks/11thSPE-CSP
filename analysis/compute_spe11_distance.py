@@ -7,13 +7,11 @@ import pandas as pd
 
 import numpy as np
 
-from analysis import (
+from datastructure import SPECase
+from utilities import (
     field_data_distance_matrix,
     mean_matrix,
     scalar_data_series_to_distance_matrix,
-)
-from datastructure import SPECase
-from utilities import (
     determine_reference_value_distance_matrix,
     identify_sparse_data,
     interpolate_data_reporting_times,

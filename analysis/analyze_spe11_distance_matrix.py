@@ -7,9 +7,6 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from analysis import (
-    plot_heatmap_distance_matrix,
-)
 from cluster_analysis import (
     argmin_distance,
     centroid_analysis,
@@ -21,6 +18,7 @@ from cluster_analysis import (
 from datastructure import SPECase
 from utilities import (
     reduce_distance_matrix_to_subset,
+    plot_heatmap_distance_matrix,
 )
 
 logger = logging.getLogger(__name__)

@@ -3,20 +3,6 @@
 import numpy as np
 
 
-# TODO move to utils.
-def split_result_name(result_name: str):
-    """Split the result name into its components."""
-
-    # Check if the last component is a number - corresponds to the result number
-    if result_name[-1].isdigit():
-        team = result_name[:-1]
-        result = result_name[-1]
-    else:
-        team = result_name
-        result = None
-    return team, result
-
-
 class SPECase:
     def __init__(self, variant):
         """Initialize the SPE case."""
