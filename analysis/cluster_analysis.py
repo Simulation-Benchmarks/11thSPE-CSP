@@ -25,46 +25,6 @@ def _cluster_analysis(
 # ! ---- PLOTTING FUNCTIONS ---- ! #
 
 
-def plot_distance_matrix_values(distance_matrix: dict[str, np.ndarray]):
-    flat_distance_matrix = {
-        key: squareform(matrix) for key, matrix in distance_matrix.items()
-    }
-
-    plt.figure("values")
-    for key, values in flat_distance_matrix.items():
-        plt.scatter(values, np.ones_like(values) * (-1), label=key)
-    plt.legend()
-
-    plt.figure("raw - srg")
-    for i, (key, data) in enumerate(srg_flat_distance_matrix.items()):
-        plt.scatter(data, np.ones_like(data) * (-i), label=key)
-    plt.legend()
-    plt.show()
-
-
-def plot_subgroup_distance_matrix_values(
-    distance_matrix: dict[tuple[str, str], np.ndarray],
-):
-    flat_distance_matrix = {
-        key: squareform(matrix) for key, matrix in distance_matrix.items()
-    }
-
-    subgroups = set([key[0] for key in distance_matrix.keys()])
-    for subgroup in subgroups:
-        subgroup_values = {
-            key[1]: values
-            for key, values in flat_distance_matrix.items()
-            if key[0] == subgroup
-        }
-
-        plt.figure(f"{subgroup} values")
-        for level, (key, values) in enumerate(subgroup_values.items()):
-            plt.scatter(values, np.ones_like(values) * (-level), label=key)
-        plt.legend()
-
-    plt.show()
-
-
 def plot_linkage_clustering(
     distance_matrix: np.ndarray,
     labels: list,
@@ -82,29 +42,6 @@ def plot_linkage_clustering(
         # distance_sort="descending",
         count_sort="ascending",
     )
-    plt.show()
-
-
-def plot_linkage_clustering_for_subgroups(
-    subgroups_distance_matrix: dict[tuple[str, str], np.ndarray],
-    subgroups_labels: list,
-    linkage_type: Literal[
-        "single", "complete", "average", "weighted", "centroid", "median", "ward"
-    ] = "average",
-) -> None:
-    for key, matrix in subgroups_distance_matrix.items():
-        labels = subgroups_labels[key[0]]
-        Z = _cluster_analysis(matrix, labels, linkage_type)
-        plt.figure(f"dendrogram - {key}")
-        plt.title(f"Dendrogram - {key} - {linkage_type}")
-        dendrogram(
-            Z,
-            labels=labels,
-            orientation="left",
-            # distance_sort="descending",
-            count_sort="ascending",
-        )
-
     plt.show()
 
 
