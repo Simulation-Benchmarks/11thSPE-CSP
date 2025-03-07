@@ -235,11 +235,6 @@ if __name__ == "__main__":
                 participant["scalar_data"], spe_case
             )
 
-        # # Replace nan values with zeros
-        # participant["scalar_data"] = clean_data(
-        #     participant["scalar_data"], replace_nan=True
-        # )
-
         # Check sanity of the data
         for data_type, index in spe_case.data_format.items():
             if data_type not in [
