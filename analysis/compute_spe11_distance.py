@@ -5,58 +5,36 @@ import logging
 from pathlib import Path
 import pandas as pd
 
-import matplotlib.pyplot as plt
 import numpy as np
 from icecream import ic
-from scipy.spatial.distance import squareform
 
 from analysis import (
     field_data_distance_matrix,
     mean_matrix,
-    plot_heatmap_distance_matrix,
     scalar_data_series_to_distance_matrix,
 )
-from cluster_analysis import (
-    argmin_distance,
-    centroid_analysis,
-    determine_median_cluster,
-    mean_distance_to_group,
-    plot_linkage_clustering_with_colors,
-    std_distance_to_group,
-)
-from datastructure import SPECase, convert_result_name, update_team_name
+from datastructure import SPECase
 from spe11_io import (
     determine_reference_value_distance_matrix,
-    find_distance,
     identify_sparse_data,
     interpolate_data_reporting_times,
     read_extra_data,
     read_field_data_distance_matrix_snapshots,
     read_time_series_data,
-    reduce_distance_matrix_to_subset,
     reduce_to_increase_over_time,
-    replace_mC_values,
     replace_sparse_values,
     rescale_distance_matrix,
     set_zero_boundaryCO2_values,
     split_result_name,
 )
 from safety import (
-    check_boundaryCO2_values,
-    check_mC_values,
     check_sanity,
-    clean_data,
 )
 from sensitivity_analysis import (
     pearson_correlation_analysis,
     plot_correlation_test,
 )
-from variability_analysis import (
-    cummulative_distribution_function,
-    left_tailed_test_for_alternative_hypothesis,
-    two_tailed_test_for_alternative_hypothesis,
-    variability_analysis,
-)
+from cluster_analysis import mean
 
 logger = logging.getLogger(__name__)
 
@@ -155,11 +133,15 @@ if __name__ == "__main__":
     cache_folder.mkdir(parents=True, exist_ok=True)
 
     # Group management
-    groups = [g.lower() for g in args.groups]
+    groups = args.groups
+    groups_lower = [g.lower() for g in args.groups]
     # groupfolders = args.groupfolders
     calculatedAB = [g.lower() for g in args.calculatedAB]
     calculatedC = [g.lower() for g in args.calculatedC]
-    zero_boundaryCO2 = [g.lower() for g in args.calculated_zero_boundaryCO2]
+    if args.calculated_zero_boundaryCO2:
+        zero_boundaryCO2 = [g.lower() for g in args.calculated_zero_boundaryCO2]
+    else:
+        zero_boundaryCO2 = []
 
     # Verbosity
     if args.verbose:
@@ -407,65 +389,15 @@ if __name__ == "__main__":
         mean_type="ag",
     )
 
-    # Restrict data to subgroups
-    subgroups_global_distance_matrix = {
-        subgroup: reduce_distance_matrix_to_subset(
-            global_distance_matrix,
-            spe_case.subgroups[subgroup],
-            spe_case.subgroups["all"],
-            # participant_index,
-        )
-        for subgroup in spe_case.subgroups.keys()
-    }
+    # ! ---- ADD MEAN TO DIAGONAL ----
 
-    # ! ---- DISTANCE MATRIX VALUES -----
-    plot_heatmap_distance_matrix(
-        subgroups_global_distance_matrix["all"],
-        [convert_result_name(r) for r in spe_case.subgroups["all"]],
-        spe_case,
-        add_mean_to_diagonal=True,
-        mean_type="ag",
-        path=save_folder / f"{spe_case.variant}_heatmap_distance_matrix_all.png",
-    )
-
-    # Visual inspection in form of a dendrogram
-    plot_linkage_clustering_with_colors(
-        spe_case,
-        subgroups_global_distance_matrix["all"],
-        [convert_result_name(r) for r in spe_case.subgroups["all"]],
-        path=save_folder / f"{spe_case.variant}_dendrogram",
-    )
-
-    # Store the main distance matrix as csv file with labels as row and column headers
-    labels = [convert_result_name(r) for r in spe_case.subgroups["all"]]
-    print(labels)
-    np.savetxt(
-        save_folder / f"{spe_case.variant}_distance_matrix.csv",
-        subgroups_global_distance_matrix["all"],
-        delimiter=",",
-        header=",".join(labels),
-    )
-    # Store the distance matrix as csv file with indices as row and column headers using pandas
-    pd.DataFrame(
-        subgroups_global_distance_matrix["all"],
-        index=labels,
-        columns=labels,
-    ).to_csv(
-        save_folder / f"{spe_case.variant}_distance_matrix.csv",
-        sep=",",
-        header=True,
-        index=True,
-    )
+    for i in range(global_distance_matrix.shape[0]):
+        distances = global_distance_matrix[i, :].tolist()
+        distances.pop(i)
+        distances = np.array(distances)
+        global_distance_matrix[i, i] = mean(distances, mean_type="ag")
 
     # TODO store median values as csv file etc
-
-    # Cache results for further analysis, in form of csv file
-    for key, matrix in subgroups_global_distance_matrix.items():
-        np.savetxt(
-            cache_folder / f"{spe_case.variant}_distance_matrix_{key}.csv",
-            matrix,
-            delimiter=",",
-        )
 
     # ! ---- SENSIITIVITY ANALYSIS ----
 
@@ -473,14 +405,14 @@ if __name__ == "__main__":
     for key in criteria:
         plot_correlation_test(
             median_scaled_distance_matrix[key],
-            subgroups_global_distance_matrix["all"],
+            global_distance_matrix,
             key,
             "SPE11 distance",
         )
 
     pearson_correlation_result = pearson_correlation_analysis(
         {key: median_scaled_distance_matrix[key] for key in criteria},
-        subgroups_global_distance_matrix["all"],
+        global_distance_matrix,
     )
 
     # Combine median values and pearson correlation analysis in a table
@@ -491,3 +423,20 @@ if __name__ == "__main__":
 
     print("Pearson correlation analysis:")
     ic(pearson_correlation_result)
+
+    # ! ---- STORE RESULTS -----
+
+    # Store the distance matrix as csv file with indices as row and column headers using pandas
+    pd.DataFrame(
+        global_distance_matrix,
+        index=groups,
+        columns=groups,
+    ).to_csv(
+        save_folder / f"{spe_case.variant}_distance_matrix.csv",
+        sep=",",
+        header=True,
+        index=True,
+    )
+    print(
+        f"Distance matrix stored in {save_folder / f'{spe_case.variant}_distance_matrix.csv'}"
+    )

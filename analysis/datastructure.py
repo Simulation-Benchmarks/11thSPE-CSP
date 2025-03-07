@@ -1,7 +1,5 @@
 """Data classes for sparse and dense data."""
 
-from warnings import warn
-
 import numpy as np
 
 
@@ -30,7 +28,7 @@ def update_team_name(name):
         "kfupm": "KFUPM",
         "opengosim": "OpenGoSim",
         "opm": "OPM",
-        "pau-inria": "Pau-INRIA",
+        "pau-inria": "Pau-Inria",
         "pflotran": "PFLOTRAN",
         "rice": "Rice",
         "sintef": "SINTEF",
@@ -40,16 +38,6 @@ def update_team_name(name):
         "ut-csee": "UT-CSEE",
     }
     return conversion[name]
-
-
-def convert_result_name(name):
-    warn("This function should be removed after the data is updated.")
-    team, resultID = split_result_name(name)
-    converted_team_name = update_team_name(team)
-    if resultID is None:
-        return converted_team_name
-    else:
-        return f"{converted_team_name}{resultID}"
 
 
 class SPECase:
@@ -73,7 +61,7 @@ class SPECase:
                 "immB": 8,  # Immobile free phase Box B [kg]
                 "dissB": 9,  # Dissolved CO2 in water Box B [kg]
                 "sealB": 10,  # CO2 in seal Box B [kg]
-                "M_C": 11,  # Convection measure [m]
+                "mC": 11,  # Convection measure [m]
                 "sealTot": 12,  # Total CO2 in seal [kg]
             }
 
@@ -135,6 +123,8 @@ class SPECase:
                         "slb2",
                         "tetratech",
                         "ut-csee1",
+                        "ut-csee2",
+                        "ut-csee3",
                     ]
                 ),
                 # Standard reporting group - see Figure in the paper
@@ -196,30 +186,30 @@ class SPECase:
                 "slb2": "base case",
                 "tetratech": "base case",
                 "ut-csee1": "base case",
-                "ut-csee2": "special cases",
-                "ut-csee3": "special cases",
+                "ut-csee2": "base case",
+                "ut-csee3": "base case",
             }
 
-            self.inconsistent_immobile_saturations = [
-                "calgary",
-                "ctc-cne",
-                "opengosim",
-            ]
-            self.inconsistent_convection = [
-                "calgary",
-                "cau-kiel",
-                "ctc-cne",
-                "pau-inria",
-                "pflotran",
-                "slb1",
-                "slb2",
-            ]
-            self.inconsistent_seal_a = ["pau-inria", "pflotran"]
-            self.inconsistent_seal_b = ["calgary", "pau-inria", "pflotran"]
-            self.inconsistent_seal = list(
-                set(self.inconsistent_seal_a + self.inconsistent_seal_b)
-            )
-            self.inconsistent_boundary_co2 = []
+            # self.inconsistent_immobile_saturations = [
+            #     "calgary",
+            #     "ctc-cne",
+            #     "opengosim",
+            # ]
+            # self.inconsistent_convection = [
+            #     "calgary",
+            #     "cau-kiel",
+            #     "ctc-cne",
+            #     "pau-inria",
+            #     "pflotran",
+            #     "slb1",
+            #     "slb2",
+            # ]
+            # self.inconsistent_seal_a = ["pau-inria", "pflotran"]
+            # self.inconsistent_seal_b = ["calgary", "pau-inria", "pflotran"]
+            # self.inconsistent_seal = list(
+            #     set(self.inconsistent_seal_a + self.inconsistent_seal_b)
+            # )
+            # self.inconsistent_boundary_co2 = []
 
         elif variant == "spe11b":
             # Columns in the sparse reporting data which are relevant for the analysis
@@ -474,7 +464,7 @@ class SPECase:
                 "immB": 8,  # Immobile free phase Box B [kg]
                 "dissB": 9,  # Dissolved CO2 in water Box B [kg]
                 "sealB": 10,  # CO2 in seal Box B [kg]
-                "M_C": 11,  # Convection measure [m]
+                "mC": 11,  # Convection measure [m]
                 "sealTot": 12,  # Total CO2 in seal [kg]
                 "boundaryCO2": 13,  # CO2 at the boundary [kg]
             }
@@ -550,17 +540,17 @@ class SPECase:
                 # Standard reporting group - see Figure in the paper
                 "base case": sorted(
                     [
-                        "cau-kiel",
-                        "opm1",
                         "calgary",
+                        "cau-kiel",
                         "csiro",
+                        "ctc-cne",
                         "geos1",
                         "ifpen",
                         "opengosim1",
+                        "opm1",
                         "pau-inria",
-                        "tetratech1",
-                        "ctc-cne",
                         "slb",
+                        "tetratech1",
                         "tetratech2",
                     ]
                 ),
@@ -628,29 +618,29 @@ class SPECase:
                 #    "opm4": 10000000,
             }
 
-            self.inconsistent_immobile_saturations = [
-                "calgary",
-                "ctc-cne",
-                "opengosim1",
-                "opengosim2",
-            ]
-            self.inconsistent_convection = [
-                "calgary",
-                "cau-kiel",
-                "ctc-cne",
-                "pau-inria",
-                "pflotran",
-                "sintef1",
-                "sintef2",
-                "sintef3",
-                "slb",
-            ]
-            self.inconsistent_seal_a = ["calgary", "pflotran"]
-            self.inconsistent_seal_b = ["calgary", "pflotran"]
-            self.inconsistent_seal = list(
-                set(self.inconsistent_seal_a + self.inconsistent_seal_b)
-            )
-            self.inconsistent_boundary_co2 = ["pflotran"]  # "pflotran", "pau-inria"]
+            # self.inconsistent_immobile_saturations = [
+            #     "calgary",
+            #     "ctc-cne",
+            #     "opengosim1",
+            #     "opengosim2",
+            # ]
+            # self.inconsistent_convection = [
+            #     "calgary",
+            #     "cau-kiel",
+            #     "ctc-cne",
+            #     "pau-inria",
+            #     "pflotran",
+            #     "sintef1",
+            #     "sintef2",
+            #     "sintef3",
+            #     "slb",
+            # ]
+            # self.inconsistent_seal_a = ["calgary", "pflotran"]
+            # self.inconsistent_seal_b = ["calgary", "pflotran"]
+            # self.inconsistent_seal = list(
+            #     set(self.inconsistent_seal_a + self.inconsistent_seal_b)
+            # )
+            # self.inconsistent_boundary_co2 = ["pflotran"]  # "pflotran", "pau-inria"]
 
         else:
             raise ValueError(f"Variant {variant} not known.")
@@ -699,7 +689,8 @@ class SPECase:
 
         # Meta data
         self.results_and_categories.update(
-            {convert_result_name(k): v for k, v in self.results_and_categories.items()}
+            # {convert_result_name(k): v for k, v in self.results_and_categories.items()}
+            {k: v for k, v in self.results_and_categories.items()}
         )
 
         # Colors
