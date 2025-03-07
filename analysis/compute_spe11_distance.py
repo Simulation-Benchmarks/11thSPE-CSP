@@ -337,7 +337,7 @@ if __name__ == "__main__":
     # ! ---- COMBINED DATA DISTANCES / GLOBAL METRIC ----
 
     # Define criteria for global metrics
-    criteria = [
+    sparse_data_criteria = [
         # Sparse data
         "mobA",
         "immA",
@@ -347,19 +347,24 @@ if __name__ == "__main__":
         "dissB",
         "mC",
         "sealTot",
+    ]
+    # BoundaryCO2 data was not a reporting quantity for variant A
+    if spe_case.variant in ["spe11b", "spe11c"]:
+        sparse_data_criteria += ["boundaryCO2"]
+
+    dense_data_criteria = [
         # Dense data
         "late_pressure_l2",
         "early_pressure_l2s",
         "early_mass_w1",
         "late_mass_w1",
     ]
-    # Add SPE11B and SPE11C specific data
-    if spe_case.variant in ["spe11b", "spe11c"]:
-        criteria += [
-            "boundaryCO2",
+    if spe_case.non_isothermal:
+        dense_data_criteria += [
             "early_temperature_l2s",
             "late_temperature_l2s",
         ]
+    criteria = sparse_data_criteria + dense_data_criteria
 
     # Compute global metrics for the selected criteria
     assert len(set([matrix.shape for matrix in distance_matrix.values()])) == 1, (
@@ -368,16 +373,19 @@ if __name__ == "__main__":
 
     # ! ---- MEDIAN-BASED RESCALING ----
 
-    # Need to group some of the data, to build meaningful medians?
-    # By using non-trivial values for the median, this is not true anymore.
-
-    median_scaled_distance_matrix = {
-        key: rescale_distance_matrix(matrix, "non_trivial_median")
+    median_values_distance_matrix = {
+        key: determine_reference_value_distance_matrix(matrix, "non_trivial_median")
         for key, matrix in distance_matrix.items()
     }
 
-    median_values_distance_matrix = {
-        key: determine_reference_value_distance_matrix(matrix, "non_trivial_median")
+    # Safety check for the median values - compare with spe_case.spe11_distance_median values
+    for key, median_value in median_values_distance_matrix.items():
+        assert np.isclose(median_value, spe_case.spe11_distance_median[key]), (
+            f"Median value for {key} is {median_value}, expected value is {spe_case.spe11_distance_median[key]}"
+        )
+
+    median_scaled_distance_matrix = {
+        key: rescale_distance_matrix(matrix, "non_trivial_median")
         for key, matrix in distance_matrix.items()
     }
 
@@ -397,33 +405,6 @@ if __name__ == "__main__":
         distances = np.array(distances)
         global_distance_matrix[i, i] = mean(distances, mean_type="ag")
 
-    # TODO store median values as csv file etc
-
-    # ! ---- SENSIITIVITY ANALYSIS ----
-
-    # Correlation analysis
-    for key in criteria:
-        plot_correlation_test(
-            median_scaled_distance_matrix[key],
-            global_distance_matrix,
-            key,
-            "SPE11 distance",
-        )
-
-    pearson_correlation_result = pearson_correlation_analysis(
-        {key: median_scaled_distance_matrix[key] for key in criteria},
-        global_distance_matrix,
-    )
-
-    # Combine median values and pearson correlation analysis in a table
-    # TODO
-
-    # Monitor median values
-    ic(median_values_distance_matrix)
-
-    print("Pearson correlation analysis:")
-    ic(pearson_correlation_result)
-
     # ! ---- STORE RESULTS -----
 
     # Store the distance matrix as csv file with indices as row and column headers using pandas
@@ -437,6 +418,39 @@ if __name__ == "__main__":
         header=True,
         index=True,
     )
+    print()
     print(
         f"Distance matrix stored in {save_folder / f'{spe_case.variant}_distance_matrix.csv'}"
     )
+
+    # ! ---- SENSIITIVITY ANALYSIS ----
+
+    # Cross-Correlation analysis
+    # for key in criteria:
+    #    plot_correlation_test(
+    #        median_scaled_distance_matrix[key],
+    #        global_distance_matrix,
+    #        key,
+    #        "SPE11 distance",
+    #    )
+
+    pearson_correlation_result = pearson_correlation_analysis(
+        {key: median_scaled_distance_matrix[key] for key in criteria},
+        global_distance_matrix,
+    )
+
+    # Export a csv file with the criteria as labels in the rows, and two columns for the median values and the correlation values
+    statistics_values = [
+        [median_values_distance_matrix[key], pearson_correlation_result[key]]
+        for key in criteria
+    ]
+    statistics_df = pd.DataFrame(
+        statistics_values, index=criteria, columns=["Median", "PCC"]
+    )
+    statistics_df.to_csv(
+        save_folder / f"{spe_case.variant}_statistics.csv",
+        sep=",",
+        header=True,
+        index=True,
+    )
+    print(f"Statistics stored in {save_folder / f'{spe_case.variant}_statistics.csv'}")
