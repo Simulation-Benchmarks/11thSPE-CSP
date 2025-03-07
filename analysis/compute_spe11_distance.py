@@ -23,8 +23,6 @@ from utilities import (
     rescale_distance_matrix,
     set_zero_boundaryCO2_values,
     split_result_name,
-)
-from safety import (
     check_sanity,
 )
 from sensitivity_analysis import (

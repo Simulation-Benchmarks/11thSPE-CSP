@@ -218,6 +218,32 @@ def read_dense_distance_data(path, participants):
 #
 #    return clean_data
 
+# ! ---- DATA SANITY CHECKS ----
+
+
+def check_sanity(data, key: str):
+    if np.any(np.isclose(data, -1)):
+        logging.info(f"Missing values detected for submission {key}.")
+        return False
+    if np.any(np.isclose(data, -999)):
+        logging.info(f"Missing values detected for submission {key}.")
+        return False
+    if np.isnan(data).any():
+        logging.info(f"NaN values detected for submission {key}.")
+        return False
+    if np.any(data < 0):
+        logging.info(
+            f"Negative values (min value {np.min(data)}) detected for submission {key}."
+        )
+    if np.any(data == np.inf):
+        logging.info(f"Positive infinity values detected for submission {key}.")
+        return False
+    if np.any(data == -np.inf):
+        logging.info(f"Negative infinity values detected for submission {key}.")
+        return False
+    return True
+
+
 # ! ---- DATA MODIFICATION ----
 
 

@@ -7,7 +7,7 @@ import numpy as np
 from matplotlib.colors import LinearSegmentedColormap
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-from cluster_analysis import nonlinear_transform
+from utilities import nonlinear_transform
 from datastructure import SPECase
 
 
