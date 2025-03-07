@@ -3,6 +3,7 @@
 import numpy as np
 
 
+# TODO move to utils.
 def split_result_name(result_name: str):
     """Split the result name into its components."""
 
@@ -14,30 +15,6 @@ def split_result_name(result_name: str):
         team = result_name
         result = None
     return team, result
-
-
-def update_team_name(name):
-    conversion = {
-        "calgary": "Calgary",
-        "cau-kiel": "CAU-Kiel",
-        "csiro": "CSIRO",
-        "ctc-cne": "CTC-CNE",
-        "darts": "DARTS",
-        "geos": "GEOS",
-        "ifpen": "IFPEN",
-        "kfupm": "KFUPM",
-        "opengosim": "OpenGoSim",
-        "opm": "OPM",
-        "pau-inria": "Pau-Inria",
-        "pflotran": "PFLOTRAN",
-        "rice": "Rice",
-        "sintef": "SINTEF",
-        "slb": "SLB",
-        "stuttgart": "Stuttgart",
-        "tetratech": "TetraTech",
-        "ut-csee": "UT-CSEE",
-    }
-    return conversion[name]
 
 
 class SPECase:
@@ -63,6 +40,31 @@ class SPECase:
                 "sealB": 10,  # CO2 in seal Box B [kg]
                 "mC": 11,  # Convection measure [m]
                 "sealTot": 12,  # Total CO2 in seal [kg]
+            }
+
+            self.spe11_distance_median = {
+                "dissA": 0.07176848993149854,
+                "dissB": 0.039408382947875735,
+                "early_mass_w1": 0.0031770509108494235,
+                "early_pressure_l2": 2962.2983042516043,
+                "early_pressure_l2s": 366.1756663833846,
+                "full_mass_w1": 0.01151651695441281,
+                "full_pressure_l2": 6357.29909636252,
+                "full_pressure_l2s": 2291.5109135015327,
+                "immA": 0.0003004940803581391,
+                "immB": 0.0008559326532330515,
+                "late_mass_w1": 0.010015734349925,
+                "late_pressure_l2": 5538.2541384088,
+                "late_pressure_l2s": 2007.7063387277124,
+                "mC": 117.09094179404104,
+                "mobA": 0.07597671198450695,
+                "mobB": 0.005546844025910249,
+                "p1": 9971.718918358361,
+                "p2": 607.5545021007509,
+                "sealA": 0.0083075259191785,
+                "sealB": 0.0035292158797797244,
+                "sealTot": 0.028765405258409812,
+                "t": 1.0,
             }
 
             # Isothermal
@@ -190,27 +192,6 @@ class SPECase:
                 "ut-csee3": "base case",
             }
 
-            # self.inconsistent_immobile_saturations = [
-            #     "calgary",
-            #     "ctc-cne",
-            #     "opengosim",
-            # ]
-            # self.inconsistent_convection = [
-            #     "calgary",
-            #     "cau-kiel",
-            #     "ctc-cne",
-            #     "pau-inria",
-            #     "pflotran",
-            #     "slb1",
-            #     "slb2",
-            # ]
-            # self.inconsistent_seal_a = ["pau-inria", "pflotran"]
-            # self.inconsistent_seal_b = ["calgary", "pau-inria", "pflotran"]
-            # self.inconsistent_seal = list(
-            #     set(self.inconsistent_seal_a + self.inconsistent_seal_b)
-            # )
-            # self.inconsistent_boundary_co2 = []
-
         elif variant == "spe11b":
             # Columns in the sparse reporting data which are relevant for the analysis
             self.data_format = {
@@ -228,6 +209,36 @@ class SPECase:
                 "mC": 11,  # Convection measure [m]
                 "sealTot": 12,  # Total CO2 in seal [kg]
                 "boundaryCO2": 13,  # CO2 at the boundary [kg]
+            }
+
+            # Fix SPE11 distance median values based on official submissions
+            self.spe11_distance_median = {
+                "boundaryCO2": 604684682.3895249,
+                "dissA": 53866193808.94402,
+                "dissB": 29798204007.810722,
+                "early_mass_w1": 4479583379725.279,
+                "early_pressure_l2": 57833574123.78914,
+                "early_pressure_l2s": 3790073212.2605157,
+                "early_temperature_l2s": 40686.35307077792,
+                "full_mass_w1": 20736931126443.348,
+                "full_pressure_l2": 108603916995.56699,
+                "full_pressure_l2s": 8011312689.846781,
+                "full_temperature_l2s": 66258.07925225252,
+                "immA": 2574286403.793894,
+                "immB": 14216936478.372185,
+                "late_mass_w1": 20250177682468.125,
+                "late_pressure_l2": 92062835303.04178,
+                "late_pressure_l2s": 5843305321.074707,
+                "late_temperature_l2s": 50317.42351695232,
+                "mC": 69710213.04146881,
+                "mobA": 160975516363.48978,
+                "mobB": 53803314384.14842,
+                "p1": 167862794448.8785,
+                "p2": 162638953414.91946,
+                "sealA": 4298701516.103369,
+                "sealB": 1854934823.843052,
+                "sealTot": 17903125016.94225,
+                "t": 1.0,
             }
 
             # Non-isothermal
@@ -469,6 +480,35 @@ class SPECase:
                 "boundaryCO2": 13,  # CO2 at the boundary [kg]
             }
 
+            self.spe11_distance_median = {
+                "boundaryCO2": 47050470125889.16,
+                "dissA": 130579678392805.52,
+                "dissB": 13844297362.569794,
+                "early_mass_w1": 3.466805485936395e17,
+                "early_pressure_l2": 414141484905.823,
+                "early_pressure_l2s": 126930592687.4999,
+                "early_temperature_l2s": 2208546.5209046425,
+                "full_mass_w1": 1.3269133295327048e18,
+                "full_pressure_l2": 1044940693045.5431,
+                "full_pressure_l2s": 223816392797.7573,
+                "full_temperature_l2s": 3376825.498822822,
+                "immA": 8341245970240.63,
+                "immB": 78844943893.82198,
+                "late_mass_w1": 1.2764058004583936e18,
+                "late_pressure_l2": 943893526296.7959,
+                "late_pressure_l2s": 185145149416.61313,
+                "late_temperature_l2s": 2703567.0430007833,
+                "mC": 124346821500.29715,
+                "mobA": 226634096329277.88,
+                "mobB": 391440466795.95404,
+                "p1": 22577384735.74473,
+                "p2": 21530076342.5297,
+                "sealA": 13497337504810.178,
+                "sealB": 7176169.471371533,
+                "sealTot": 19572365609395.59,
+                "t": 1.0,
+            }
+
             # Non-isothermal
             self.non_isothermal = True
 
@@ -618,30 +658,6 @@ class SPECase:
                 #    "opm4": 10000000,
             }
 
-            # self.inconsistent_immobile_saturations = [
-            #     "calgary",
-            #     "ctc-cne",
-            #     "opengosim1",
-            #     "opengosim2",
-            # ]
-            # self.inconsistent_convection = [
-            #     "calgary",
-            #     "cau-kiel",
-            #     "ctc-cne",
-            #     "pau-inria",
-            #     "pflotran",
-            #     "sintef1",
-            #     "sintef2",
-            #     "sintef3",
-            #     "slb",
-            # ]
-            # self.inconsistent_seal_a = ["calgary", "pflotran"]
-            # self.inconsistent_seal_b = ["calgary", "pflotran"]
-            # self.inconsistent_seal = list(
-            #     set(self.inconsistent_seal_a + self.inconsistent_seal_b)
-            # )
-            # self.inconsistent_boundary_co2 = ["pflotran"]  # "pflotran", "pau-inria"]
-
         else:
             raise ValueError(f"Variant {variant} not known.")
 
@@ -687,12 +703,6 @@ class SPECase:
             self.late_reporting_times_dense_delta
         )
 
-        # Meta data
-        self.results_and_categories.update(
-            # {convert_result_name(k): v for k, v in self.results_and_categories.items()}
-            {k: v for k, v in self.results_and_categories.items()}
-        )
-
         # Colors
         self.categories_and_colors = {
             "base case": "#91afdcff",
@@ -701,26 +711,46 @@ class SPECase:
             "special cases": "#ffffffff",
         }
 
+        # Colors from ../evaluation/groups_and_colors.py
         self.groups_and_colors = {
-            "calgary": "#000000",
-            "cau-kiel": "#A30059",
-            "csiro": "#1B4400",
-            "ctc-cne": "#1CE6FF",
-            "darts": "#FF34FF",
-            "geos": "#FF4A46",
-            "ifpen": "#008941",
-            "kfupm": "#006FA6",
-            "opengosim": "#EFCBD5",  # "#FFDBE5",
-            "opm": "#7A4900",
-            "pau-inria": "#0000A6",
-            "pflotran": "#63FFAC",
-            "rice": "#004D43",
-            "sintef": "#8FB0FF",
-            "slb": "#997D87",
-            "stuttgart": "#5A0007",
-            "tetratech": "#809693",
-            "ut-csee": "#4FC601",
+            "calgary": "#90B0DD",
+            "cau-kiel": "#C40F10",
+            "csiro": "#0B5197",
+            "ctc-cne": "#FFA052",
+            "darts": "#FF5A03",
+            "geos": "#B0B0B0",
+            "ifpen": "#000000",
+            "kfupm": "#FF7573",
+            "opengosim": "#AD92C3",
+            "opm": "#7141A3",
+            "pau-inria": "#AC7A71",
+            "pflotran": "#683229",
+            "rice": "#F39ABF",
+            "sintef": "#D651A9",
+            "slb": "#75D166",
+            "stuttgart": "#127F12",
+            "tetratech": "#07A4BB",
+            "ut-csee": "#A1A30C",
         }
-        self.groups_and_colors.update(
-            {update_team_name(k): v for k, v in self.groups_and_colors.items()}
-        )
+
+        # Find appropriate colors for text to be writtin on group_and_colors
+        self.groups_and_text_colors = {
+            "calgary": "black",
+            "cau-kiel": "white",
+            "csiro": "white",
+            "ctc-cne": "black",
+            "darts": "black",
+            "geos": "black",
+            "ifpen": "white",
+            "kfupm": "black",
+            "opengosim": "black",
+            "opm": "white",
+            "pau-inria": "black",
+            "pflotran": "white",
+            "rice": "black",
+            "sintef": "black",
+            "slb": "black",
+            "stuttgart": "black",
+            "tetratech": "black",
+            "ut-csee": "black",
+        }
