@@ -75,6 +75,7 @@ if __name__ == "__main__":
         "--variability-analysis",
         help="perform variability analysis",
         nargs="+",
+        action="append",
     )
 
     parser.add_argument(
@@ -117,7 +118,15 @@ if __name__ == "__main__":
         labels = np.arange(len(groups), dtype=int).tolist()
 
     # Further input for tuning the analysis
-    _variability_analysis = args.variability_analysis
+    if args.variability_analysis:
+        variability_analysis_groups = args.variability_analysis
+        variability_analysis_groups_lower = [
+            [g.lower() for g in group] for group in variability_analysis_groups
+        ]
+    else:
+        variability_analysis_groups = []
+        variability_analysis_groups_lower = []
+
     reference_group = args.reference_group
 
     # Safety check
@@ -133,6 +142,9 @@ if __name__ == "__main__":
     # Verbosity
     if args.verbose:
         logging.basicConfig(level=logging.INFO)
+
+    # ! ---- GLOBAL SETTINGS ----
+    fontsize = 10
 
     # ! ---- READ SPARSE DATA ----
 
@@ -192,22 +204,38 @@ if __name__ == "__main__":
         mesh_refinement_distance_values[counter] = dv
         counter += 1
 
+    # Repeat the same for the variability analysis groups
+    variability_analysis_distance_values = []
+    for group in variability_analysis_groups:
+        for i in range(len(group) - 1):
+            for j in range(i + 1, len(group)):
+                variability_analysis_distance_values.append(
+                    find_distance(distance_matrix, (group[i], group[j]), all_groups)
+                )
+
     plt.figure("Mesh refinement study")
     fig = plt.gcf()
-    fig.set_size_inches(14, 14)
+    # fig.set_size_inches(14, 14)
     ax = plt.gca()
+    unique_labels = []
     for key in range(counter):
+        if labels[key] not in unique_labels:
+            is_new_label = True
+            unique_labels.append(labels[key])
+        else:
+            is_new_label = False
         try:
-            color = spe_case.groups_and_colors[labels[key]]
+            color = spe_case.groups_and_colors[labels[key].lower()]
         except KeyError:
             # Choose a color from the default color cycle
             color = plt.gca()._get_lines.get_next_color()
+            print(f"No color pre-defined for {labels[key].lower()}, using {color}.")
         sct = plt.scatter(
             mesh_refinement_factor[key],
             np.array(mesh_refinement_distance_values[key]),
             marker="o",
             s=100,
-            label=labels[key],
+            label=labels[key] if is_new_label else None,
             color=color,
             edgecolors="gray",
             zorder=20,
@@ -218,7 +246,7 @@ if __name__ == "__main__":
                     mesh_refinement_factor[key][i] + 0.15,
                     mesh_refinement_distance_values[key][i] - 0.025,
                     txt,
-                    fontsize=14,
+                    fontsize=fontsize,
                     color=[0.3] * 3,
                     zorder=30,
                 )
@@ -227,21 +255,15 @@ if __name__ == "__main__":
                     mesh_refinement_factor[key][i] + 0.15,
                     mesh_refinement_distance_values[key] - 0.025,
                     txt,
-                    fontsize=14,
+                    fontsize=fontsize,
                     color=[0.3] * 3,
                     zorder=30,
                 )
 
     # Include variability analysis
-    if _variability_analysis:
-        distance_values = []
-        for key in _variability_analysis:
-            counter = labels.index(key)
-            distance_values.append(mesh_refinement_distance_values[counter])
-        distance_values = np.hstack(distance_values).flatten()
-
+    if len(variability_analysis_groups) > 0:
         variability_refinement = variability_analysis(
-            distance_values,
+            variability_analysis_distance_values,
             mean_type="ag",
         )
 
@@ -249,7 +271,7 @@ if __name__ == "__main__":
         plt.axhline(
             y=variability_refinement["mean"],
             color="black",
-            label="Mean variability",
+            label="Mean variability | moderate refinement",
         )
         # Add margin of error
         plt.axhline(
@@ -283,7 +305,7 @@ if __name__ == "__main__":
             y=reference_variability["mean"],
             color="black",
             linestyle="--",
-            label="Reference variability",
+            label="Baseline variability",
         )
         plt.axhline(
             y=reference_variability["lower_limit_margin_of_error"],
@@ -302,15 +324,18 @@ if __name__ == "__main__":
             color=[0.9] * 3,
         )
 
-    plt.legend(loc="upper left", fontsize=14)
-    plt.xlabel("Mesh refinement factor", fontsize=14)
+    plt.legend(loc="upper left", fontsize=fontsize)
+    plt.xlabel("Mesh refinement factor", fontsize=fontsize)
+    plt.xticks([1, 2, 4, 10])
+    plt.yticks([0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1])
     # Add grid behind the scatter plot
     plt.grid(zorder=10, color="lightgray")
     plt.xlim(0.5, 10.5)
-    plt.ylabel("SPE11 distance", fontsize=14)
+    plt.ylim(0.25, 1.05)
+    plt.ylabel("SPE11 distance", fontsize=fontsize)
     # Set fontsize large
-    plt.xticks(fontsize=14)
-    plt.yticks(fontsize=14)
+    plt.xticks(fontsize=fontsize)
+    plt.yticks(fontsize=fontsize)
 
     plt.tight_layout()
     plt.savefig(save_folder / f"{spe_case.variant}_mesh_refinement_study.png", dpi=1000)
