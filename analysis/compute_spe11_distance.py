@@ -89,6 +89,20 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
+        "-cSealA",
+        "--calculatedSealA",
+        nargs="+",
+        help="names of groups, taking calculated seal data for Box A",
+    )
+
+    parser.add_argument(
+        "-cSealB",
+        "--calculatedSealB",
+        nargs="+",
+        help="names of groups, taking calculated seal data for Box B",
+    )
+
+    parser.add_argument(
         "-cC",
         "--calculatedC",
         nargs="+",
@@ -130,6 +144,8 @@ if __name__ == "__main__":
     groups_lower = [g.lower() for g in args.groups]
     # groupfolders = args.groupfolders
     calculatedAB = [g.lower() for g in args.calculatedAB]
+    calculatedSealA = [g.lower() for g in args.calculatedSealA]
+    calculatedSealB = [g.lower() for g in args.calculatedSealB]
     calculatedC = [g.lower() for g in args.calculatedC]
     if args.calculated_zero_boundaryCO2:
         zero_boundaryCO2 = [g.lower() for g in args.calculated_zero_boundaryCO2]
@@ -153,8 +169,8 @@ if __name__ == "__main__":
         "immB",
         "mobA",
         "mobB",
-        "dissA",
-        "dissB",
+        # "dissA",
+        # "dissB",
         "mC",
         "sealA",
         "sealB",
@@ -164,16 +180,16 @@ if __name__ == "__main__":
         )
         extra_values[extra_key] = read_extra_data(extra_values_path, participants)
 
-    # Post-process seal data - compute total seal data
-    extra_values["sealTot"] = {}
-    extra_values["sealTot"]["t"] = extra_values["sealA"]["t"].copy()
-    extra_values["sealTot"].update(
-        {
-            key: extra_values["sealA"][key] + extra_values["sealB"][key]
-            for key in participants.keys()
-            if key != "t"
-        }
-    )
+    ## Post-process seal data - compute total seal data
+    # extra_values["sealTot"] = {}
+    # extra_values["sealTot"]["t"] = extra_values["sealA"]["t"].copy()
+    # extra_values["sealTot"].update(
+    #    {
+    #        key: extra_values["sealA"][key] + extra_values["sealB"][key]
+    #        for key in participants.keys()
+    #        if key != "t"
+    #    }
+    # )
 
     # ! ---- READ DENSE DATA ----
 
@@ -194,13 +210,10 @@ if __name__ == "__main__":
             for extra_key in [
                 "immA",
                 "immB",
-                "dissA",
-                "dissB",
                 "mobA",
                 "mobB",
-                "sealA",
-                "sealB",
-                "sealTot",
+                # "dissA",
+                # "dissB",
             ]:
                 participant["scalar_data"] = replace_sparse_values(
                     participant["scalar_data"],
@@ -210,6 +223,30 @@ if __name__ == "__main__":
                     spe_case,
                     key,
                 )
+        if key in calculatedSealA:
+            participant["scalar_data"] = replace_sparse_values(
+                participant["scalar_data"],
+                extra_values["sealA"]["t"],
+                extra_values["sealA"][key],
+                "sealA",
+                spe_case,
+                key,
+            )
+        if key in calculatedSealB:
+            participant["scalar_data"] = replace_sparse_values(
+                participant["scalar_data"],
+                extra_values["sealB"]["t"],
+                extra_values["sealB"][key],
+                "sealB",
+                spe_case,
+                key,
+            )
+        # Consistent update in the total seal data
+        if key in calculatedSealA or key in calculatedSealB:
+            participant["scalar_data"][:, spe_case.data_format["sealTot"]] = (
+                participant["scalar_data"][:, spe_case.data_format["sealA"]]
+                + participant["scalar_data"][:, spe_case.data_format["sealB"]]
+            )
         # Replace inconsistent data for the convection
         if key in calculatedC:
             for extra_key in ["mC"]:
@@ -237,8 +274,8 @@ if __name__ == "__main__":
                 "immB",
                 "dissA",
                 "dissB",
-                "sealA",
-                "sealB",
+                # "sealA",
+                # "sealB",
                 "mC",
                 "sealTot",
                 "boundaryCO2",
