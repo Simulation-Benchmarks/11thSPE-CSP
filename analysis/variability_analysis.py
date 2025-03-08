@@ -494,12 +494,12 @@ if __name__ == "__main__":
         print("-" * 80)
         print()
         print(
-            f"""The mean distance among the {len(groups_smaller)} groups\n{groups_smaller}\n"""
+            f"""The mean distance among the {num_smaller_groups} groups\n{groups_smaller}\n"""
             f"""is {variability_smaller_ag["mean"]} +- {variability_smaller_ag["margin_of_error"]} (margin of error) based on \n"""
             f"""with a standard deviation of {variability_smaller_ag["std"]}.\n"""
         )
         print(
-            f"""The mean distance among the {len(groups_greater)} groups\n{groups_greater}\n"""
+            f"""The mean distance among the {num_greater_groups} groups\n{groups_greater}\n"""
             f"""is {variability_greater_ag["mean"]} +- {variability_greater_ag["margin_of_error"]} (margin of error) based on \n"""
             f"""with a standard deviation of {variability_greater_ag["std"]}.\n"""
         )
