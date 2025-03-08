@@ -15,6 +15,9 @@ def variability_analysis(
     distance_matrix: np.ndarray,
     mean_type: Literal["arithmetic", "geometric", "ag"] = "ag",
 ):
+    if isinstance(distance_matrix, list):
+        distance_matrix = np.array(distance_matrix)
+
     if len(distance_matrix.shape) == 1:
         distance_values = distance_matrix.copy()
     elif len(distance_matrix.shape) == 2:
