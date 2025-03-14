@@ -323,7 +323,7 @@ def visualizeSpatialMaps():
             plotColorMesh(figRhoG, x, y, rhoG, i, group, pRows, pCols, 'icefire', 0.8e3, 1.0e3, titleRhoG)
             plotColorMesh(figRhoL, x, y, rhoL, i, group, pRows, pCols, 'icefire', 0.99e3, 1.03e3, titleRhoL)
             plotColorMesh(figTmCO2, x, y, tmCO2, i, group, pRows, pCols, cmap, 0, 3e6, titleTmCO2)
-            plotColorMesh(figTemp, x, y, temp, i, group, pRows, pCols, 'coolwarm', 40, 70, titleTemp)
+            plotColorMesh(figTemp, x, y, temp, i, group, pRows, pCols, 'coolwarm', 20, 70, titleTemp)
     
     if len(groups) == 1:
         fig.suptitle(f'{groups[0]} at {time} years')

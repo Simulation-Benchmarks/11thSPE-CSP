@@ -54,7 +54,7 @@ def assembleTimeSeries():
         lowerPercentile = int(cmdArgs["percentiles"][0])
         upperPercentile = int(cmdArgs["percentiles"][1])
         tableFolder = cmdArgs["tablefolder"]
-    groups = sorted(list(groups))
+    groups = sorted(list(groups), key=str.casefold)
 
     utils.set_fonts()
 
@@ -184,13 +184,19 @@ def assembleTimeSeries():
         else:
             axsP[1].plot(t, csvData[:, 2], label=label, color=color, linestyle=ls)
 
+        if np.isnan(csvData[:, 5]).all():
+            print(f'{group} only reported nan for dissA.')
+        elif all(val < 0 for val in csvData[:, 5]):
+            print(f'{group} only reported negative values for dissA.')
+        else:
+            axsA[1, 0].plot(t, csvData[:, 5], label=label, color=color, linestyle=ls)
+            axsPub[1, 1].plot(t, csvData[:, 5], label=label, color=color, linestyle=ls)
+
         if group in calculatedAB:
             columnName = group.lower().replace('-', '')
             axsA[0, 0].plot(tSpatialMaps, mobileFromSpatialMapsA[columnName], label=label+'*', color=color, linestyle=ls)
             axsPub[1, 0].plot(tSpatialMaps, mobileFromSpatialMapsA[columnName], label=label, color=color, linestyle=ls)
             axsA[0, 1].plot(tSpatialMaps, immobileFromSpatialMapsA[columnName], label=label+'*', color=color, linestyle=ls)
-            axsA[1, 0].plot(tSpatialMaps, dissolvedFromSpatialMapsA[columnName], label=label+'*', color=color, linestyle=ls)
-            axsPub[1, 1].plot(tSpatialMaps, dissolvedFromSpatialMapsA[columnName], label=label, color=color, linestyle=ls)
             axsA[1, 1].plot(tSpatialMaps, sealFromSpatialMapsA[columnName], label=label +'*', color=color, linestyle=ls)
         else:
             if np.isnan(csvData[:, 3]).all():
@@ -206,13 +212,6 @@ def assembleTimeSeries():
                 print(f'{group} only reported negative values for immA.')
             else:
                 axsA[0, 1].plot(t, csvData[:, 4], label=label, color=color, linestyle=ls)
-            if np.isnan(csvData[:, 5]).all():
-                print(f'{group} only reported nan for dissA.')
-            elif all(val < 0 for val in csvData[:, 5]):
-                print(f'{group} only reported negative values for dissA.')
-            else:
-                axsA[1, 0].plot(t, csvData[:, 5], label=label, color=color, linestyle=ls)
-                axsPub[1, 1].plot(t, csvData[:, 5], label=label, color=color, linestyle=ls)
             if np.isnan(csvData[:, 6]).all():
                 print(f'{group} only reported nan for sealA.')
             elif all(val < 0 for val in csvData[:, 6]):
@@ -223,12 +222,18 @@ def assembleTimeSeries():
             if max(csvData[:, 4]) > 0.05e-3:
                 print(f"{group} potentially used inconsistent evaluation of immobile CO2.")
 
+        if np.isnan(csvData[:, 9]).all():
+            print(f'{group} only reported nan for dissB.')
+        elif all(val < 0 for val in csvData[:, 9]):
+            print(f'{group} only reported negative values for dissB.')
+        else:
+            axsB[1, 0].plot(t, csvData[:, 9], label=label, color=color, linestyle=ls)
+
         if group in calculatedAB:
             columnName = group.lower().replace('-', '')
             axsB[0, 0].plot(tSpatialMaps, mobileFromSpatialMapsB[columnName], label=label+'*', color=color, linestyle=ls)
             axsPub[2, 0].plot(tSpatialMaps, mobileFromSpatialMapsB[columnName], label=label, color=color, linestyle=ls)
             axsB[0, 1].plot(tSpatialMaps, immobileFromSpatialMapsB[columnName], label=label+'*', color=color, linestyle=ls)
-            axsB[1, 0].plot(tSpatialMaps, dissolvedFromSpatialMapsB[columnName], label=label+'*', color=color, linestyle=ls)
             axsB[1, 1].plot(tSpatialMaps, sealFromSpatialMapsB[columnName], label=label+'*', color=color, linestyle=ls)
         else:
             if np.isnan(csvData[:, 7]).all():
@@ -244,12 +249,6 @@ def assembleTimeSeries():
                 print(f'{group} only reported negative values for immB.')
             else:
                 axsB[0, 1].plot(t, csvData[:, 8], label=label, color=color, linestyle=ls)
-            if np.isnan(csvData[:, 9]).all():
-                print(f'{group} only reported nan for dissB.')
-            elif all(val < 0 for val in csvData[:, 9]):
-                print(f'{group} only reported negative values for dissB.')
-            else:
-                axsB[1, 0].plot(t, csvData[:, 9], label=label, color=color, linestyle=ls)
             if np.isnan(csvData[:, 10]).all():
                 print(f'{group} only reported nan for sealB.')
             elif all(val < 0 for val in csvData[:, 10]):
