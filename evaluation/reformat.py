@@ -120,9 +120,10 @@ def reformatDenseData(folder, case):
         z = np.zeros(numCells)
 
         for k in range(numZ):
+            z[k*numX*numY:(k+1)*numX*numY] = cellHeight*(k + 0.5)
             for j in range(numY):
-                x[j*numX:(j+1)*numX] = np.arange(0.5*cellWidth, cellWidth*numX, cellWidth)
-                y[j*numX:(j+1)*numX] = cellWidth*(j + 0.5)
+                x[k*numX*numY+j*numX:k*numX*numY+(j+1)*numX] = np.arange(0.5*cellWidth, cellWidth*numX, cellWidth)
+                y[k*numX*numY+j*numX:k*numX*numY+(j+1)*numX] = cellWidth*(j + 0.5)
     else:
         for j in range(numY):
             x[j*numX:(j+1)*numX] = np.arange(0.5*cellWidth, cellWidth*numX, cellWidth)
@@ -166,9 +167,10 @@ def reformatDenseData(folder, case):
                     csvData[:,2] = np.around(csvData[:,2], decimals=5)
                     ind = np.lexsort((csvData[:,0], csvData[:,1], csvData[:,2]))
                 csvData = csvData[ind]
-                if case == "a" or case == "b":
-                    csvData[:,0] = x
-                    csvData[:,1] = y
+                csvData[:,0] = x
+                csvData[:,1] = y
+                if case == "c":
+                    csvData[:,2] = z
 
                 requiredRows = numCells
                 if case == "a":
