@@ -20,24 +20,6 @@ logger = logging.getLogger(__name__)
 # ! ---- NAME MANAGEMENT ----
 
 
-def get_result_name_from_multiple(folder):
-    # folder has the structure .../team/speID/result<N> and is a Path object.
-    # Reduce to team<N>.
-    team = Path(folder).parts[-3]
-    result = Path(folder).parts[-1]
-    result = result.split("result")[-1]
-
-    return f"{team}{result}"
-
-
-def get_result_name_from_unique(folder):
-    # folder has the structure .../team/speID/result<N> and is a Path object.
-    # Reduce to team.
-    team = Path(folder).parts[-2]
-
-    return f"{team}"
-
-
 def split_result_name(result_name: str):
     """Split the result name into its components."""
 
@@ -51,40 +33,41 @@ def split_result_name(result_name: str):
     return team, result
 
 
-def identify_sparse_data(
-    sparse_data_folder: Path,
+def identify_data(
+    data_folder: Path,
     spe_case: SPECase,
     participants,
 ):
-    """Identify participants based on the folder structure and existence of files."""
+    """Identify participants based on the folder structure and existence of files.
 
-    # Find paths to relevant sparse data
-    for team in sparse_data_folder.iterdir():
-        spe_input_folder = team / spe_case.variant
+    The structure of the folder is assumed to be:
+        - team1
+            - {speID}_spatial_map_<time>.csv
+            - speID_time_series.csv
+        ...
+        - team<N>
+            - speID_time_series.csv
+        - ...
 
-        # Check if the folder "result1" is contained in spe_input_folder.
-        # Then multiple results are present. Otherwise, only one result is present,
-        # which is directly in spe_input_folder.
-        if (spe_input_folder / "result1").exists():
-            # Multiple results are present.
-            for result in spe_input_folder.iterdir():
-                if "result" not in result.name:
-                    continue
-                if (result / f"{spe_case.variant}_time_series.csv").exists():
-                    result_name = get_result_name_from_multiple(result)
-                    participants[result_name] = {
-                        "sparse": result / f"{spe_case.variant}_time_series.csv",
-                    }
-                else:
-                    warn(f"Skipping {team} {result.name}")
-        elif (spe_input_folder / f"{spe_case.variant}_time_series.csv").exists():
-            # Only one result is present
-            result_name = get_result_name_from_unique(spe_input_folder)
-            participants[result_name] = {
-                "sparse": spe_input_folder / f"{spe_case.variant}_time_series.csv",
-            }
-        else:
-            warn(f"Results missing for {spe_case.variant} - skipping {team}.")
+    Multiple submissions by the same team are marked with a number at the end of the team name.
+    If a team only has one submission, the number is anyhow used.
+
+    """
+    # Collect the data
+    team_submissions = {}
+    for submission in data_folder.iterdir():
+        participants[submission.name] = {
+            "sparse": submission / f"{spe_case.variant}_time_series.csv",
+        }
+        team, result = split_result_name(submission.name)
+        if team not in team_submissions:
+            team_submissions[team] = []
+        team_submissions[team].append(result)
+
+    # Clean the keys - omit number if the only submission by a team is "team1"
+    for team, submissions in team_submissions.items():
+        if submissions == ["1"]:
+            participants[team] = participants.pop(f"{team}1")
 
     return participants
 
