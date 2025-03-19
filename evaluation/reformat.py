@@ -104,7 +104,8 @@ def reformatDenseData(folder, case):
         numCells = numX*numY
         cellWidth = 1e1
     else:
-        timeSteps = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 75, 100, 150, 200, 250, 300, 350, 400, 450, 500, 600, 700, 800, 900, 1000]
+        timeSteps = [1000]
+#        timeSteps = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 75, 100, 150, 200, 250, 300, 350, 400, 450, 500, 600, 700, 800, 900, 1000]
         unit = "y"
         numX = 168
         numY = 100
@@ -119,11 +120,11 @@ def reformatDenseData(folder, case):
     if case == "c":
         z = np.zeros(numCells)
 
-        for k in range(numZ):
-            z[k*numX*numY:(k+1)*numX*numY] = cellHeight*(k + 0.5)
+        for k in range(numX):
+            x[k*numZ*numY:(k+1)*numZ*numY] = cellWidth*(k + 0.5)
             for j in range(numY):
-                x[k*numX*numY+j*numX:k*numX*numY+(j+1)*numX] = np.arange(0.5*cellWidth, cellWidth*numX, cellWidth)
-                y[k*numX*numY+j*numX:k*numX*numY+(j+1)*numX] = cellWidth*(j + 0.5)
+                y[k*numZ*numY+j*numZ:k*numZ*numY+(j+1)*numZ] = cellWidth*(j + 0.5)
+                z[k*numZ*numY+j*numZ:k*numZ*numY+(j+1)*numZ] = np.arange(0.5*cellHeight, cellHeight*numZ, cellHeight)
     else:
         for j in range(numY):
             x[j*numX:(j+1)*numX] = np.arange(0.5*cellWidth, cellWidth*numX, cellWidth)
@@ -161,16 +162,20 @@ def reformatDenseData(folder, case):
                     csvData[:,0] = np.around(csvData[:,0], decimals=5)
                     csvData[:,1] = np.around(csvData[:,1], decimals=5)
                     ind = np.lexsort((csvData[:,0], csvData[:,1]))
+                    csvData = csvData[ind]
+                    csvData[:,0] = x
+                    csvData[:,1] = y
                 else:
                     csvData[:,0] = np.around(csvData[:,0], decimals=5)
                     csvData[:,1] = np.around(csvData[:,1], decimals=3)
                     csvData[:,2] = np.around(csvData[:,2], decimals=5)
-                    ind = np.lexsort((csvData[:,0], csvData[:,1], csvData[:,2]))
-                csvData = csvData[ind]
-                csvData[:,0] = x
-                csvData[:,1] = y
-                if case == "c":
+                    ind = np.lexsort((csvData[:,2], csvData[:,1], csvData[:,0]))
+                    csvData = csvData[ind]
+                    csvData[:,0] = x
+                    csvData[:,1] = y
                     csvData[:,2] = z
+                    ind = np.lexsort((csvData[:,0], csvData[:,1], csvData[:,2]))
+                    csvData = csvData[ind]
 
                 requiredRows = numCells
                 if case == "a":
@@ -199,7 +204,7 @@ def reformatDenseData(folder, case):
                         csvData = csvData[:, :requiredColumns]
                         print("  Superfluous columns deleted.")
 
-                for col in range(requiredColumns):
+                for col in range(3, requiredColumns):
                     if all(val < 0 for val in csvData[:, col]):
                         print(f'Only negative values in column {col}, replacing by nan.')
                         csvData[:, col] = np.nan
