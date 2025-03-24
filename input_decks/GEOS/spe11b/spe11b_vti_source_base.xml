@@ -34,11 +34,11 @@
     <Box
       name="thermalSource1"
       xMin="{ 2699.99, -0.01, 299.99 }"
-      xMax="{ 2721.01,  1.01, 321.01 }" />
+      xMax="{ 2710.01,  1.01, 310.01 }" />
     <Box
       name="thermalSource2"
       xMin="{ 5099.99, -0.01, 699.99 }"
-      xMax="{ 5121.01,  1.01, 721.01 }" />
+      xMax="{ 5110.01,  1.01, 710.01 }" />
   </Geometry> 
 
   <ElementRegions>
