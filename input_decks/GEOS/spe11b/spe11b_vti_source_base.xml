@@ -16,37 +16,29 @@
         newtonTol="1.0e-4"
         maxTimeStepCuts="100"
         maxSubSteps="1000"
-	lineSearchAction="Attempt"
-	lineSearchStartingIteration="5"
+        lineSearchAction="Attempt"
+        lineSearchStartingIteration="5"
         timeStepIncreaseIterLimit="0.3"
         timeStepDecreaseIterLimit="0.6"
         newtonMaxIter="15" />
       <LinearSolverParameters
         solverType="fgmres"
-	preconditionerType="mgr"
+        preconditionerType="mgr"
         krylovTol="1e-5"
         krylovMaxIter="100"
-        logLevel="1" />
+        logLevel="1" />        
     </CompositionalMultiphaseFVM>
   </Solvers>
 
   <Geometry>
     <Box
-      name="top"
-      xMin="{   -0.01, -0.01, 1189.99 }"
-      xMax="{ 8400.01,  1.01, 1200.01 }" />
-    <Box
-      name="bottom"
-      xMin="{   -0.01, -0.01, -0.01 }"
-      xMax="{ 8400.01,  1.01, 10.01 }" />
-    <Box
       name="thermalSource1"
       xMin="{ 2699.99, -0.01, 299.99 }"
-      xMax="{ 2720.01,  1.01, 320.01 }" />
+      xMax="{ 2721.01,  1.01, 321.01 }" />
     <Box
       name="thermalSource2"
       xMin="{ 5099.99, -0.01, 699.99 }"
-      xMax="{ 5120.01,  1.01, 720.01 }" />
+      xMax="{ 5121.01,  1.01, 721.01 }" />
   </Geometry> 
 
   <ElementRegions>
@@ -187,8 +179,8 @@
       phaseNames="{ gas, water }"
       wettingNonWettingCapPressureTableName="cappresTable5" />
     <TableCapillaryPressure
-	name="cappres6"
-	phaseNames="{ gas, water }"
+      name="cappres6"
+      phaseNames="{ gas, water }"
       wettingNonWettingCapPressureTableName="cappresTable6" />
     <TableCapillaryPressure
       name="cappres7"

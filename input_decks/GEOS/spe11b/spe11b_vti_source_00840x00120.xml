@@ -16,6 +16,17 @@
     </VTKMesh>
   </Mesh>
 
+  <Geometry>
+    <Box
+      name="top"
+      xMin="{   -0.01, -0.01, 1189.99 }"
+      xMax="{ 8400.01,  1.01, 1200.01 }" />
+    <Box
+      name="bottom"
+      xMin="{   -0.01, -0.01, -0.01 }"
+      xMax="{ 8400.01,  1.01, 10.01 }" />
+  </Geometry> 
+
   <Functions>
     <TableFunction
       name="bufferVolume"
@@ -30,25 +41,19 @@
     maxTime="31536000000">
 
     <PeriodicEvent
-      name="outputs0"
-      beginTime="-31536000000"
-      endTime="-31535136000"
-      timeFrequency="864000"
-      targetExactTimestep="1"
-      target="/Outputs/vtkOutput" />
-    <PeriodicEvent
       name="outputs1"
       beginTime="0"
       endTime="3153600000"
-      timeFrequency="6307200"
+      timeFrequency="315360000"
       targetExactTimestep="1"
       target="/Outputs/vtkOutput" />
     <PeriodicEvent
       name="outputs2"
       beginTime="3153600000"
-      timeFrequency="157680000"
+      timeFrequency="3153600000"
       targetExactTimestep="1"
       target="/Outputs/vtkOutput" />
+
     <PeriodicEvent
       name="solverApplications0"
       beginTime="-31536000000"
