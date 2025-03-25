@@ -1,0 +1,111 @@
+<?xml version="1.0" ?>
+<Problem>
+    <!-- kr per facies -->
+    <BrooksCoreyRelativePermeability
+      name="relperm1"
+      phaseNames="{ gas, water }"
+      phaseMinVolumeFraction="{ 0.1, 0.32 }"
+      phaseRelPermExponent="{ 1.5, 1.5 }"
+      phaseRelPermMaxValue="{ 1.0, 1.0 }"/>
+    <BrooksCoreyRelativePermeability
+      name="relperm2"
+      phaseNames="{ gas, water }"
+      phaseMinVolumeFraction="{ 0.1, 0.14 }"
+      phaseRelPermExponent="{ 1.5, 1.5 }"
+      phaseRelPermMaxValue="{ 1.0, 1.0 }"/>
+    <BrooksCoreyRelativePermeability
+      name="relperm3"
+      phaseNames="{ gas, water }"
+      phaseMinVolumeFraction="{ 0.1, 0.12 }"
+      phaseRelPermExponent="{ 1.5, 1.5 }"
+      phaseRelPermMaxValue="{ 1.0, 1.0 }"/>
+    <BrooksCoreyRelativePermeability
+      name="relperm4"
+      phaseNames="{ gas, water }"
+      phaseMinVolumeFraction="{ 0.1, 0.12 }"
+      phaseRelPermExponent="{ 1.5, 1.5 }"
+      phaseRelPermMaxValue="{ 1.0, 1.0 }"/>
+    <BrooksCoreyRelativePermeability
+      name="relperm5"
+      phaseNames="{ gas, water }"
+      phaseMinVolumeFraction="{ 0.1, 0.12 }"
+      phaseRelPermExponent="{ 1.5, 1.5 }"
+      phaseRelPermMaxValue="{ 1.0, 1.0 }"/>
+    <BrooksCoreyRelativePermeability
+      name="relperm6"
+      phaseNames="{ gas, water }"
+      phaseMinVolumeFraction="{ 0.1, 0.1 }"
+      phaseRelPermExponent="{ 1.5, 1.5 }"
+      phaseRelPermMaxValue="{ 1.0, 1.0 }"/>
+    <!-- impermeable model -->
+    <BrooksCoreyRelativePermeability
+      name="relperm7"
+      phaseNames="{ gas, water }"
+      phaseMinVolumeFraction="{ 0.1, 0.1 }"
+      phaseRelPermExponent="{ 1.5, 1.5 }"
+      phaseRelPermMaxValue="{ 0.0001, 0.0001 }"/>
+
+    <ConstantDiffusion
+      name="diffusion"
+      phaseNames="{ gas, water }"
+      defaultPhaseDiffusivityMultipliers="{ 20, 1 }"
+      diffusivityComponents="{ 1e-9, 1e-9, 1e-9 }"/>
+    <ConstantDiffusion
+      name="noDiffusion"
+      phaseNames="{ gas, water }"
+      defaultPhaseDiffusivityMultipliers="{ 0, 0 }"
+      diffusivityComponents="{ 0, 0, 0 }"/>
+    
+    <!-- cap per facies -->
+    <BrooksCoreyCapillaryPressure
+      name="cappres1"
+      phaseNames="{gas,water}"
+      capPressureEpsilon="1e-3"
+      phaseCapPressureExponentInv="{1., 1.5}"
+      phaseEntryPressure="{0., 193531.4}"
+      phaseMinVolumeFraction="{ 0.1, 0.32 }" />
+    <BrooksCoreyCapillaryPressure
+      name="cappres2"
+      phaseNames="{gas,water}"
+      capPressureEpsilon="1e-3"
+      phaseCapPressureExponentInv="{1., 1.5}"
+      phaseEntryPressure="{0., 8655.0}"
+      phaseMinVolumeFraction="{ 0.1, 0.14 }" />
+    <BrooksCoreyCapillaryPressure
+      name="cappres3"
+      phaseNames="{gas,water}"
+      capPressureEpsilon="1e-3"
+      phaseCapPressureExponentInv="{1., 1.5}"
+      phaseEntryPressure="{0., 6120.}"
+      phaseMinVolumeFraction="{ 0.1, 0.12 }" />
+    <BrooksCoreyCapillaryPressure
+      name="cappres4"
+      phaseNames="{gas,water}"
+      capPressureEpsilon="1e-3"
+      phaseCapPressureExponentInv="{1., 1.5}"
+      phaseEntryPressure="{0., 3870.6}"
+      phaseMinVolumeFraction="{ 0.1, 0.12 }" />
+    <BrooksCoreyCapillaryPressure
+      name="cappres5"
+      phaseNames="{gas,water}"
+      capPressureEpsilon="1e-3"
+      phaseCapPressureExponentInv="{1., 1.5}"
+      phaseEntryPressure="{0., 3060.0}"
+      phaseMinVolumeFraction="{ 0.1, 0.12 }" />
+    <BrooksCoreyCapillaryPressure
+      name="cappres6"
+      phaseNames="{gas,water}"
+      capPressureEpsilon="1e-3"
+      phaseCapPressureExponentInv="{1., 1.5}"
+      phaseEntryPressure="{0., 2560.2}"
+      phaseMinVolumeFraction="{ 0.1, 0.1 }" />
+    <BrooksCoreyCapillaryPressure
+      name="cappres7"
+      phaseNames="{gas,water}"
+      capPressureEpsilon="1e-3"
+      phaseCapPressureExponentInv="{1., 1.5}"
+      phaseEntryPressure="{0.0, 0.0}"
+      phaseMinVolumeFraction="{0.1, 0.12}" />
+</Problem>
+	
+
