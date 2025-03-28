@@ -792,7 +792,7 @@ def plot_heatmap_distance_matrix(
 
     if path is not None:
         plt.tight_layout()
-        plt.savefig(path, dpi=1200)
+        plt.savefig(path, dpi=300)
         print(f"Saved heatmap to {path}.")
 
     plt.show()
