@@ -2,7 +2,9 @@
 <!--SPDX-License-Identifier: CC-BY-4.0-->
 # 11th SPE CSP
 
-This repository accompanies the 11th Society of Petroleum Engineers Comparative Solution Project, see https://spe.org/csp/.
+[![REUSE status](https://api.reuse.software/badge/github.com/Simulation-Benchmarks/11thSPE-CSP)](https://api.reuse.software/info/github.com/Simulation-Benchmarks/11thSPE-CSP)
+
+This repository accompanies the 11th Society of Petroleum Engineers Comparative Solution Project, see https://spe.org/csp/spe11/.
 
 To access data and scripts interactively, open this repo on the NFDI JupyterHub:
 [![NFDI](https://nfdi-jupyter.de/images/nfdi_badge.svg)](https://hub.nfdi-jupyter.de/v2/gh/Simulation-Benchmarks/11thSPE-CSP/HEAD?system=JSC-Cloud&flavor=xl1nfdi&labpath=notebooks%2Fstart.ipynb)
