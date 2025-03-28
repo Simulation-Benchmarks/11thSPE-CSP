@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2025 Jakub W. Both <jakub.both@uib.no>
+#
+# SPDX-License-Identifier: MIT
 from typing import Literal
 
 import matplotlib.pyplot as plt

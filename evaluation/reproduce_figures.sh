@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2025 Bernd Flemisch <bernd@iws.uni-stuttgart.de>
+# 
+# SPDX-License-Identifier: CC0-1.0
+
 python3 spe11a_visualize_spatial_maps.py -g TetraTech OPM4 Pau-Inria IFPEN -f /media/bernd/bernd/spe11/data -t 120
 python3 spe11a_assemble_time_series.py -g CSIRO1 CSIRO2 GEOS1 GEOS2 IFPEN OPM1 OPM2 OPM3 OPM4    TetraTech UT-CSEE1 UT-CSEE2 UT-CSEE3 -f /media/bernd/bernd/spe11/data -cAB Calgary CTC-CNE OpenGoSim -cC Calgary CAU-Kiel CTC-CNE PFLOTRAN Pau-Inria SLB1 SLB2 -t /media/bernd/bernd/spe11/evaluation/spe11a/sparse
 python3 spe11a_assemble_performance_time_series.py -g CAU-Kiel CSIRO1 CSIRO2 CTC-CNE IFPEN OPM1 OPM2 OPM3 OPM4 Pau-Inria UT-CSEE1 UT-CSEE2 UT-CSEE3 -f /media/bernd/bernd/spe11/data

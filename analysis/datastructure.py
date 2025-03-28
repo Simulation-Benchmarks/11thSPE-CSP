@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2025 Jakub W. Both <jakub.both@uib.no>
+#
+# SPDX-License-Identifier: MIT
 """Data classes for sparse and dense data."""
 
 import numpy as np
