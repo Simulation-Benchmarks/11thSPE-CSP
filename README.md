@@ -11,6 +11,8 @@ To access data and scripts interactively, open this repo on the NFDI JupyterHub:
 
 Navigate to one of the following folders for accessing the corresponding material:
 
+* [analysis](https://github.com/Simulation-Benchmarks/11thSPE-CSP/tree/main/analysis): scripts for calculating the SPE11 distance.
+
 * [description](https://github.com/Simulation-Benchmarks/11thSPE-CSP/tree/main/description): the official CSP description.
 
 * [evaluation](https://github.com/Simulation-Benchmarks/11thSPE-CSP/tree/main/evaluation): scripts for checking and evaluating results.
@@ -18,6 +20,8 @@ Navigate to one of the following folders for accessing the corresponding materia
 * [geometries](https://github.com/Simulation-Benchmarks/11thSPE-CSP/tree/main/geometries): geometry files and scripts for the three variants of the CSP.
 
 * [input_decks](https://github.com/Simulation-Benchmarks/11thSPE-CSP/tree/main/input_decks): grids and configuration files for specific simulators.
+
+* [notebooks](https://github.com/Simulation-Benchmarks/11thSPE-CSP/tree/main/notebooks): Jupyter notebooks illustrating the usage of the scripts.
 
 * [templates](https://github.com/Simulation-Benchmarks/11thSPE-CSP/tree/main/templates): the questionnaire sheet.
 
