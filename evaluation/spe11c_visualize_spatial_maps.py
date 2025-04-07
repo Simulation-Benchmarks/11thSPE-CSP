@@ -252,8 +252,12 @@ def visualizeSpatialMaps():
         titleTemp = f'temperature [°C] at {time} years'
 
     # select file that contains impermeable cells with 'nan' pressure values
-    fileNameTetra = os.path.join(folder, 'tetratech', 'spe11c', 'result2', f'spe11c_spatial_map_{time}y.csv')
-    p, s, mCO2Tetra, mH2O, rhoG, rhoL, tmCO2, temp = getFieldValues(fileNameTetra, nX, nY, nZ)
+    fileNameTetra = os.path.join(
+        folder, "tetratech2", f"spe11c_spatial_map_{time}y.csv"
+    )
+    p, s, mCO2Tetra, mH2O, rhoG, rhoL, tmCO2, temp = getFieldValues(
+        fileNameTetra, nX, nY, nZ
+    )
 
     for i, group in zip(range(len(groups)), groups):
         if groupFolders:
@@ -261,13 +265,15 @@ def visualizeSpatialMaps():
 
         if not group[-1].isnumeric():
             if not groupFolders:
-                baseFolder = os.path.join(folder, group.lower(), 'spe11c')
+                baseFolder = os.path.join(folder, f"{group.lower()}1")
         else:
             if not groupFolders:
-                baseFolder = os.path.join(folder, group[:-1].lower(), 'spe11c', f'result{group[-1]}')
+                baseFolder = os.path.join(folder, group.lower())
 
-        fileName = os.path.join(baseFolder, f'spe11c_spatial_map_{time}y.csv')
-        p3, s3, mCO23, mH2O3, rhoG3, rhoL3, tmCO23, temp3 = getFieldValues(fileName, nX, nY, nZ)
+        fileName = os.path.join(baseFolder, f"spe11c_spatial_map_{time}y.csv")
+        p3, s3, mCO23, mH2O3, rhoG3, rhoL3, tmCO23, temp3 = getFieldValues(
+            fileName, nX, nY, nZ
+        )
         p3[np.isnan(mCO2Tetra)] = np.nan
         s3[np.isnan(mCO2Tetra)] = np.nan
         mCO23[np.isnan(mCO2Tetra)] = np.nan

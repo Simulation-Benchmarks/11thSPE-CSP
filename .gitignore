@@ -4,6 +4,7 @@
 # Basic output files (generated)
 *.txt
 *.csv
+*.png
 
 # Python Byte-compiled / optimized / DLL files
 __pycache__/
@@ -35,4 +36,3 @@ MANIFEST
 
 # Jupyter notebooks
 .ipynb_checkpoints
-
