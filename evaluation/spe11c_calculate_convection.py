@@ -108,7 +108,7 @@ def calculateConvection():
 
         if group[-1].isnumeric():
             if not groupFolders:
-                baseFolder = os.path.join(folder, group[:-1], 'spe11c', f'result{group[-1]}')
+                baseFolder = os.path.join(folder, group)
             if group[:-1] in groups_and_colors:
                 color = groups_and_colors[group[:-1]]
             if group[-1] == '1': ls = '-'
@@ -117,7 +117,7 @@ def calculateConvection():
             elif group[-1] == '4': ls = ':'
         else:
             if not groupFolders:
-                baseFolder = os.path.join(folder, group, 'spe11c')
+                baseFolder = os.path.join(folder, f"{group}1")
             if group in groups_and_colors:
                 color = groups_and_colors[group]
             ls = '-'

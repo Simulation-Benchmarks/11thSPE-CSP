@@ -79,7 +79,7 @@ def calculateL2Differences():
     cellVolume = deltaX*deltaY*deltaZ
 
     # select file that contains impermeable cells with 'nan' pressure values
-    fileNameSLB = os.path.join(folder, 'slb', 'spe11c', f'spe11c_spatial_map_{year}y.csv')
+    fileNameSLB = os.path.join(folder, 'slb1', f'spe11c_spatial_map_{year}y.csv')
     pSLB, tmCO2, temp = getFieldValues(fileNameSLB, nX, nY, nZ)
 
 
@@ -93,10 +93,10 @@ def calculateL2Differences():
 
         if not group[-1].isnumeric():
             if not groupFolders:
-                baseFolder = os.path.join(folder, group, 'spe11c')
+                baseFolder = os.path.join(folder, f'{group}1')
         else:
             if not groupFolders:
-                baseFolder = os.path.join(folder, group[:-1], 'spe11c', f'result{group[-1]}')
+                baseFolder = os.path.join(folder, group)
 
         fileName = os.path.join(baseFolder, f'spe11c_spatial_map_{year}y.csv')
         p[:, i], tmCO2[:, i], temp[:, i] = getFieldValues(fileName, nX, nY, nZ)
