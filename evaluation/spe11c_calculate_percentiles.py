@@ -63,19 +63,19 @@ def assembleTimeSeries():
     numGroups = len(groups)
     numTimeSteps = 10001
     t = np.linspace(0, 1000*365*24*60*60, num=numTimeSteps)
-    p1 = np.zeros((numTimeSteps, numGroups));
-    p2 = np.zeros((numTimeSteps, numGroups));
-    mobA = np.zeros((numTimeSteps, numGroups));
-    immA = np.zeros((numTimeSteps, numGroups));
-    dissA = np.zeros((numTimeSteps, numGroups));
-    sealA = np.zeros((numTimeSteps, numGroups));
-    mobB = np.zeros((numTimeSteps, numGroups));
-    immB = np.zeros((numTimeSteps, numGroups));
-    dissB = np.zeros((numTimeSteps, numGroups));
-    sealB = np.zeros((numTimeSteps, numGroups));
-    mC = np.zeros((numTimeSteps, numGroups));
-    sealTot = np.zeros((numTimeSteps, numGroups));
-    boundary = np.zeros((numTimeSteps, numGroups));
+    p1 = np.zeros((numTimeSteps, numGroups))
+    p2 = np.zeros((numTimeSteps, numGroups))
+    mobA = np.zeros((numTimeSteps, numGroups))
+    immA = np.zeros((numTimeSteps, numGroups))
+    dissA = np.zeros((numTimeSteps, numGroups))
+    sealA = np.zeros((numTimeSteps, numGroups))
+    mobB = np.zeros((numTimeSteps, numGroups))
+    immB = np.zeros((numTimeSteps, numGroups))
+    dissB = np.zeros((numTimeSteps, numGroups))
+    sealB = np.zeros((numTimeSteps, numGroups))
+    mC = np.zeros((numTimeSteps, numGroups))
+    sealTot = np.zeros((numTimeSteps, numGroups))
+    boundary = np.zeros((numTimeSteps, numGroups))
 
     for i, group in zip(range(numGroups), groups):
         if groupFolders:
