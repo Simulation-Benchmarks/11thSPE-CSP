@@ -18,14 +18,14 @@ from round_to_digits import round_to_digits
 import utils
 
 def getFieldValues(fileName, nX, nY, nZ):
-    p = np.zeros([nX, nY, nZ]); p[:] = np.nan
-    s = np.zeros([nX, nY, nZ]); s[:] = np.nan
-    mCO2 = np.zeros([nX, nY, nZ]); mCO2[:] = np.nan
-    mH2O = np.zeros([nX, nY, nZ]); mH2O[:] = np.nan
-    rhoG = np.zeros([nX, nY, nZ]); rhoG[:] = np.nan
-    rhoL = np.zeros([nX, nY, nZ]); rhoL[:] = np.nan
-    tmCO2 = np.zeros([nX, nY, nZ]); tmCO2[:] = np.nan
-    temp = np.zeros([nX, nY, nZ]); temp[:] = np.nan
+    p = np.zeros([nX, nY, nZ])*np.nan
+    s = np.zeros([nX, nY, nZ])*np.nan
+    mCO2 = np.zeros([nX, nY, nZ])*np.nan
+    mH2O = np.zeros([nX, nY, nZ])*np.nan
+    rhoG = np.zeros([nX, nY, nZ])*np.nan
+    rhoL = np.zeros([nX, nY, nZ])*np.nan
+    tmCO2 = np.zeros([nX, nY, nZ])*np.nan
+    temp = np.zeros([nX, nY, nZ])*np.nan
 
     if os.path.isfile(fileName):
         print(f'Processing {fileName}.')
