@@ -3,6 +3,7 @@
 # 11th SPE CSP
 
 [![REUSE status](https://api.reuse.software/badge/github.com/Simulation-Benchmarks/11thSPE-CSP)](https://api.reuse.software/info/github.com/Simulation-Benchmarks/11thSPE-CSP)
+[![CodeFactor](https://www.codefactor.io/repository/github/simulation-benchmarks/11thspe-csp/badge)](https://www.codefactor.io/repository/github/simulation-benchmarks/11thspe-csp)
 
 This repository accompanies the 11th Society of Petroleum Engineers Comparative Solution Project, see https://spe.org/csp/spe11/.
 
