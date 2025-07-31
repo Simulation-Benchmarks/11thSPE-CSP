@@ -1,3 +1,5 @@
+<!--SPDX-FileCopyrightText: 2025 Jacques Franc <jacquesfrancdev@gmail.com-->
+<!--SPDX-License-Identifier: CC-BY-4.0-->
 ## GEOS input deck
 
 The *SPE11b* input deck for GEOS open-source simulator can be found in the repository under [/inputFiles/compositionalMultiphaseFlow/benchmarks/SPE11/b](https://github.com/GEOS-DEV/GEOS/tree/develop/inputFiles/compositionalMultiphaseFlow/benchmarks/SPE11/b).
