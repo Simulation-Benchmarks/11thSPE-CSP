@@ -1,0 +1,103 @@
+# SPDX-FileCopyrightText: 2025 Bernd Flemisch <bernd@iws.uni-stuttgart.de>
+# SPDX-License-Identifier: CC0-1.0
+
+[build-system]
+requires = ["setuptools>=65.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "spe11-csp"
+version = "1.0.0"
+description = "11th Society of Petroleum Engineers Comparative Solution Project. This project uses REUSE for comprehensive license and copyright information."
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "MIT AND CC-BY-4.0 AND CC0-1.0"}
+authors = [
+    {name = "Bernd Flemisch", email = "bernd@iws.uni-stuttgart.de"},
+    {name = "David Landa Marban", email = "dmar@norceresearch.no"},
+    {name = "Dennis Gläser", email = "dennis.a.glaeser@gmail.com"},
+    {name = "Jakub Both", email = "jakub.both@uib.no"},
+    {name = "Jan Martin Nordbotten", email = "jan.nordbotten@uib.no"},
+    {name = "Kai Wendel", email = "kai.wendel@iws.uni-stuttgart.de"},
+    {name = "Olav Møyner", email = "olav.moyner@gmail.com"},
+    {name = "Tim Kreuzer", email = "t.kreuzer@fz-juelich.de"},
+    {name = "Timo Koch", email = "timo.koch@iws.uni-stuttgart.de"},
+    {name = "Tor Harald Sandve", email = "tosa@norceresearch.no"},
+    {name = "Jacques Franc", email = "jfranc@stanford.edu"},
+    {name = "Marie Ann Giddins", email = "giddins@slb.com"}
+]
+keywords = ["engineering", "simulation", "benchmark", "CO2", "GCS"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "License :: OSI Approved :: Creative Commons Attribution 4.0 International",
+    "License :: CC0 1.0 Universal (CC0 1.0) Public Domain Dedication",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering",
+]
+dependencies = [
+    "numpy==1.24.4",
+    "matplotlib==3.8.0",
+    "seaborn==0.13.0",
+    "scipy",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "black>=23.0",
+    "flake8>=6.0",
+    "isort>=5.0",
+    "mypy>=1.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/Simulation-Benchmarks/11thSPE-CSP"
+Repository = "https://github.com/Simulation-Benchmarks/11thSPE-CSP.git"
+Documentation = "https://github.com/Simulation-Benchmarks/11thSPE-CSP"
+Issues = "https://github.com/Simulation-Benchmarks/11thSPE-CSP/issues"
+REUSE = "https://reuse.software/"
+
+[tool.setuptools]
+packages = ["analysis", "evaluation", "geometries", "thermodynamics"]
+
+[tool.setuptools.package-data]
+analysis = ["*.npy"]
+evaluation = ["*.npy", "*.sh"]
+
+[tool.black]
+line-length = 100
+target-version = ["py38", "py39", "py310", "py311", "py312"]
+
+[tool.isort]
+profile = "black"
+line_length = 100
+
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+
+[tool.pytest.ini_options]
+addopts = "--cov=analysis --cov=evaluation --cov=geometries --cov=thermodynamics"
+testpaths = ["tests"]
+
+[tool.reuse]
+version = "1.0"
+comments = [
+    "This project follows the REUSE Specification to make licensing information explicit and machine-readable.",
+    "Each file contains SPDX headers with copyright and license information.",
+    "See LICENSES/ directory for full license texts."
+]
+depreciated = false
