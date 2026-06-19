@@ -2,7 +2,7 @@
 <!--SPDX-License-Identifier: CC-BY-4.0-->
 # 11th SPE CSP
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20760402.svg)](https://doi.org/10.5281/zenodo.20760402)
+[![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.20760402-blue)](https://doi.org/10.5281/zenodo.20760402)
 [![REUSE status](https://api.reuse.software/badge/github.com/Simulation-Benchmarks/11thSPE-CSP)](https://api.reuse.software/info/github.com/Simulation-Benchmarks/11thSPE-CSP)
 [![CodeFactor](https://www.codefactor.io/repository/github/simulation-benchmarks/11thspe-csp/badge)](https://www.codefactor.io/repository/github/simulation-benchmarks/11thspe-csp)
 
