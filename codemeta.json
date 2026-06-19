@@ -1,0 +1,131 @@
+{
+  "@context": "https://w3id.org/codemeta/3.0",
+  "@type": "SoftwareSourceCode",
+  "name": "11th SPE CSP",
+  "identifier": "spe11-csp",
+  "version": "1.0.0",
+  "description": "Repository accompanying the 11th Society of Petroleum Engineers Comparative Solution Project (SPE11 CSP). Includes geometry files, simulator input decks, scripts for thermodynamics, geometry generation, result evaluation, and Jupyter notebooks illustrating their usage.",
+  "license": [
+    "https://spdx.org/licenses/MIT.html",
+    "https://spdx.org/licenses/CC-BY-4.0.html",
+    "https://spdx.org/licenses/CC0-1.0.html"
+  ],
+  "codeRepository": "https://github.com/Simulation-Benchmarks/11thSPE-CSP",
+  "url": "https://spe.org/csp/spe11/",
+  "issueTracker": "https://github.com/Simulation-Benchmarks/11thSPE-CSP/issues",
+  "dateCreated": "2023-03-24",
+  "dateModified": "2026-04-20",
+  "datePublished": "2026-04-20",
+  "programmingLanguage": [
+    {
+      "@type": "ComputerLanguage",
+      "name": "Python",
+      "version": ">=3.8"
+    }
+  ],
+  "keywords": [
+    "benchmark",
+    "CO2",
+    "geological carbon storage",
+    "GCS",
+    "simulation",
+    "petroleum engineering",
+    "comparative solution project",
+    "SPE11"
+  ],
+  "author": [
+    {
+      "@type": "Person",
+      "@id": "https://orcid.org/0000-0001-8188-620X",
+      "givenName": "Bernd",
+      "familyName": "Flemisch",
+      "email": "bernd@iws.uni-stuttgart.de"
+    },
+    {
+      "@type": "Person",
+      "@id": "https://orcid.org/0000-0002-3343-1005",
+      "givenName": "David",
+      "familyName": "Landa Marbán",
+      "email": "dmar@norceresearch.no"
+    },
+    {
+      "@type": "Person",
+      "@id": "https://orcid.org/0000-0001-9646-881X",
+      "givenName": "Dennis",
+      "familyName": "Gläser",
+      "email": "dennis.a.glaeser@gmail.com"
+    },
+    {
+      "@type": "Person",
+      "@id": "https://orcid.org/0000-0001-6131-4976",
+      "givenName": "Jakub",
+      "familyName": "Both",
+      "email": "jakub.both@uib.no"
+    },
+    {
+      "@type": "Person",
+      "@id": "https://orcid.org/0000-0003-1455-5704",
+      "givenName": "Jan Martin",
+      "familyName": "Nordbotten",
+      "email": "jan.nordbotten@uib.no"
+    },
+    {
+      "@type": "Person",
+      "@id": "https://orcid.org/0000-0003-1871-1540",
+      "givenName": "Kai",
+      "familyName": "Wendel",
+      "email": "kai.wendel@iws.uni-stuttgart.de"
+    },
+    {
+      "@type": "Person",
+      "@id": "https://orcid.org/0000-0001-9993-3879",
+      "givenName": "Olav",
+      "familyName": "Møyner",
+      "email": "olav.moyner@gmail.com"
+    },
+    {
+      "@type": "Person",
+      "@id": "https://orcid.org/0000-0001-7301-4495",
+      "givenName": "Tim",
+      "familyName": "Kreuzer",
+      "email": "t.kreuzer@fz-juelich.de"
+    },
+    {
+      "@type": "Person",
+      "@id": "https://orcid.org/0000-0003-4776-5222",
+      "givenName": "Timo",
+      "familyName": "Koch",
+      "email": "timo.koch@iws.uni-stuttgart.de"
+    },
+    {
+      "@type": "Person",
+      "@id": "https://orcid.org/0000-0002-3267-8276",
+      "givenName": "Tor Harald",
+      "familyName": "Sandve",
+      "email": "tosa@norceresearch.no"
+    },
+    {
+      "@type": "Person",
+      "@id": "https://orcid.org/0000-0002-8833-9425",
+      "givenName": "Jacques",
+      "familyName": "Franc",
+      "email": "jfranc@stanford.edu"
+    },
+    {
+      "@type": "Person",
+      "@id": "https://orcid.org/0000-0001-7486-5013",
+      "givenName": "Marie Ann",
+      "familyName": "Giddins",
+      "email": "giddins@slb.com"
+    }
+  ],
+  "developmentStatus": "active",
+  "operatingSystem": "any",
+  "softwareRequirements": [
+    "Python >= 3.8",
+    "numpy == 1.24.4",
+    "matplotlib == 3.8.0",
+    "seaborn == 0.13.0",
+    "scipy"
+  ]
+}

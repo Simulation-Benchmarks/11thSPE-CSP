@@ -1,0 +1,78 @@
+# SPDX-FileCopyrightText: 2025 Bernd Flemisch <bernd@iws.uni-stuttgart.de>
+# SPDX-License-Identifier: CC0-1.0
+
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+type: software
+title: "11th SPE CSP"
+abstract: >-
+  Repository accompanying the 11th Society of Petroleum Engineers Comparative
+  Solution Project (SPE11 CSP). Includes geometry files, simulator input decks,
+  scripts for thermodynamics, geometry generation, result evaluation, and
+  Jupyter notebooks illustrating their usage.
+version: "1.0.0"
+date-released: "2026-04-20"
+license:
+  - MIT
+  - CC-BY-4.0
+  - CC0-1.0
+repository-code: "https://github.com/Simulation-Benchmarks/11thSPE-CSP"
+url: "https://spe.org/csp/spe11/"
+keywords:
+  - benchmark
+  - CO2
+  - geological carbon storage
+  - GCS
+  - simulation
+  - petroleum engineering
+  - comparative solution project
+  - SPE11
+authors:
+  - family-names: Flemisch
+    given-names: Bernd
+    email: bernd@iws.uni-stuttgart.de
+    orcid: "https://orcid.org/0000-0001-8188-620X"
+  - family-names: Landa Marbán
+    given-names: David
+    email: dmar@norceresearch.no
+    orcid: "https://orcid.org/0000-0002-3343-1005"
+  - family-names: Gläser
+    given-names: Dennis
+    email: dennis.a.glaeser@gmail.com
+    orcid: "https://orcid.org/0000-0001-9646-881X"
+  - family-names: Both
+    given-names: Jakub
+    email: jakub.both@uib.no
+    orcid: "https://orcid.org/0000-0001-6131-4976"
+  - family-names: Nordbotten
+    given-names: Jan Martin
+    email: jan.nordbotten@uib.no
+    orcid: "https://orcid.org/0000-0003-1455-5704"
+  - family-names: Wendel
+    given-names: Kai
+    email: kai.wendel@iws.uni-stuttgart.de
+    orcid: "https://orcid.org/0000-0003-1871-1540"
+  - family-names: Møyner
+    given-names: Olav
+    email: olav.moyner@gmail.com
+    orcid: "https://orcid.org/0000-0001-9993-3879"
+  - family-names: Kreuzer
+    given-names: Tim
+    email: t.kreuzer@fz-juelich.de
+    orcid: "https://orcid.org/0000-0001-7301-4495"
+  - family-names: Koch
+    given-names: Timo
+    email: timo.koch@iws.uni-stuttgart.de
+    orcid: "https://orcid.org/0000-0003-4776-5222"
+  - family-names: Sandve
+    given-names: Tor Harald
+    email: tosa@norceresearch.no
+    orcid: "https://orcid.org/0000-0002-3267-8276"
+  - family-names: Franc
+    given-names: Jacques
+    email: jfranc@stanford.edu
+    orcid: "https://orcid.org/0000-0002-8833-9425"
+  - family-names: Giddins
+    given-names: Marie Ann
+    email: giddins@slb.com
+    orcid: "https://orcid.org/0000-0001-7486-5013"
