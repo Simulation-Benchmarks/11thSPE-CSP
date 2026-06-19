@@ -76,3 +76,118 @@ authors:
     given-names: Marie Ann
     email: giddins@slb.com
     orcid: "https://orcid.org/0000-0001-7486-5013"
+# doi: "10.5281/zenodo.XXXXXXX"  # Add after Zenodo archiving
+
+preferred-citation:
+  type: article
+  title: "The 11th Society of Petroleum Engineers Comparative Solution Project: Problem Definition"
+  authors:
+    - family-names: Nordbotten
+      given-names: Jan M.
+    - family-names: Fernø
+      given-names: Martin A.
+    - family-names: Flemisch
+      given-names: Bernd
+    - family-names: Kovscek
+      given-names: Anthony R.
+    - family-names: Lie
+      given-names: Knut-Andreas
+  journal: "SPE Journal"
+  volume: 29
+  issue: 5
+  start: 2507
+  end: 2524
+  year: 2024
+  doi: "10.2118/218015-PA"
+
+references:
+  - type: article
+    title: "Benchmarking CO₂ storage simulations: Results from the 11th Society of Petroleum Engineers Comparative Solution Project"
+    authors:
+      - family-names: Nordbotten
+        given-names: Jan M.
+      - family-names: Fernø
+        given-names: Martin A.
+      - family-names: Flemisch
+        given-names: Bernd
+      - family-names: Kovscek
+        given-names: Anthony R.
+      - family-names: Lie
+        given-names: Knut-Andreas
+      - family-names: Both
+        given-names: Jakub W.
+      - family-names: Møyner
+        given-names: Olav
+      - family-names: Sandve
+        given-names: Tor Harald
+      - family-names: Ahusborde
+        given-names: Etienne
+      - family-names: Bauer
+        given-names: Sebastian
+      - family-names: Chen
+        given-names: Zhangxing
+      - family-names: Class
+        given-names: Holger
+      - family-names: Di
+        given-names: Chaojie
+      - family-names: Ding
+        given-names: Didier
+      - family-names: Element
+        given-names: David
+      - family-names: Flauraud
+        given-names: Eric
+      - family-names: Franc
+        given-names: Jacques
+      - family-names: Gasanzade
+        given-names: Firdovsi
+      - family-names: Ghomian
+        given-names: Yousef
+      - family-names: Giddins
+        given-names: Marie Ann
+      - family-names: Green
+        given-names: Christopher
+      - family-names: Fernandes
+        given-names: Bruno R.B.
+      - family-names: Hadjisotiriou
+        given-names: George
+      - family-names: Hammond
+        given-names: Glenn
+      - family-names: Huang
+        given-names: Hai
+      - family-names: Kachuma
+        given-names: Dickson
+      - family-names: Kern
+        given-names: Michel
+      - family-names: Koch
+        given-names: Timo
+      - family-names: Krishnamurthy
+        given-names: Prasanna
+      - family-names: Lye
+        given-names: Kjetil Olsen
+      - family-names: Landa-Marbán
+        given-names: David
+      - family-names: Nole
+        given-names: Michael
+      - family-names: Orsini
+        given-names: Paolo
+      - family-names: Ruby
+        given-names: Nicolas
+      - family-names: Salinas
+        given-names: Pablo
+      - family-names: Sayyafzadeh
+        given-names: Mohammad
+      - family-names: Torben
+        given-names: Jakob
+      - family-names: Turner
+        given-names: Adam
+      - family-names: Voskov
+        given-names: Denis V.
+      - family-names: Wendel
+        given-names: Kai
+      - family-names: Youssef
+        given-names: AbdAllah A.
+    journal: "International Journal of Greenhouse Gas Control"
+    volume: 148
+    start: 104519
+    year: 2025
+    doi: "10.1016/j.ijggc.2025.104519"
