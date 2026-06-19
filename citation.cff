@@ -76,7 +76,7 @@ authors:
     given-names: Marie Ann
     email: giddins@slb.com
     orcid: "https://orcid.org/0000-0001-7486-5013"
-# doi: "10.5281/zenodo.XXXXXXX"  # Add after Zenodo archiving
+doi: "10.5281/zenodo.20760402"
 
 preferred-citation:
   type: article
