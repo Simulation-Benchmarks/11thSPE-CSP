@@ -1,0 +1,48 @@
+version = 1
+SPDX-PackageName = "11thSPE-CSP"
+
+[[annotations]]
+path = "codemeta.json"
+SPDX-FileCopyrightText = "2025 Bernd Flemisch <bernd@iws.uni-stuttgart.de>"
+SPDX-License-Identifier = "CC0-1.0"
+
+[[annotations]]
+path = [
+    "notebooks/start.ipynb",
+    "notebooks/spe11a_compare_own_result.ipynb",
+    "notebooks/spe11a_visualization.ipynb",
+    "notebooks/spe11b_compare_own_result.ipynb",
+    "notebooks/spe11b_visualization.ipynb",
+    "notebooks/spe11c_compare_own_result.ipynb",
+    "notebooks/spe11c_visualization.ipynb",
+]
+SPDX-FileCopyrightText = "2025 Bernd Flemisch <bernd@iws.uni-stuttgart.de>"
+SPDX-License-Identifier = "CC-BY-4.0"
+
+[[annotations]]
+path = [
+    "notebooks/spe11a_data_analysis.ipynb",
+    "notebooks/spe11b_data_analysis.ipynb",
+    "notebooks/spe11c_data_analysis.ipynb",
+]
+SPDX-FileCopyrightText = "2025 Jakub W. Both <jakub.both@uib.no>"
+SPDX-License-Identifier = "CC-BY-4.0"
+
+[[annotations]]
+path = [
+    "evaluation/spe11a_facies.npy",
+    "evaluation/spe11b_facies.npy",
+    "evaluation/spe11c_facies.npy",
+]
+SPDX-FileCopyrightText = "2025 Jakub W. Both <jakub.both@uib.no>"
+SPDX-License-Identifier = "CC0-1.0"
+
+[[annotations]]
+path = "description/spe_csp11_description.pdf"
+SPDX-FileCopyrightText = "2023 Jan M. Nordbotten <jan.nordbotten@uib.no>, Martin A. Fernø, Bernd Flemisch, Anthony R. Kovscek, Knut-Andreas Lie"
+SPDX-License-Identifier = "CC-BY-4.0"
+
+[[annotations]]
+path = "templates/spe11_questionnaire.xlsx"
+SPDX-FileCopyrightText = "2024 Jan M. Nordbotten <jan.nordbotten@uib.no>, Martin A. Fernø, Bernd Flemisch, Anthony R. Kovscek, Knut-Andreas Lie"
+SPDX-License-Identifier = "CC-BY-4.0"
